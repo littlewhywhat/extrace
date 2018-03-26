@@ -22,8 +22,17 @@ Use -j[n] option on sync & build steps, if build host has a good number of CPU c
 
 Graphics HAL of this build : https://github.com/anholt/mesa/wiki/VC4
 
-## Run unit test on target
+## Build and run unit tests
 
+* on target
 ```
+source build/envsetup.sh
+lunch rpi3-eng
 python ./development/testrunner/runtest.py -x frameworks/native/cmds/extrace/
+```
+
+* on host linux x86-64
+```
+make extrace_test_host
+./out/host/linux-86/bin/extrace_test64
 ```

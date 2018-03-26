@@ -15,12 +15,12 @@ LOCAL_CFLAGS := -Werror -Wall
 
 include $(BUILD_EXECUTABLE)
 
-# greeter_test
-# ===============
+# extrace_test target
+# ===================
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := greeter_test
+LOCAL_MODULE := extrace_test
 LOCAL_MODULE_TAGS := tests
 
 LOCAL_CFLAGS := -Werror -Wall
@@ -28,8 +28,30 @@ LOCAL_CFLAGS := -Werror -Wall
 LOCAL_SRC_FILES := \
     src/greeter.cpp \
     src/greeter_test.cpp \
+    src/extrace_test.cpp \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock \
 
 include $(BUILD_NATIVE_TEST)
+
+# extrace_test
+# =================
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := extrace_test_host
+LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE_HOST := linux
+
+LOCAL_CFLAGS := -Werror -Wall
+
+LOCAL_SRC_FILES := \
+    src/greeter.cpp \
+    src/greeter_test.cpp \
+    src/extrace_test.cpp \
+
+LOCAL_STATIC_LIBRARIES := \
+    libgmock_host \
+
+include $(BUILD_HOST_NATIVE_TEST)

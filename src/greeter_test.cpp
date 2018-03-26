@@ -35,7 +35,3 @@ class GreeterTest : public ::testing::Test {
   private:
   	Greeter greeter;
 };
-
-TEST_F(GreeterTest, greet) {
-  test_greet();
-}
