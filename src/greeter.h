@@ -17,8 +17,16 @@
 #ifndef LTTLWHWHT_GREETER_H
 #define LTTLWHWHT_GREETER_H
 
+//! Greeter greets smb
+/*!
+    Says hello to anybody you want in std out
+*/
 class Greeter {
   public:
+    //! Greets whom in out
+    /*!
+        Greets whom in std out
+    */
     void greet(const char * whom);
 };
 
