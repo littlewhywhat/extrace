@@ -11,7 +11,7 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_MODULE:= extrace
 
-LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
 
 include $(BUILD_EXECUTABLE)
 
@@ -23,7 +23,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := extrace_test
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
 
 LOCAL_SRC_FILES := \
     src/greeter.cpp \
@@ -44,7 +44,7 @@ LOCAL_MODULE := extrace_test_host
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE_HOST := linux
 
-LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
 
 LOCAL_SRC_FILES := \
     src/greeter.cpp \

@@ -25,6 +25,8 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
                  ${CMAKE_BINARY_DIR}/googletest-build
                  EXCLUDE_FROM_ALL)
 
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "-Wall -Werror")
 # create and separate lists of necessary sources:
 # - OBJ_SOURCES, MAIN, TEST_SOURCES
 include_directories("src")
