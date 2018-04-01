@@ -35,6 +35,5 @@ class GreeterTest : public ::testing::Test {
       ASSERT_STREQ(stdout_.c_str(), greeting);
   	}
   private:
-    //! Tested greeter
   	Greeter greeter;
 };
