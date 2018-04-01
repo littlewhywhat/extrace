@@ -1,4 +1,4 @@
-# Extrace
+# Extrace [![Build Status](https://travis-ci.org/littlewhywhat/extrace.svg?branch=master)](https://travis-ci.org/littlewhywhat/extrace)[![Waffle.io - Columns and their card count](https://badge.waffle.io/littlewhywhat/extrace.svg?columns=all)](https://waffle.io/littlewhywhat/extrace)
 Enhanced tracing tool for Android derived from atrace
 
 ## Build
