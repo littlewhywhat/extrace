@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-#include "greeter.h"
-#include "argsparser.h"
-#include "arguments.h"
 #include "invalidoptionexception.h"
 
-int main(int argc, const char ** argv)
-{
-  Arguments args;
-  ArgsParser parser;
-  parser.register_string("-name", "name");
-  try {
-    parser.parse(args, argc, argv);
-  }
-  catch (const InvalidOptionException & e)
-  {
-    printf("%s\n", e.what());
-    return 1;
-  }
+#include <sstream>
+#include <string>
 
-  Greeter greeter;
-  std::string whom;
-  if (args.has_string("name"))
-  {
-    whom = args.get_string("name");
-  }
-  else
-  {
-    whom = "World";
-  }
-  greeter.greet(whom.c_str());
-  return 0;
+InvalidOptionException::InvalidOptionException(const std::string & what_option):
+    std::exception() {
+  std::ostringstream oss;
+  oss << "Invalid option: " << what_option;
+  this->m_Message = oss.str();
+}
+
+InvalidOptionException::InvalidOptionException(const char * what_option):
+    std::exception() {
+  std::ostringstream oss;
+  oss << "Invalid option: " << what_option;
+  this->m_Message = oss.str();
+}
+
+const char* InvalidOptionException::what() const noexcept
+{
+  return this->m_Message.c_str();
 }
