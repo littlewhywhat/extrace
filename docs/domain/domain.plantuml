@@ -1,0 +1,71 @@
+@startuml
+
+title Domain Model
+
+class MachineTrace {
+  /' trace to run on machine
+   '/
+  - options
+    ' other available trace options on machine with default values
+  - report
+    ' report of trace
+  - is_started
+    ' signals that trace is started
+  --
+  + start()
+  + stop()
+  + setup(arguments)
+    ' overwrite Machine options with trace_options
+  + reset()
+    ' reset Machine options to default
+  + clear()
+    ' clear previous report
+  + dump_report(where)
+    ' dump report to where
+}
+hide MachineTrace circle
+
+class TracingCategory {
+  ' category to trace on machine
+  - id
+  ' identifier of category
+}
+hide TracingCategory methods
+hide TracingCategory circle
+
+class TraceSession {
+  /' trace session of machine trace
+     this class abstracts trace options
+     that are not related to machine
+     such as delay, duration, async_start, output
+   '/
+  - options
+    ' delay start, duration
+  --
+  + start()
+    ' start trace session on Machine
+  + stop()
+    ' stop trace session
+}
+hide TraceSession circle
+
+MachineTrace - TraceSession : runs <
+/' trace session runs MachineTrace '/
+TracingCategory "*" -- MachineTrace : supports <
+' available trace categories on machine
+
+class ExtraceApp {
+  ' bash application to run trace or provide other information
+  - options
+    ' options provided by user using cmdline arguments
+  --
+  + setup_by(args)
+    ' convert user cmdline args to options
+  + run()
+    ' run application with options
+}
+hide ExtraceApp circle
+
+TraceSession - ExtraceApp: runs <
+
+@enduml
