@@ -14,35 +14,20 @@
  * limitations under the License.
  */
 
-#include "greeter.h"
-#include "argsparser.h"
-#include "arguments.h"
-#include "invalidoptionexception.h"
+#ifndef LTTLWHWHT_INVARGEXCEPT_H
+#define LTTLWHWHT_INVARGEXCEPT_H
 
-int main(int argc, const char ** argv)
+#include <string>
+#include <stdexcept>
+
+class InvalidOptionException : public std::exception
 {
-  Arguments args;
-  ArgsParser parser;
-  parser.register_string("-name", "name");
-  try {
-    parser.parse(args, argc, argv);
-  }
-  catch (const InvalidOptionException & e)
-  {
-    printf("%s\n", e.what());
-    return 1;
-  }
+  public:
+    InvalidOptionException(const std::string & what_option);
+    InvalidOptionException(const char * what_option);
+    const char* what() const noexcept override;
+  private:
+    std::string m_Message;
+};
 
-  Greeter greeter;
-  std::string whom;
-  if (args.has_string("name"))
-  {
-    whom = args.get_string("name");
-  }
-  else
-  {
-    whom = "World";
-  }
-  greeter.greet(whom.c_str());
-  return 0;
-}
+#endif // LTTLWHWHT_INVARGEXCEPT_H
