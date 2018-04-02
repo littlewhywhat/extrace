@@ -17,19 +17,16 @@
 #include "greeter.h"
 #include "argsparser.h"
 #include "arguments.h"
-#include "invalidoptionexception.h"
 
 int main(int argc, const char ** argv)
 {
   Arguments args;
   ArgsParser parser;
   parser.register_string("-name", "name");
-  try {
-    parser.parse(args, argc, argv);
-  }
-  catch (const InvalidOptionException & e)
+  int i = parser.parse(args, argc, argv);
+  if (i < argc)
   {
-    printf("%s\n", e.what());
+    printf("Invalid option: %s\n", argv[i]);
     return 1;
   }
 

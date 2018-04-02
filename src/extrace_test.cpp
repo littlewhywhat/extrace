@@ -53,5 +53,4 @@ TEST_F(ArgsParserTest, parse) {
 TEST_F(ArgsParserTest, invalid_parse) {
   test_invalid_parse_boolean();
   test_invalid_parse_int_or_string();
-  test_invalid_parse_int();
 }
