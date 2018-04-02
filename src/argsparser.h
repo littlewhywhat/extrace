@@ -29,7 +29,9 @@ class ArgsParser {
     //! Registers string option with specified name under provided specifier
     void register_string(const char * specifier, const char * option_name);
     //! Parses argv using list of registered options to arguments
-    void parse(Arguments & arguments, int argc, const char ** argv);
+    // Returns index of last processed arg from argv or argc value if processed
+    // all without error
+    int parse(Arguments & arguments, int argc, const char ** argv);
   private:
     //! Stores registered boolean options
     std::map<std::string, std::string> boolean_opt_names;

@@ -15,7 +15,6 @@
  */
 
 #include "argsparser.h"
-#include "invalidoptionexception.h"
 
 #include "stdio.h"
 
@@ -49,35 +48,35 @@ void ArgsParser::register_string(const char * specifier, const char * option_nam
   this->string_opt_names[specifier] = option_name;
 }
 
-void ArgsParser::parse(Arguments & arguments, int argc, const char ** argv)
+int ArgsParser::parse(Arguments & arguments, int argc, const char ** argv)
 {
-  for (int i = 1; i < argc; i++)
+  int i = 1;
+  while (i < argc)
   {
     const char * arg = argv[i];
     if (is_boolean_spec(arg))
     {
       arguments.put_boolean(this->boolean_opt_names[arg].c_str());
+      i++;
       continue;
     }
-    if ((i+1) < argc)
+    if ((i+1) == argc)
     {
-      if (is_integer_spec(arg))
-      {
-        try 
-        {
-          arguments.put_integer(this->integer_opt_names[arg].c_str(), std::stoi(argv[i+1]));
-          i++;
-          continue;
-        }
-        catch (const std::invalid_argument & e) {}
-      }
-      else if (is_string_spec(arg))
-      {
-        arguments.put_string(this->string_opt_names[arg].c_str(), argv[i+1]);
-        i++;
-        continue;
-      }
+      break;
     }
-    throw InvalidOptionException(arg);
+    if (is_integer_spec(arg))
+    {
+      arguments.put_integer(this->integer_opt_names[arg].c_str(), std::stoi(argv[i+1]));
+    }
+    else if (is_string_spec(arg))
+    {
+      arguments.put_string(this->string_opt_names[arg].c_str(), argv[i+1]);
+    }
+    else
+    {
+      break;
+    }
+    i+=2;
   }
+  return i;
 }

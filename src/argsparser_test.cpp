@@ -16,7 +16,6 @@
 
 #include <gtest/gtest.h>
 
-#include "invalidoptionexception.h"
 #include "argsparser.h"
 
 //! Tests ArgsParser
@@ -99,7 +98,7 @@ class ArgsParserTest : public ::testing::Test {
       const char * argv[]         = { "argsparser_test",
                                       "-b" };
       Arguments args;
-      ASSERT_THROW(parser.parse(args, argc, argv), InvalidOptionException);
+      ASSERT_EQ(parser.parse(args, argc, argv), 1);
     }
     //! Tests invalid parsing
     void test_invalid_parse_int_or_string() {
@@ -107,17 +106,9 @@ class ArgsParserTest : public ::testing::Test {
       const char * argv[]         = { "argsparser_test",
                                       "-b", "unknown" };
       Arguments args;
-      ASSERT_THROW(parser.parse(args, argc, argv), InvalidOptionException);
+      ASSERT_EQ(parser.parse(args, argc, argv), 1);
     }
-    //! Tests invalid parsing
-    void test_invalid_parse_int() {
-      const int    argc           = 3;
-      const char * argv[]         = { "argsparser_test",
-                                      "-b", "a7" };
-      Arguments args;
-      parser.register_integer("-b", "invalid_int");
-      ASSERT_THROW(parser.parse(args, argc, argv), InvalidOptionException);
-    }
+
   private:
     //! Tested ArgsParser
     ArgsParser parser;
