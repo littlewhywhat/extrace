@@ -25,7 +25,7 @@ void Arguments::put_boolean(const char * option_name)
   }
 }
 
-bool Arguments::is_enabled(const char * option_name)
+bool Arguments::is_enabled(const char * option_name) const
 {
   return this->booleans.find(option_name) != booleans.end();
 }
@@ -39,12 +39,12 @@ void Arguments::put_integer(const char * option_name, int value)
   }
 }
 
-bool Arguments::has_integer(const char * option_name)
+bool Arguments::has_integer(const char * option_name) const
 {
   return single_integers.find(option_name) != single_integers.end();
 }
 
-int Arguments::get_integer(const char * option_name)
+int Arguments::get_integer(const char * option_name) const
 {
   return (*single_integers.find(option_name)).second;
 }
@@ -58,12 +58,12 @@ void Arguments::put_string(const char * option_name, const std::string & value)
   }
 }
 
-bool Arguments::has_string(const char * option_name)
+bool Arguments::has_string(const char * option_name) const
 {
   return single_strings.find(option_name) != single_strings.end();
 }
 
-const std::string & Arguments::get_string(const char * option_name)
+const std::string & Arguments::get_string(const char * option_name) const
 {
   return (*single_strings.find(option_name)).second;
 }

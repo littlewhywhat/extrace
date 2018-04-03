@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "extraceconsoleappbuilder.h"
-#include "consoleappmain.h"
 
-//! Builds ExtraceConsoleApp and runs it with ConsoleAppMain
-int main(int argc, const char ** argv)
+#ifndef LTTLWHWHT_CONSOLEAPP_H
+#define LTTLWHWHT_CONSOLEAPP_H
+
+//! I am a console application to run using console arguments
+class ConsoleApp
 {
-  ConsoleAppMain consoleAppMain;
-  consoleAppMain.set_consoleapp(ExtraceConsoleAppBuilder().build());
-  return consoleAppMain.run(argc, argv);
-}
+  public:
+    virtual ~ConsoleApp() {}
+    //! Setups ConsoleApp by console args to run
+    virtual void setup(int argc, const char ** argv) = 0;
+    //! Indicates if app is setup and is ready to run
+    virtual bool is_ready(void) const = 0;
+    //! Runs app
+    virtual void run() = 0;
+    //! Indicates if run was successful
+    virtual bool succeeded(void) const = 0;
+};
+
+#endif // LTTLWHWHT_CONSOLEAPP_H

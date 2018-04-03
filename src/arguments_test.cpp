@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+//! Tests Arguments
 class ArgumentsTest : public ::testing::Test
 {
   public:
@@ -50,6 +51,7 @@ class ArgumentsTest : public ::testing::Test
       ASSERT_STREQ(this->args.get_string("entry").c_str(), module.c_str());
     }
   private:
+    //! Tested instance
     Arguments args;
 };
 
