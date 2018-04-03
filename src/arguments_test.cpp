@@ -52,3 +52,15 @@ class ArgumentsTest : public ::testing::Test
   private:
     Arguments args;
 };
+
+TEST_F(ArgumentsTest, boolean) {
+  test_boolean();
+}
+
+TEST_F(ArgumentsTest, integer) {
+  test_single_integers();
+}
+
+TEST_F(ArgumentsTest, string) {
+  test_single_strings();
+}

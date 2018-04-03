@@ -113,3 +113,24 @@ class ArgsParserTest : public ::testing::Test {
     //! Tested ArgsParser
     ArgsParser parser;
 };
+
+TEST_F(ArgsParserTest, parse_boolean) {
+  test_parse_boolean();
+}
+
+TEST_F(ArgsParserTest, parse_integer) {
+  test_parse_integer();
+}
+
+TEST_F(ArgsParserTest, parse_string) {
+  test_parse_string();
+}
+
+TEST_F(ArgsParserTest, parse) {
+  test_parse();
+}
+
+TEST_F(ArgsParserTest, invalid_parse) {
+  test_invalid_parse_boolean();
+  test_invalid_parse_int_or_string();
+}
