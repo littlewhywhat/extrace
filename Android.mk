@@ -6,6 +6,8 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
+   src/argsparser.cpp \
+   src/arguments.cpp \
    src/greeter.cpp \
    src/main.cpp \
 
@@ -26,6 +28,10 @@ LOCAL_MODULE_TAGS := tests
 LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
 
 LOCAL_SRC_FILES := \
+    src/argsparser.cpp \
+    src/argsparser_test.cpp \
+    src/arguments.cpp \
+    src/arguments_test.cpp \
     src/greeter.cpp \
     src/greeter_test.cpp \
     src/extrace_test.cpp \
@@ -47,6 +53,10 @@ LOCAL_MODULE_HOST := linux
 LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
 
 LOCAL_SRC_FILES := \
+    src/argsparser.cpp \
+    src/argsparser_test.cpp \
+    src/arguments.cpp \
+    src/arguments_test.cpp \
     src/greeter.cpp \
     src/greeter_test.cpp \
     src/extrace_test.cpp \
