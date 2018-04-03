@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "extraceconsoleapp.h"
 #include "extraceconsoleappbuilder.h"
-#include "consoleappmain.h"
 
-//! Builds ExtraceConsoleApp and runs it with ConsoleAppMain
-int main(int argc, const char ** argv)
+ExtraceConsoleApp * ExtraceConsoleAppBuilder::build(void) const
 {
-  ConsoleAppMain consoleAppMain;
-  consoleAppMain.set_consoleapp(ExtraceConsoleAppBuilder().build());
-  return consoleAppMain.run(argc, argv);
+  // TODO
+  // FMachineTrace * fMachineTrace = new FMachineTrace();
+  // MachineTraceSession * machineTraceSession = new FMachineTraceSession(fMachineTrace);
+  // ExtraceApp * extraceApp = new ExtraceAppImpl(machineTraceSession);
+  ExtraceConsoleApp * consoleApp = new ExtraceConsoleApp();
+  return consoleApp;
 }

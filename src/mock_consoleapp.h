@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_GREETER_H
-#define LTTLWHWHT_GREETER_H
+#ifndef LTTLWHWHT_MOCK_CONSOLEAPP_H
+#define LTTLWHWHT_MOCK_CONSOLEAPP_H
 
-//! Greeter greets smb
-/*!
-    Says hello to anybody you want in std out
-*/
-class Greeter {
-  public:
-    //! Greets whom in out
-    /*!
-        Greets whom in std out
-    */
-    void greet(const char * whom);
+#include <gmock/gmock.h>
+
+#include "consoleapp.h"
+
+//! Mock for ConsoleApp
+class MockConsoleApp : public ConsoleApp
+{
+ public:
+  //! Mock method for setup
+  MOCK_METHOD2(setup, void(int argc, const char ** argv));
+  //! Mock method for is_ready
+  MOCK_CONST_METHOD0(is_ready, bool());
+  //! Mock method for succeeded
+  MOCK_CONST_METHOD0(succeeded, bool());
+  //! Mock method for run
+  MOCK_METHOD0(run, void());
 };
 
-#endif
+#endif // LTTLWHWHT_MOCK_CONSOLEAPP_H

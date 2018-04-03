@@ -26,7 +26,6 @@ abstract class ConsoleApp {
 class ExtraceConsoleApp {
   + set_machinetrace(MachineTraceApp * machineTraceApp): void
   ..overwrite..
-  + init(void): void
   + run(void): void
   + succeeded(void): bool
   - register_args_to(ConsoleArgsParser & parser) const: void

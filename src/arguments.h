@@ -27,19 +27,19 @@ class Arguments {
     //! Enables boolean option specified by option_name
     void put_boolean(const char * option_name);
     //! Says if boolean option specified by option_name is enabled
-    bool is_enabled(const char * option_name);
+    bool is_enabled(const char * option_name) const;
     //! Specifies new single integer option with provided option_name
     void put_integer(const char * option_name, int value);
     //! Says if single integer option specified by option_name is present
-    bool has_integer(const char * option_name);
+    bool has_integer(const char * option_name) const;
     //! Returns value for single integer option specified by option name
-    int get_integer(const char * option_name);
+    int get_integer(const char * option_name) const;
     //! Specifies new single string option with provided option_name
     void put_string(const char * option_name, const std::string & value);
     //! Says if single string option specified by option_name is present
-    bool has_string(const char * option_name);
+    bool has_string(const char * option_name) const;
     //! Returns value for single string option specified by option name
-    const std::string & get_string(const char * option_name);
+    const std::string & get_string(const char * option_name) const;
   private:
     //! set of enabled boolean options
     std::set<std::string> booleans;

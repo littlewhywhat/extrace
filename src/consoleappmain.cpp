@@ -13,10 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
 
-#include "greeter.h"
-#include <stdio.h>
+#include "consoleappmain.h"
 
-void Greeter::greet(const char * whom) {
-  printf("Hello, %s!\n", whom);
+int ConsoleAppMain::run(int argc, const char ** argv)
+{
+  ConsoleApp & consoleapp = *(this->consoleapp);
+  consoleapp.setup(argc, argv);
+  if (consoleapp.is_ready())
+  {
+    consoleapp.run();
+    if (consoleapp.succeeded())
+    {
+      return EXIT_SUCCESS;
+    }
+  }
+  return EXIT_FAILURE;
+}
+
+ConsoleAppMain::~ConsoleAppMain()
+{
+  delete this->consoleapp;
+}
+
+void ConsoleAppMain::set_consoleapp(ConsoleApp * consoleapp)
+{
+  this->consoleapp = consoleapp;
 }

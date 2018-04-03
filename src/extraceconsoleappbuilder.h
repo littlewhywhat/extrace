@@ -13,31 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "extraceconsoleapp.h"
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
-#include "greeter.h"
-
-using ::testing::internal::CaptureStdout;
-using ::testing::internal::GetCapturedStdout;
-
-//! Tests Greeter
-class GreeterTest : public ::testing::Test {
+//! I am a builder class to build ExtraceConsoleApp with all dependencies
+class ExtraceConsoleAppBuilder 
+{
   public:
-    //! Tests greet method
-  	void test_greet() {
-  	  const char * greeting = "Hello, test!\n";
-  	  const char * whom   = "test";
-      CaptureStdout();
-      this->greeter.greet(whom);
-      std::string stdout_ = GetCapturedStdout();
-      ASSERT_STREQ(stdout_.c_str(), greeting);
-  	}
-  private:
-  	Greeter greeter;
+    //! Builds ExtraceConsoleApp
+    ExtraceConsoleApp * build(void) const;
 };
-
-TEST_F(GreeterTest, greet) {
-  test_greet();
-}

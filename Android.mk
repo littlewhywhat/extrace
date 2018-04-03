@@ -1,3 +1,22 @@
+common_src_files := \
+    src/abstractconsoleapp.cpp \
+    src/argsparser.cpp \
+    src/arguments.cpp \
+    src/consoleappmain.cpp \
+    src/extraceconsoleapp.cpp \
+    src/extraceconsoleappbuilder.cpp \
+
+common_test_files := \
+    src/argsparser_test.cpp \
+    src/arguments_test.cpp \
+    src/consoleappmain_test.cpp \
+    src/extrace_test.cpp \
+
+common_cflags := \
+    -Werror \
+    -Wall \
+    -std=c++11 \
+
 LOCAL_PATH:= $(call my-dir)
 
 # extrace
@@ -6,14 +25,12 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
-   src/argsparser.cpp \
-   src/arguments.cpp \
-   src/greeter.cpp \
-   src/main.cpp \
+    $(common_src_files) \
+    src/main.cpp \
 
 LOCAL_MODULE:= extrace
 
-LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
+LOCAL_CPPFLAGS := $(common_cflags)
 
 include $(BUILD_EXECUTABLE)
 
@@ -25,23 +42,18 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := extrace_test
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
+LOCAL_CPPFLAGS := $(common_cflags)
 
 LOCAL_SRC_FILES := \
-    src/argsparser.cpp \
-    src/argsparser_test.cpp \
-    src/arguments.cpp \
-    src/arguments_test.cpp \
-    src/greeter.cpp \
-    src/greeter_test.cpp \
-    src/extrace_test.cpp \
+    $(common_src_files) \
+    $(common_test_files) \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock \
 
 include $(BUILD_NATIVE_TEST)
 
-# extrace_test
+# extrace_test host
 # =================
 
 include $(CLEAR_VARS)
@@ -50,16 +62,11 @@ LOCAL_MODULE := extrace_test_host
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE_HOST := linux
 
-LOCAL_CPPFLAGS := -Werror -Wall -std=c++11
+LOCAL_CPPFLAGS := $(common_cflags)
 
 LOCAL_SRC_FILES := \
-    src/argsparser.cpp \
-    src/argsparser_test.cpp \
-    src/arguments.cpp \
-    src/arguments_test.cpp \
-    src/greeter.cpp \
-    src/greeter_test.cpp \
-    src/extrace_test.cpp \
+    $(common_src_files) \
+    $(common_test_files) \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock_host \
