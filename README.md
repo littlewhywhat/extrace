@@ -24,6 +24,11 @@ Graphics HAL of this build : https://github.com/anholt/mesa/wiki/VC4
 
 ## Build and run unit tests
 
+* all
+```
+ONE_SHOT_MAKEFILE="frameworks/native/cmds/extrace/Android.mk" make -j16 -C "/home/littlewhywhat/Projects/aosp" GET-INSTALL-PATH all_modules
+```
+
 * on target
 ```
 source build/envsetup.sh
