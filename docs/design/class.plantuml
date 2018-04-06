@@ -1,0 +1,68 @@
+@startuml
+
+title Class Diagram
+
+class ConsoleAppMain {
+  + set_consoleapp(ConsoleApp * consoleApp)
+  + run(int argc, const char ** argv): int
+}
+hide ConsoleAppMain fields
+
+abstract class ConsoleApp {
+  - isReady: bool
+  --
+  + setup(int argc, const char ** argv): void
+  + is_ready(void): bool
+  + set_arguments(Arguments * arguments): void
+  + set_argsparser(ArgsParser * parser): void
+  ..virtual..
+  + {abstract} run(void): void
+  + {abstract} succeeded(void): bool
+  # {abstract} register_args_to(ConsoleArgsParser & parser) const: void
+  # {abstract} admits(const Arguments & arguments) const: bool
+  # {abstract} setup_with(const Arguments & arguments): void
+}
+
+class ExtraceConsoleApp {
+  + set_machinetrace(MachineTraceApp * machineTraceApp): void
+  ..overwrite..
+  + init(void): void
+  + run(void): void
+  + succeeded(void): bool
+  - register_args_to(ConsoleArgsParser & parser) const: void
+  - admits(const Arguments & arguments) const: bool
+  - setup_with(const Arguments & arguments): void
+}
+hide ExtraceConsoleApp fields
+
+class MachineTraceApp {
+  + set_machinetracesession(MachineTraceSession * machineTraceSession): void
+  + run(void): void
+  + succeeded(void): bool
+}
+hide MachineTraceApp fields
+
+class MachineTraceSession {
+  - duration_in_sec: int
+  - start_delay_in_sec: int
+  - buffer_size: int
+  - mode: AsyncMode
+  - categories: vector<string>
+  --
+  + set_machinetrace(MachineTrace * machineTrace): void
+  + run(void): void
+}
+
+class MachineTrace {
+  {abstract} + set(all): void
+  {abstract} + run(void): void
+}
+hide MachineTrace fields
+
+ConsoleAppMain "- consoleApp" *--> ConsoleApp: runs
+ExtraceConsoleApp -|> ConsoleApp
+ExtraceConsoleApp "- machineTraceApp" *--> MachineTraceApp: runs
+MachineTraceApp "- machineTraceSession" *--> MachineTraceSession: runs
+MachineTraceSession "- machineTrace" *--> MachineTrace: runs
+
+@enduml
