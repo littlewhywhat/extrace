@@ -19,14 +19,17 @@
 #include "abstractconsoleapp.h"
 #include "argsparser.h"
 #include "arguments.h"
+#include "machinetraceapp.h"
 
 //! I am a wrapper for extrace app to run from console
 class ExtraceConsoleApp : public AbstractConsoleApp
 {
   public:
-    ExtraceConsoleApp(): AbstractConsoleApp() {}
-    ~ExtraceConsoleApp() {}
+    ExtraceConsoleApp(): AbstractConsoleApp(), machinetraceapp(NULL) {}
+    ~ExtraceConsoleApp() { delete this-> machinetraceapp; }
+    void set_machinetraceapp(MachineTraceApp * machinetraceapp);
    private:
+    MachineTraceApp * machinetraceapp;
     void do_run(void) override;
     bool do_succeeded(void) const override;
     void register_args_to(ArgsParser & argsParser) const override;

@@ -3,65 +3,86 @@
 title Class Diagram
 
 class ConsoleAppMain {
-  + set_consoleapp(ConsoleApp * consoleApp)
   + run(int argc, const char ** argv): int
 }
 hide ConsoleAppMain fields
 
-abstract class ConsoleApp {
-  - isReady: bool
-  --
-  + setup(int argc, const char ** argv): void
-  + is_ready(void): bool
-  + set_arguments(Arguments * arguments): void
-  + set_argsparser(ArgsParser * parser): void
-  ..virtual..
+ConsoleAppMain "- consoleApp" *--> ConsoleApp: runs
+
+interface ConsoleApp {
+  + {abstract} setup(int argc, const char ** argv): void
+  + {abstract} is_ready(void): void
   + {abstract} run(void): void
   + {abstract} succeeded(void): bool
-  # {abstract} register_args_to(ConsoleArgsParser & parser) const: void
-  # {abstract} admits(const Arguments & arguments) const: bool
-  # {abstract} setup_with(const Arguments & arguments): void
 }
+hide ConsoleApp fields
 
-class ExtraceConsoleApp {
-  + set_machinetrace(MachineTraceApp * machineTraceApp): void
-  ..overwrite..
+abstract class AbstractConsoleApp {
+  - isReady: bool
+  --
+  - {abstract} do_run(void): void
+  - {abstract} do_succeeded(void): void
+  - {abstract} register_args_to(ArgsParser & parser) const: void
+  - {abstract} admits(const Arguments & arguments) const: bool
+  - {abstract} setup_with(const Arguments & arguments): void
+  ..override..
   + run(void): void
   + succeeded(void): bool
+  + setup(int argc, const char ** argv): void
+  + is_ready(void): bool
+}
+AbstractConsoleApp ..> ConsoleApp
+
+class ExtraceConsoleApp {
+  ..override..
+  - do_run(void): void
+  - do_succeeded(void): bool
   - register_args_to(ConsoleArgsParser & parser) const: void
   - admits(const Arguments & arguments) const: bool
   - setup_with(const Arguments & arguments): void
 }
 hide ExtraceConsoleApp fields
+ExtraceConsoleApp --|> AbstractConsoleApp
+ExtraceConsoleApp "- machineTraceApp" *--> MachineTraceApp: runs
 
-class MachineTraceApp {
-  + set_machinetracesession(MachineTraceSession * machineTraceSession): void
-  + run(void): void
-  + succeeded(void): bool
+interface MachineTraceApp {
+  + {abstract} run(void): void
+  + {abstract} succeeded(void): bool
 }
 hide MachineTraceApp fields
 
-class MachineTraceSession {
-  - duration_in_sec: int
-  - start_delay_in_sec: int
-  - buffer_size: int
-  - mode: AsyncMode
-  - categories: vector<string>
-  --
-  + set_machinetrace(MachineTrace * machineTrace): void
+class FMachineTraceApp {
+  ..override..
   + run(void): void
+  + succeeded(void): bool
 }
+hide FMachineTraceApp fields
+FMachineTraceApp ..> MachineTraceApp
+FMachineTraceApp "-machinetracesession" *--> MachineTraceSession: runs
 
-class MachineTrace {
-  {abstract} + set(all): void
+interface MachineTraceSession {
+  + {abstract} start(void): void
+}
+hide MachineTraceSession fields
+
+class FMachineTraceSession {
+  ..override..
+  + start(void): void
+}
+FMachineTraceSession ..> MachineTraceSession
+FMachineTraceSession "-machinetrace" *--> MachineTrace: runs
+
+interface MachineTrace {
   {abstract} + run(void): void
 }
 hide MachineTrace fields
 
-ConsoleAppMain "- consoleApp" *--> ConsoleApp: runs
-ExtraceConsoleApp -|> ConsoleApp
-ExtraceConsoleApp "- machineTraceApp" *--> MachineTraceApp: runs
-MachineTraceApp "- machineTraceSession" *--> MachineTraceSession: runs
-MachineTraceSession "- machineTrace" *--> MachineTrace: runs
+class FMachineTrace {
+  ..override..
+  + run(void): void
+}
+hide FMachineTrace fields
+FMachineTrace ..> MachineTrace
+
 
 @enduml

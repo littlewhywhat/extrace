@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "extraceconsoleapp.h"
+#include "machinetrace.h"
 
 void ExtraceConsoleApp::register_args_to(ArgsParser & argsParser) const
 {
@@ -41,12 +42,17 @@ void ExtraceConsoleApp::do_run()
 {
   // TODO
   // MachineTrace trace;
-  // this->traceSession.run(trace);
+  this->machinetraceapp->run();
 }
 
 bool ExtraceConsoleApp::do_succeeded(void) const 
 { 
   // TODO
   // return !this->TraceSession.report.is_empty();
-  return true;
+  return this->machinetraceapp->succeeded();
+}
+
+void ExtraceConsoleApp::set_machinetraceapp(MachineTraceApp * machinetraceapp)
+{
+  this->machinetraceapp = machinetraceapp;
 }

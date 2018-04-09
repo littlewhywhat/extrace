@@ -3,8 +3,7 @@
 title Domain Model
 
 class MachineTrace {
-  /' trace to run on machine
-   '/
+  ' trace to run on machine
   - options
     ' other available trace options on machine with default values
   - report
@@ -34,11 +33,10 @@ hide TracingCategory methods
 hide TracingCategory circle
 
 class TraceSession {
-  /' trace session of machine trace
-     this class abstracts trace options
-     that are not related to machine
-     such as delay, duration, async_start, output
-   '/
+  ' trace session of machine trace
+  ' this class abstracts trace options
+  ' that are not related to machine
+  ' such as delay, duration, async_start, output
   - options
     ' delay start, duration
   --
