@@ -2,70 +2,235 @@
 
 title Domain Model
 
-class MachineTrace {
-  /' trace to run on machine
-   '/
-  - options
-    ' other available trace options on machine with default values
-  - report
-    ' report of trace
-  - is_started
-    ' signals that trace is started
-  --
-  + start()
-  + stop()
-  + setup(arguments)
-    ' overwrite Machine options with trace_options
-  + reset()
-    ' reset Machine options to default
-  + clear()
-    ' clear previous report
-  + dump_report(where)
-    ' dump report to where
+class KernelTraceCategory {
 }
-hide MachineTrace circle
+hide KernelTraceCategory circle
+hide KernelTraceCategory methods
+hide KernelTraceCategory fields
 
-class TracingCategory {
-  ' category to trace on machine
-  - id
-  ' identifier of category
+KernelTraceCategory --|> KernelTraceable
+KernelTraceCategory "1" -- "1..*" KernelTraceCategoryFeature: requires >
+
+class AndroidTraceCategory {
+  - tag_id: int
 }
-hide TracingCategory methods
-hide TracingCategory circle
+hide AndroidTraceCategory circle
+hide AndroidTraceCategory methods
+
+AndroidTraceCategory --|> AndroidTraceable
+
+class KernelTraceFile {
+  - path: string
+}
+hide KernelTraceFile circle
+hide KernelTraceFile methods
+
+class EnableFile {
+  ' indicates if file enables smth
+  - is_enabled: bool
+}
+hide EnableFile circle
+hide EnableFile methods
+
+class KernelTraceCategoryFeature {
+}
+hide KernelTraceCategoryFeature circle
+hide KernelTraceCategoryFeature methods
+hide KernelTraceCategoryFeature fields
+
+EnableFile --|> KernelTraceFile
+EnableFile "1" -- "1" KernelTraceCategoryFeature: enables >
+EnableFile "1" - "1" Trace: enables >
+
+class Trace {
+}
+hide Trace circle
+hide Trace methods
+hide Trace fields
+
+Trace "2" -- "1" TraceBuffer: logs into >
+
+class KernelTrace {
+}
+hide KernelTrace circle
+hide KernelTrace methods
+hide KernelTrace fields
+
+KernelTrace --|> Trace
+KernelTrace "1" -- "1..*" KernelTraceFile: has >
+KernelTrace "1" -- "1..*" KernelTraceable: traces >
+KernelTrace "1" -- "1..*" KernelTraceable: supports >
+
+class FunctionTraceFile {
+}
+hide FunctionTraceFile circle
+hide FunctionTraceFile methods
+hide FunctionTraceFile fields
+
+FunctionTraceFile --|> KernelTraceFile
+FunctionTraceFile -- KernelFunction: specifies >
+
+class KernelTraceable {
+  - name: string
+}
+hide KernelTraceable circle
+hide KernelTraceable methods
+
+class AndroidTrace {
+}
+hide AndroidTrace circle
+hide AndroidTrace methods
+hide AndroidTrace fields
+
+AndroidTrace --|> Trace
+AndroidTrace "1" -- "1..*" AndroidTraceable: traces >
+AndroidTrace "1" -- "1..*" AndroidProperty: has >
+
+class KernelFunction {
+}
+hide KernelFunction circle
+hide KernelFunction methods
+hide KernelFunction fields
+
+KernelFunction --|> KernelTraceable
+
+class AndroidTraceable {
+  - name : string
+}
+hide AndroidTraceable circle
+hide AndroidTraceable methods
+
+class AndroidApp {
+}
+hide AndroidApp circle
+hide AndroidApp methods
+hide AndroidApp fields
+
+AndroidApp --|> AndroidTraceable
+
+class AndroidCoreService {
+}
+hide AndroidCoreService circle
+hide AndroidCoreService methods
+hide AndroidCoreService fields
+
+AndroidCoreService --|> AndroidApp
+
+class AndroidProperty {
+  - name : string
+  - content : string
+}
+hide AndroidProperty circle
+hide AndroidProperty methods
+
+AndroidProperty "1" -- "1..*" AndroidCoreService: stores names of >
+AndroidProperty "1" -- "1" AndroidApp: enable trace of > 
+AndroidProperty "1" -- "0..16" AndroidApp: stores number of traced >
+AndroidProperty "1" -- "1" AndroidTraceCategory: stores tag of > 
+
+class TraceBuffer {
+  - size: int
+}
+hide TraceBuffer circle
+hide TraceBuffer methods
+
+TraceBuffer "1..*" -- "1" BufferMode: is in >
+TraceBuffer --|> KernelTraceFile
+
+class BufferMode {
+}
+hide BufferMode circle
+hide BufferMode methods
+hide BufferMode fields
+
+class CircularBufferMode {
+}
+hide CircularBufferMode circle
+hide CircularBufferMode methods
+hide CircularBufferMode fields
+
+CircularBufferMode --|> BufferMode
+
+class WriteUntilFullBufferMode {
+}
+hide WriteUntilFullBufferMode circle
+hide WriteUntilFullBufferMode methods
+hide WriteUntilFullBufferMode fields
+
+WriteUntilFullBufferMode --|> BufferMode
+
+class TraceApp {
+}
+hide TraceApp circle
+hide TraceApp methods
+hide TraceApp fields
+
+TraceApp "1" -- "1" TraceSession: starts >
 
 class TraceSession {
-  /' trace session of machine trace
-     this class abstracts trace options
-     that are not related to machine
-     such as delay, duration, async_start, output
-   '/
-  - options
-    ' delay start, duration
-  --
-  + start()
-    ' start trace session on Machine
-  + stop()
-    ' stop trace session
+  - delay_at_start: int
+  - ignores_os_signals: bool
 }
 hide TraceSession circle
+hide TraceSession methods
 
-MachineTrace - TraceSession : runs <
-/' trace session runs MachineTrace '/
-TracingCategory "*" -- MachineTrace : supports <
-' available trace categories on machine
+TraceSession "1" - "1..*" KernelTraceable: traces >
+TraceSession "1" - "1..*" AndroidTraceable: traces >
+TraceSession "1" -- "1" KernelTrace: uses >
+TraceSession "1" -- "1" AndroidTrace: uses >
 
-class ExtraceApp {
-  ' bash application to run trace or provide other information
-  - options
-    ' options provided by user using cmdline arguments
-  --
-  + setup_by(args)
-    ' convert user cmdline args to options
-  + run()
-    ' run application with options
+class AsyncTraceSession {
 }
-hide ExtraceApp circle
+hide AsyncTraceSession circle
+hide AsyncTraceSession methods
+hide AsyncTraceSession fields
 
-TraceSession - ExtraceApp: runs <
+AsyncTraceSession --|> TraceSession
+AsyncTraceSession "1" -- "1" TraceAction: does >
+
+class SyncTraceSession {
+  - duration: int
+}
+hide SyncTraceSession circle
+hide SyncTraceSession methods
+
+SyncTraceSession --|> TraceSession
+SyncTraceSession "1" -- "1" StartTrace: does >
+SyncTraceSession "1" -- "1" StopTrace: does >
+SyncTraceSession "1" -- "1" DumpTraceBuffer: does >
+
+class TraceAction {
+}
+hide TraceAction circle
+hide TraceAction methods
+hide TraceAction fields
+
+class StartTrace {
+}
+hide StartTrace circle
+hide StartTrace methods
+hide StartTrace fields
+
+StartTrace --|> TraceAction
+
+class StopTrace {
+}
+hide StopTrace circle
+hide StopTrace methods
+hide StopTrace fields
+
+StopTrace --|> TraceAction
+
+class DumpTraceBuffer {
+}
+hide DumpTraceBuffer circle
+hide DumpTraceBuffer methods
+hide DumpTraceBuffer fields
+
+DumpTraceBuffer --|> TraceAction
+
+' TODO
+' TraceBuffer (size, circular)
+' TraceSession (mode-(async-(action-(start,dump,stop)),sync),ignore_signals,duration,initial_sleep)
 
 @enduml
