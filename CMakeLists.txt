@@ -31,11 +31,13 @@ set (CMAKE_CXX_FLAGS "-Wall -Werror -fno-exceptions -pedantic -Wunused-parameter
 # - OBJ_SOURCES, MAIN, TEST_SOURCES
 include_directories("src")
 set(MAIN "${CMAKE_SOURCE_DIR}/src/main.cpp")
+set(ATRACE "${CMAKE_SOURCE_DIR}/src/atrace.cpp")
+set(ATRACE_ABSTRACT "${CMAKE_SOURCE_DIR}/src/atrace_abstract.cpp")
 file (GLOB OBJ_SOURCES "src/*.cpp")
 file (GLOB TEST_SOURCES "src/*_test.cpp")
 
 # filter OBJ_SOURCES
-list(REMOVE_ITEM OBJ_SOURCES ${MAIN} ${TEST_SOURCES})
+list(REMOVE_ITEM OBJ_SOURCES ${MAIN} ${ATRACE} ${ATRACE_ABSTRACT} ${TEST_SOURCES})
 
 # create main executable 
 set (SOURCES ${OBJ_SOURCES} ${MAIN})
