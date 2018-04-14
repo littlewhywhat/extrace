@@ -41,3 +41,17 @@ python ./development/testrunner/runtest.py -x frameworks/native/cmds/extrace/
 make extrace_test_host
 ./out/host/linux-86/bin/extrace_test64
 ```
+## Run
+
+to run you need to mount kernel debug file system first
+
+```
+mount -t debugfs none /sys/kernel/debug
+```
+
+then list categories and choose one to trace
+
+```
+extrace --list_categories
+extrace some_category
+```
