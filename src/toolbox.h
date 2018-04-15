@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_FILESYSTEM_H
-#define LTTLWHWHT_FILESYSTEM_H
+#ifndef LTTLWHWHT_TOOLBOX_H
+#define LTTLWHWHT_TOOLBOX_H
 
-#include <stdio.h>
+#include <string>
+#include <set>
 
-class FileSystem {
+class Toolbox {
   public:
-    virtual ~FileSystem() {}
-    virtual bool fileExists(const char* filename) = 0;
-    virtual bool fileIsWritable(const char* filename) = 0;
-    virtual bool truncateFile(const char* path) = 0;
-    virtual bool writeStr(const char* filename, const char* str) = 0;
-    virtual bool appendStr(const char* filename, const char* str) = 0;
-    virtual bool readStr(const char* filename, char* str, int max_size) = 0;
+    virtual ~Toolbox() {}
+    virtual bool parseFileToTokens(const char * filename, const char * delims,
+                                   std::set<std::string> & tokens) const = 0;
+    virtual void parseToTokens(const char * delimseplist, const char * delims,
+                               std::set<std::string> & tokens) const = 0;
 };
 
-#endif // LTTLWHWHT_FILESYSTEM_H
+#endif //LTTLWHWHT_TOOLBOX_H

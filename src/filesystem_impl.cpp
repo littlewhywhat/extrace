@@ -85,3 +85,22 @@ bool FileSystemImpl::_writeStr(const char* filename, const char* str, int flags)
 
     return ok;
 }
+
+bool FileSystemImpl::readStr(const char* filename, char* str, int max_size) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        fprintf(errstream, "error opening %s: %s (%d)\n", filename,
+            strerror(errno), errno);
+        return false;
+    }
+
+    ssize_t n = read(fd, str, max_size - 1);
+    close(fd);
+    if (n == -1) {
+        fprintf(errstream, "error reading %s: %s (%d)\n", filename,
+            strerror(errno), errno);
+        return false;
+    }
+    str[n] = '\0';
+    return true;
+}

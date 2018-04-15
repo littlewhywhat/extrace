@@ -22,13 +22,12 @@
 #include <fcntl.h>  // creat, ope
 #include <stdlib.h> // free
 #include <unistd.h> // read, close
-#include <utils/String8.h>
-
-using namespace android;
+#include <set>
 
 KernelSystemImpl::~KernelSystemImpl()
 {
     delete this->file_system;
+    delete this->toolbox;
 }
 
 void KernelSystemImpl::set_errstream(FILE * errstream)
@@ -39,6 +38,11 @@ void KernelSystemImpl::set_errstream(FILE * errstream)
 void KernelSystemImpl::set_file_system(FileSystem * file_system)
 {
     this->file_system = file_system;
+}
+
+void KernelSystemImpl::set_toolbox(Toolbox * toolbox)
+{
+    this->toolbox = toolbox;
 }
 
 bool KernelSystemImpl::setKernelOptionEnable(const char* filename, bool enable)
@@ -163,11 +167,11 @@ bool KernelSystemImpl::setPrintTgidEnableIfPresent(bool enable)
     return true;
 }
 
-bool KernelSystemImpl::setKernelTraceFuncs(const char* funcs)
+bool KernelSystemImpl::setKernelTraceFuncs(const char* commasepfuncs)
 {
     bool ok = true;
 
-    if (funcs == NULL || funcs[0] == '\0') {
+    if (commasepfuncs == NULL || commasepfuncs[0] == '\0') {
         // Disable kernel function tracing.
         if (file_system->fileIsWritable(k_currentTracerPath)) {
             ok &= file_system->writeStr(k_currentTracerPath, "nop");
@@ -181,17 +185,15 @@ bool KernelSystemImpl::setKernelTraceFuncs(const char* funcs)
         ok &= setKernelOptionEnable(k_funcgraphAbsTimePath, true);
         ok &= setKernelOptionEnable(k_funcgraphCpuPath, true);
         ok &= setKernelOptionEnable(k_funcgraphProcPath, true);
-        ok &= setKernelOptionEnable(k_funcgraphFlatPath, true);
+        // ok &= setKernelOptionEnable(k_funcgraphFlatPath, true);
 
         // Set the requested filter functions.
         ok &= file_system->truncateFile(k_ftraceFilterPath);
-        char* myFuncs = strdup(funcs);
-        char* func = strtok(myFuncs, ",");
-        while (func) {
-            ok &= file_system->appendStr(k_ftraceFilterPath, func);
-            func = strtok(NULL, ",");
+        std::set<std::string> funcs;
+        toolbox->parseToTokens(commasepfuncs, ",", funcs);
+        for (const auto & func: funcs) {
+            ok &= file_system->appendStr(k_ftraceFilterPath, func.c_str());
         }
-        free(myFuncs);
 
         // Verify that the set functions are being traced.
         if (ok) {
@@ -204,22 +206,10 @@ bool KernelSystemImpl::setKernelTraceFuncs(const char* funcs)
 
 bool KernelSystemImpl::isTraceClock(const char *mode)
 {
-    int fd = open(k_traceClockPath, O_RDONLY);
-    if (fd == -1) {
-        fprintf(errstream, "error opening %s: %s (%d)\n", k_traceClockPath,
-            strerror(errno), errno);
+    char buf[4097];    
+    if (!file_system->readStr(k_traceClockPath, buf, 4097)) {
         return false;
     }
-
-    char buf[4097];
-    ssize_t n = read(fd, buf, 4096);
-    close(fd);
-    if (n == -1) {
-        fprintf(errstream, "error reading %s: %s (%d)\n", k_traceClockPath,
-            strerror(errno), errno);
-        return false;
-    }
-    buf[n] = '\0';
 
     char *start = strchr(buf, '[');
     if (start == NULL) {
@@ -236,45 +226,25 @@ bool KernelSystemImpl::isTraceClock(const char *mode)
     return strcmp(mode, start) == 0;
 }
 
-bool KernelSystemImpl::verifyKernelTraceFuncs(const char * funcs) const
+bool KernelSystemImpl::verifyKernelTraceFuncs(const std::set<std::string> & funcs) const
 {
-    int fd = open(k_ftraceFilterPath, O_RDONLY);
-    if (fd == -1) {
-        fprintf(errstream, "error opening %s: %s (%d)\n", k_ftraceFilterPath,
-            strerror(errno), errno);
+    char buf[4097];    
+    if (!file_system->readStr(k_ftraceFilterPath, buf, 4097)) {
         return false;
     }
 
-    char buf[4097];
-    ssize_t n = read(fd, buf, 4096);
-    close(fd);
-    if (n == -1) {
-        fprintf(errstream, "error reading %s: %s (%d)\n", k_ftraceFilterPath,
-            strerror(errno), errno);
-        return false;
-    }
+    std::set<std::string> funcs_traced;
+    toolbox->parseToTokens(buf, "\n", funcs_traced);
 
-    buf[n] = '\0';
-    String8 funcList = String8::format("\n%s", buf);
-
-    // Make sure that every function listed in funcs is in the list we just
-    // read from the kernel, except for wildcard inputs.
     bool ok = true;
-    char* myFuncs = strdup(funcs);
-    char* func = strtok(myFuncs, ",");
-    while (func) {
-        if (!strchr(func, '*')) {
-            String8 fancyFunc = String8::format("\n%s\n", func);
-            bool found = funcList.find(fancyFunc.string(), 0) >= 0;
-            if (!found || func[0] == '\0') {
-                fprintf(errstream, "error: \"%s\" is not a valid kernel function "
-                        "to trace.\n", func);
-                ok = false;
-            }
+    for (const auto & func : funcs) {
+        // except wildcards
+        if (strchr(func.c_str(), '*') == NULL 
+            && funcs_traced.find(func) == funcs_traced.end()) {
+            fprintf(errstream, "error: \"%s\" is not a valid kernel function to trace.\n",
+                    func.c_str());
+            ok = false;
         }
-        func = strtok(NULL, ",");
     }
-    free(myFuncs);
-
     return ok;
 }

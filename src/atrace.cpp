@@ -22,11 +22,14 @@
 #include "androidsystem_impl.h"
 #include "kernelsystem_impl.h"
 #include "atraceapp.h"
+#include "androidtoolbox.h"
 
+#include <getopt.h>      // getopt_long, no_argument
 #include <signal.h>      // sigaction
 #include <utils/Trace.h> // ATRACE_TAGs
 
 AtraceApp atrace;
+FILE * errstream = stderr;
 
 void handleSignal(int /*signo*/)
 {
@@ -45,18 +48,53 @@ void registerSigHandler()
     sigaction(SIGTERM, &sa, NULL);
 }
 
-int main(int argc, char ** argv) {
-  FileSystemImpl * file_system = new FileSystemImpl();
-  KernelSystemImpl * kernel_system_impl = new KernelSystemImpl();
-  kernel_system_impl->set_errstream(stderr);
-  kernel_system_impl->set_file_system(file_system);
-  AndroidSystemImpl * android_system_impl = new AndroidSystemImpl();
-  android_system_impl->set_errstream(stderr);
+// Print the command usage help to errstream.
+void showHelp(const char *cmd)
+{
+    fprintf(errstream, "usage: %s [options] [categories...]\n", cmd);
+    fprintf(errstream, "options include:\n"
+                    "  -a appname      enable app-level tracing for a comma "
+                        "separated list of cmdlines\n"
+                    "  -b N            use a trace buffer size of N KB\n"
+                    "  -c              trace into a circular buffer\n"
+                    "  -f filename     use the categories written in a file as space-separated\n"
+                    "                    values in a line\n"
+                    "  -k fname,...    trace the listed kernel functions\n"
+                    "  -n              ignore signals\n"
+                    "  -s N            sleep for N seconds before tracing [default 0]\n"
+                    "  -t N            trace for N seconds [defualt 5]\n"
+                    "  -z              compress the trace dump\n"
+                    "  --async_start   start circular trace and return immediatly\n"
+                    "  --async_dump    dump the current contents of circular trace buffer\n"
+                    "  --async_stop    stop tracing and dump the current contents of circular\n"
+                    "                    trace buffer\n"
+                    "  --stream        stream trace to outstream as it enters the trace buffer\n"
+                    "                    Note: this can take significant CPU time, and is best\n"
+                    "                    used for measuring things that are not affected by\n"
+                    "                    CPU performance, like pagecache usage.\n"
+                    "  --list_categories\n"
+                    "                  list the available tracing categories\n"
+                    " -o filename      write the trace to the specified file instead\n"
+                    "                    of outstream.\n"
+            );
+}
 
+int main(int argc, char ** argv) {
+  Toolbox * toolbox = new AndroidToolbox();
+  FileSystemImpl * file_system = new FileSystemImpl();
+  file_system->set_errstream(errstream);
+  KernelSystemImpl * kernel_system_impl = new KernelSystemImpl();
+  kernel_system_impl->set_errstream(errstream);
+  kernel_system_impl->set_file_system(file_system);
+  kernel_system_impl->set_toolbox(toolbox);
+  AndroidSystemImpl * android_system_impl = new AndroidSystemImpl();
+  android_system_impl->set_errstream(errstream);
+
+  atrace.set_toolbox(toolbox);
   atrace.set_systime(new SystemTimeImpl());
   atrace.set_kernel_system(kernel_system_impl);
   atrace.set_android_system(android_system_impl);
-  atrace.set_errstream(stderr);
+  atrace.set_errstream(errstream);
   atrace.set_outstream(stdout);
   atrace.add_android_category( "gfx",        "Graphics",         ATRACE_TAG_GRAPHICS         );
   atrace.add_android_category( "input",      "Input",            ATRACE_TAG_INPUT            );
@@ -163,7 +201,109 @@ int main(int argc, char ** argv) {
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/filemap/enable" },
   });
+
+  if (argc == 2 && 0 == strcmp(argv[1], "--help")) {
+    showHelp(argv[0]);
+    return EXIT_SUCCESS;
+  }
+
+  for (;;) {
+      int ret;
+      int option_index = 0;
+      static struct option long_options[] = {
+          {"async_start",     no_argument, 0,  0 },
+          {"async_stop",      no_argument, 0,  0 },
+          {"async_dump",      no_argument, 0,  0 },
+          {"list_categories", no_argument, 0,  0 },
+          {"stream",          no_argument, 0,  0 },
+          {           0,                0, 0,  0 }
+      };
+
+      ret = getopt_long(argc, argv, "a:b:cf:k:ns:t:zo:",
+                        long_options, &option_index);
+
+      if (ret < 0) {
+          for (int i = optind; i < argc; i++) {
+              if (!atrace.setCategory(argv[i])) {
+                  fprintf(errstream, "error enabling tracing category \"%s\"\n", argv[i]);
+                  return EXIT_FAILURE;
+              }
+          }
+          break;
+      }
+
+      switch(ret) {
+          case 'a':
+              atrace.set_debugAppCmdLine(optarg);
+          break;
+
+          case 'b':
+              atrace.set_traceBufferSizeKB(atoi(optarg));
+          break;
+
+          case 'c':
+              atrace.enable_trace_overwrite();
+          break;
+
+          case 'f':
+              atrace.set_categoriesFile(optarg);
+          break;
+
+          case 'k':
+              atrace.set_kernelTraceFuncs(optarg);
+          break;
+
+          case 'n':
+              atrace.nosignals();
+          break;
+
+          case 's':
+              atrace.set_initialSleepSecs(atoi(optarg));
+          break;
+
+          case 't':
+              atrace.set_traceDurationSeconds(atoi(optarg));
+          break;
+
+          case 'z':
+              atrace.enable_compression();
+          break;
+
+          case 'o':
+              atrace.set_outputFile(optarg);
+          break;
+
+          case 0:
+              if (!strcmp(long_options[option_index].name, "async_start")) {
+                  atrace.set_async(true);
+                  atrace.set_stop(false);
+                  atrace.set_dump(false);
+                  atrace.enable_trace_overwrite();
+              } else if (!strcmp(long_options[option_index].name, "async_stop")) {
+                  atrace.set_async(true);
+                  atrace.set_start(false);
+              } else if (!strcmp(long_options[option_index].name, "async_dump")) {
+                  atrace.set_async(true);
+                  atrace.set_start(false);
+                  atrace.set_stop(false);
+              } else if (!strcmp(long_options[option_index].name, "stream")) {
+                  atrace.enable_streaming();
+                  atrace.set_dump(false);
+              } else if (!strcmp(long_options[option_index].name, "list_categories")) {
+                  atrace.listSupportedCategories();
+                  return EXIT_SUCCESS;
+              }
+          break;
+
+          default:
+              fprintf(errstream, "\n");
+              showHelp(argv[0]);
+              return EXIT_FAILURE;
+          break;
+      }
+  }
+
   registerSigHandler();
-  int res = atrace.run_atrace(argc, argv);
-  return res;
+
+  return atrace.run();
 }

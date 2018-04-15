@@ -20,6 +20,7 @@
 
 #include "kernelsystem.h"
 #include "filesystem.h"
+#include "toolbox.h"
 
 #include <stdio.h>
 
@@ -28,6 +29,7 @@ class KernelSystemImpl : public KernelSystem {
     ~KernelSystemImpl();
     void set_errstream(FILE * errstream);
     void set_file_system(FileSystem * file_system);
+    void set_toolbox(Toolbox * toolbox);
     // Enable or disable a kernel option by writing a "1" or a "0" into a /sys
     // file.
     bool setKernelOptionEnable(const char* filename, bool enable) override;
@@ -58,13 +60,14 @@ class KernelSystemImpl : public KernelSystem {
     // Set the comma separated list of functions that the kernel is to trace.
     bool setKernelTraceFuncs(const char* funcs) override;
   private:
-    FILE * errstream;
-    FileSystem * file_system;
+    FILE * errstream = NULL;
+    FileSystem * file_system = NULL;
+    Toolbox * toolbox = NULL;
     // Read the trace_clock sysfs file and return true if it matches the requested
     // value.  The trace_clock file format is:
     // local [global] counter uptime perf
     bool isTraceClock(const char *mode);
-    bool verifyKernelTraceFuncs(const char * funcs) const;
+    bool verifyKernelTraceFuncs(const std::set<std::string> & funcs) const;
     const char * k_traceClockPath =  "/sys/kernel/debug/tracing/trace_clock";
     const char * k_traceBufferSizePath =  "/sys/kernel/debug/tracing/buffer_size_kb";
     const char * k_tracingOverwriteEnablePath =  "/sys/kernel/debug/tracing/options/overwrite";
@@ -73,7 +76,7 @@ class KernelSystemImpl : public KernelSystem {
     const char * k_funcgraphAbsTimePath =  "/sys/kernel/debug/tracing/options/funcgraph-abstime";
     const char * k_funcgraphCpuPath =  "/sys/kernel/debug/tracing/options/funcgraph-cpu";
     const char * k_funcgraphProcPath =  "/sys/kernel/debug/tracing/options/funcgraph-proc";
-    const char * k_funcgraphFlatPath =  "/sys/kernel/debug/tracing/options/funcgraph-flat";
+    // const char * k_funcgraphFlatPath =  "/sys/kernel/debug/tracing/options/funcgraph-flat";
     const char * k_ftraceFilterPath =  "/sys/kernel/debug/tracing/set_ftrace_filter";
     const char * k_tracingOnPath =  "/sys/kernel/debug/tracing/tracing_on";
     const char * k_tracePath =  "/sys/kernel/debug/tracing/trace";

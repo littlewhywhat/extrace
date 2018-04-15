@@ -33,6 +33,8 @@ class FileSystemImpl : public FileSystem {
     bool writeStr(const char* filename, const char* str) override;
     // Append a string to a file, returning true if the write was successful.
     bool appendStr(const char* filename, const char* str) override;
+    // Read a string from a file, returning true if the read is successful
+    bool readStr(const char* filename, char* str, int max_size) override;
   private:
     FILE * errstream;
     bool _writeStr(const char* filename, const char* str, int flags);

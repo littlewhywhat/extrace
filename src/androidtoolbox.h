@@ -15,20 +15,17 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_FILESYSTEM_H
-#define LTTLWHWHT_FILESYSTEM_H
+#ifndef LTTLWHWHT_ANDROID_TOOLBOX_H
+#define LTTLWHWHT_ANDROID_TOOLBOX_H
 
-#include <stdio.h>
+#include "toolbox.h"
 
-class FileSystem {
+class AndroidToolbox : public Toolbox {
   public:
-    virtual ~FileSystem() {}
-    virtual bool fileExists(const char* filename) = 0;
-    virtual bool fileIsWritable(const char* filename) = 0;
-    virtual bool truncateFile(const char* path) = 0;
-    virtual bool writeStr(const char* filename, const char* str) = 0;
-    virtual bool appendStr(const char* filename, const char* str) = 0;
-    virtual bool readStr(const char* filename, char* str, int max_size) = 0;
+    bool parseFileToTokens(const char * filename, const char * delims,
+                           std::set<std::string> & tokens) const override;
+    void parseToTokens(const char * delimseplist, const char * delims,
+                       std::set<std::string> & tokens) const override;
 };
 
-#endif // LTTLWHWHT_FILESYSTEM_H
+#endif //LTTLWHWHT_ANDROID_TOOLBOX_H
