@@ -8,25 +8,47 @@ class AtraceApp {
   - g_compress : bool
   - g_nohup : bool
   - g_initialSleepSecs : int
-  - g_categoriesFile : const char*
-  - g_kernelTraceFuncs : const char*
-  - g_debugAppCmdLine : const char*
-  - g_outputFile : const char*
+  - g_categoriesFile : string
+  - g_kernelTraceFuncs : string
+  - g_debugAppCmdLine : string
+  - g_outputFile : string
   - g_traceAborted : bool
+  - async : bool
+  - traceStart : bool
+  - traceStop : bool
+  - traceDump : bool
+  - traceStream : bool
   - errstream : FILE *
   - outstream : FILE *
   --
   + handleSignal(): void
+  + enable_trace_overwrite(): void
+  + enable_streaming(): void
+  + enable_compression(): void
+  + nosignals(): void
+  + setCategory(const char * name): void
   + add_android_category(const char * id, const char * name, uint64_t atrace_tag): void
   + add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles): void
   + set_android_core_services(const char * id, const char * name): void
-  + run_atrace(int argc, char **argv): int
+  + run(): int
+  - writeClockSyncMarker(): bool 
+  - isCategorySupported(const TracingCategory& category): bool 
+  - disableKernelTraceEvents(): bool 
+  - setCategoryEnable(const char* name, bool enable): bool 
+  - setCategoriesEnableFromFile(): bool 
+  - setUpTrace(): bool 
+  - cleanUpTrace(): void 
+  - startTrace(): bool 
+  - stopTrace(): void 
+  - streamTrace(): void 
+  - dumpTrace(int outFd): void 
 }
 
 AtraceApp "-androidsystem" *-->"1" AndroidSystem
 AtraceApp "-kernelsystem" *-->"1" KernelSystem
 AtraceApp "-systime" *-->"1" SystemTime
 AtraceApp "-k_categories " -->"0..*" TracingCategory
+AtraceApp "-toolbox " -->"1" Toolbox
 
 interface KernelSystem {
   + {abstract} setKernelOptionEnable(const char* filename, bool enable): bool
@@ -49,7 +71,6 @@ hide KernelSystem fields
 
 interface AndroidSystem {
   + {abstract} has_core_services() const: bool
-  + {abstract} setCategoriesEnableFromFile(const char * filename): bool
   + {abstract} property_get_core_service_names(std::string & content) const: void
   + {abstract} setAppCmdlineProperty(const char * data): bool
   + {abstract} pokeBinderServices(): bool
@@ -84,7 +105,6 @@ hide EnableFile methods
 
 class KernelSystemImpl {
   - errstream: FILE
-  - file_system: FileSystem
   - k_traceClockPath: const char *
   - k_traceBufferSizePath: const char *
   - k_tracingOverwriteEnablePath: const char *
@@ -106,6 +126,7 @@ class KernelSystemImpl {
 
 KernelSystemImpl ..> KernelSystem
 KernelSystemImpl "-file_system" --> "1" FileSystem
+KernelSystemImpl "-toolbox" --> "1" Toolbox
 
 interface FileSystem {
   + {abstract} fileExists(const char* filename): bool
@@ -141,5 +162,18 @@ hide SystemTimeImpl methods
 hide SystemTimeImpl fields
 
 SystemTimeImpl ..> SystemTime
+
+interface Toolbox {
+  + {abstract} parseFileToTokens(const char* filename, const char* delims, set<string> & tokens)
+  + {abstract} parseToTokens(const char* delimsepstr, const char* delims, set<string> & tokens)
+}
+hide Toolbox fields
+
+class AndroidToolbox {
+}
+hide AndroidToolbox fields
+hide AndroidToolbox methods
+
+AndroidToolbox ..> Toolbox
 
 @enduml

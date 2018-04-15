@@ -22,7 +22,7 @@
 #include <binder/Parcel.h>
 #include <cutils/properties.h>
 #include <utils/String8.h>
-// #include <utils/Tokenizer.h>
+
 #include <zlib.h>
 
 using namespace android;
@@ -39,27 +39,6 @@ bool AndroidSystemImpl::has_core_services() const {
     property_get(k_coreServicesProp, value, "");
     return strlen(value) != 0;
 }
-
-// bool AndroidSystemImpl::setCategoriesEnableFromFile(const char * categories_file) {
-//     if (!categories_file) {
-//         return true;
-//     }
-//     Tokenizer* tokenizer = NULL;
-//     if (Tokenizer::open(String8(categories_file), &tokenizer) != NO_ERROR) {
-//         return false;
-//     }
-//     bool ok = true;
-//     while (!tokenizer->isEol()) {
-//         String8 token = tokenizer->nextToken(" ");
-//         if (token.isEmpty()) {
-//             tokenizer->skipDelimiters(" ");
-//             continue;
-//         }
-//         ok &= setCategoryEnable(token.string(), true);
-//     }
-//     delete tokenizer;
-//     return ok;
-// }
 
 void AndroidSystemImpl::property_get_core_service_names(std::string & content) const {
     char value[PROPERTY_VALUE_MAX];

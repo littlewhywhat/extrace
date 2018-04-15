@@ -19,6 +19,8 @@
 #define LTTLWHWHT_KERNELSYSTEM_H
 
 #include "tracingcategory.h"
+#include <set>
+#include <string>
 
 class KernelSystem {
   public:
@@ -40,7 +42,7 @@ class KernelSystem {
     virtual bool setGlobalClockEnable(bool enable) = 0;
     virtual bool setPrintTgidEnableIfPresent(bool enable) = 0;
     virtual bool setKernelTraceFuncs(const char* funcs) = 0;
-    virtual bool verifyKernelTraceFuncs(const char * comma_separ_function_list) const = 0;
+    virtual bool verifyKernelTraceFuncs(const std::set<std::string> & funcs) const = 0;
 };
 
 #endif // LTTLWHWHT_KERNELSYSTEM_H

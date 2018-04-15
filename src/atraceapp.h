@@ -22,6 +22,7 @@
 #include "kernelsystem.h"
 #include "systemtime.h"
 #include "tracingcategory.h"
+#include "toolbox.h"
 
 #include <stdio.h>    // FILE
 #include <inttypes.h> // uint64_t
@@ -36,12 +37,31 @@ class AtraceApp {
     void set_systime(SystemTime * systime);
     void set_errstream(FILE * errstream);
     void set_outstream(FILE * outstream);
+    void set_toolbox(Toolbox * toolbox);
+    void set_debugAppCmdLine(const char * app);
+    void set_traceBufferSizeKB(int size);
+    void enable_trace_overwrite();
+    void set_categoriesFile(const char * file);
+    void set_kernelTraceFuncs(const char * funcs);
+    void nosignals();
+    void set_initialSleepSecs(int secs);
+    void set_traceDurationSeconds(int secs);
+    void enable_compression();
+    void set_outputFile(const char * filename);
+    void set_async(bool option);
+    void set_stop(bool option);
+    void set_dump(bool option);
+    void set_start(bool option);
+    void enable_streaming();
+    void listSupportedCategories();
+    bool setCategory(const char* name);
     void add_android_category(const char * id, const char * name, uint64_t atrace_tag);
     void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles);
     void set_android_core_services(const char * id, const char * name);
-    int run_atrace(int argc, char **argv);
+    int run();
   private:
     std::vector<TracingCategory> k_categories;
+    Toolbox * toolbox = NULL;
     SystemTime * systime = NULL;
     KernelSystem * kernel_system = NULL;
     AndroidSystem * android_system = NULL;
@@ -52,16 +72,21 @@ class AtraceApp {
     const char* k_coreServiceCategory = NULL;
 
     /* Command line options */
+    bool async = false;
+    bool traceStart = true;
+    bool traceStop = true;
+    bool traceDump = true;
+    bool traceStream = false;
     int g_traceDurationSeconds = 5;
     bool g_traceOverwrite = false;
     int g_traceBufferSizeKB = 2048;
     bool g_compress = false;
     bool g_nohup = false;
     int g_initialSleepSecs = 0;
-    const char* g_categoriesFile = NULL;
-    const char* g_kernelTraceFuncs = NULL;
-    const char* g_debugAppCmdLine = "";
-    const char* g_outputFile = nullptr;
+    std::string g_categoriesFile;
+    std::string g_kernelTraceFuncs;
+    std::string g_debugAppCmdLine;
+    std::string g_outputFile;
 
     /* Global state */
     bool g_traceAborted = false;
@@ -75,6 +100,7 @@ class AtraceApp {
     // Disable all /sys/ enable files.
     bool disableKernelTraceEvents();
     bool setCategoryEnable(const char* name, bool enable);
+    bool setCategoriesEnableFromFile();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     bool setUpTrace();
@@ -88,9 +114,6 @@ class AtraceApp {
     void streamTrace();
     // Read the current kernel trace and write it to outstream.
     void dumpTrace(int outFd);
-    void listSupportedCategories();
-    // Print the command usage help to errstream.
-    void showHelp(const char *cmd);
 };
 
 #endif // LTTLWHWHT_ATRACEAPP_H

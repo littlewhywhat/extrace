@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <sys/sendfile.h>
 #include <fcntl.h>  // O_WRONLY, O_CREAT
+#include <string.h>
 
 AtraceApp::~AtraceApp() {
   delete systime;
@@ -57,6 +58,91 @@ void AtraceApp::set_outstream(FILE * outstream) {
     this->outstream = outstream;
 }
 
+void AtraceApp::set_toolbox(Toolbox * toolbox)
+{
+    this->toolbox = toolbox;
+}
+
+void AtraceApp::set_debugAppCmdLine(const char * app) 
+{
+    g_debugAppCmdLine = app;
+}
+
+void AtraceApp::set_traceBufferSizeKB(int size) 
+{
+    g_traceBufferSizeKB = size;
+}
+
+void AtraceApp::enable_trace_overwrite() 
+{
+    g_traceOverwrite = true;
+}
+
+void AtraceApp::set_categoriesFile(const char * file) 
+{
+    g_categoriesFile = file;
+}
+
+void AtraceApp::set_kernelTraceFuncs(const char * funcs) 
+{
+    g_kernelTraceFuncs = funcs;
+}
+
+void AtraceApp::nosignals() 
+{
+    g_nohup = true;
+}
+
+void AtraceApp::set_initialSleepSecs(int secs) 
+{
+    g_initialSleepSecs = secs;
+}
+
+void AtraceApp::set_traceDurationSeconds(int secs) 
+{
+    g_traceDurationSeconds = secs;
+}
+
+void AtraceApp::enable_compression() 
+{
+    g_compress = true;
+}
+
+void AtraceApp::set_outputFile(const char * filename) 
+{
+    g_outputFile = filename;
+}
+
+void AtraceApp::set_async(bool option) 
+{
+    async = option;
+}
+
+void AtraceApp::set_start(bool option) 
+{
+    traceStart = option;
+}
+
+void AtraceApp::set_stop(bool option) 
+{
+    traceStop = option;
+}
+
+void AtraceApp::set_dump(bool option) 
+{
+    traceDump = option;
+}
+
+void AtraceApp::enable_streaming() 
+{
+    traceStream = true;
+}
+
+bool AtraceApp::setCategory(const char* name)
+{
+    return setCategoryEnable(name, true);
+}
+
 void AtraceApp::add_android_category(const char * id, const char * name, uint64_t atrace_tag)
 {
   k_categories.push_back({ id, name, atrace_tag, {}, false });
@@ -73,115 +159,8 @@ void AtraceApp::set_android_core_services(const char * id, const char * name)
   k_categories.push_back({ k_coreServiceCategory, name, 0, { }, false });
 }
 
-int AtraceApp::run_atrace(int argc, char **argv)
+int AtraceApp::run()
 {
-    bool async = false;
-    bool traceStart = true;
-    bool traceStop = true;
-    bool traceDump = true;
-    bool traceStream = false;
-
-    if (argc == 2 && 0 == strcmp(argv[1], "--help")) {
-        showHelp(argv[0]);
-        return EXIT_SUCCESS;
-    }
-
-    for (;;) {
-        int ret;
-        int option_index = 0;
-        static struct option long_options[] = {
-            {"async_start",     no_argument, 0,  0 },
-            {"async_stop",      no_argument, 0,  0 },
-            {"async_dump",      no_argument, 0,  0 },
-            {"list_categories", no_argument, 0,  0 },
-            {"stream",          no_argument, 0,  0 },
-            {           0,                0, 0,  0 }
-        };
-
-        ret = getopt_long(argc, argv, "a:b:cf:k:ns:t:zo:",
-                          long_options, &option_index);
-
-        if (ret < 0) {
-            for (int i = optind; i < argc; i++) {
-                if (!setCategoryEnable(argv[i], true)) {
-                    fprintf(errstream, "error enabling tracing category \"%s\"\n", argv[i]);
-                    return EXIT_FAILURE;
-                }
-            }
-            break;
-        }
-
-        switch(ret) {
-            case 'a':
-                g_debugAppCmdLine = optarg;
-            break;
-
-            case 'b':
-                g_traceBufferSizeKB = atoi(optarg);
-            break;
-
-            case 'c':
-                g_traceOverwrite = true;
-            break;
-
-            case 'f':
-                g_categoriesFile = optarg;
-            break;
-
-            case 'k':
-                g_kernelTraceFuncs = optarg;
-            break;
-
-            case 'n':
-                g_nohup = true;
-            break;
-
-            case 's':
-                g_initialSleepSecs = atoi(optarg);
-            break;
-
-            case 't':
-                g_traceDurationSeconds = atoi(optarg);
-            break;
-
-            case 'z':
-                g_compress = true;
-            break;
-
-            case 'o':
-                g_outputFile = optarg;
-            break;
-
-            case 0:
-                if (!strcmp(long_options[option_index].name, "async_start")) {
-                    async = true;
-                    traceStop = false;
-                    traceDump = false;
-                    g_traceOverwrite = true;
-                } else if (!strcmp(long_options[option_index].name, "async_stop")) {
-                    async = true;
-                    traceStart = false;
-                } else if (!strcmp(long_options[option_index].name, "async_dump")) {
-                    async = true;
-                    traceStart = false;
-                    traceStop = false;
-                } else if (!strcmp(long_options[option_index].name, "stream")) {
-                    traceStream = true;
-                    traceDump = false;
-                } else if (!strcmp(long_options[option_index].name, "list_categories")) {
-                    listSupportedCategories();
-                    return EXIT_SUCCESS;
-                }
-            break;
-
-            default:
-                fprintf(errstream, "\n");
-                showHelp(argv[0]);
-                return EXIT_FAILURE;
-            break;
-        }
-    }
-
     if (g_initialSleepSecs > 0) {
         sleep(g_initialSleepSecs);
     }
@@ -224,21 +203,20 @@ int AtraceApp::run_atrace(int argc, char **argv)
     // Stop the trace and restore the default settings.
     if (traceStop)
         stopTrace();
-
     if (ok && traceDump) {
         if (!g_traceAborted) {
             printf(" done\n");
             fflush(outstream);
             int outFd = fileno(outstream);
-            if (g_outputFile) {
-                outFd = open(g_outputFile, O_WRONLY | O_CREAT);
+            if (!g_outputFile.empty()) {
+                outFd = open(g_outputFile.c_str(), O_WRONLY | O_CREAT);
             }
             if (outFd == -1) {
-                printf("Failed to open '%s', err=%d", g_outputFile, errno);
+                printf("Failed to open '%s', err=%d", g_outputFile.c_str(), errno);
             } else {
                 dprintf(outFd, "TRACE:\n");
                 dumpTrace(outFd);
-                if (g_outputFile) {
+                if (!g_outputFile.empty()) {
                     close(outFd);
                 }
             }
@@ -330,6 +308,20 @@ bool AtraceApp::setCategoryEnable(const char* name, bool enable)
     return false;
 }
 
+bool AtraceApp::setCategoriesEnableFromFile() {
+    if (g_categoriesFile.empty()) {
+        return true;
+    }
+    bool ok = true;
+    std::set<std::string> tokens;
+    ok &= toolbox->parseFileToTokens(g_categoriesFile.c_str(), " ", tokens);
+
+    for (const auto & token : tokens) {
+        ok &= setCategoryEnable(token.c_str(), true);
+    }
+    return ok;
+}
+
 // Set all the kernel tracing settings to the desired state for this trace
 // capture.
 bool AtraceApp::setUpTrace()
@@ -337,12 +329,12 @@ bool AtraceApp::setUpTrace()
     bool ok = true;
 
     // Set up the tracing options.
-    // ok &= android_system->setCategoriesEnableFromFile(g_categoriesFile);
+    ok &= setCategoriesEnableFromFile();
     ok &= kernel_system->setTraceOverwriteEnable(g_traceOverwrite);
     ok &= kernel_system->setTraceBufferSizeKB(g_traceBufferSizeKB);
     ok &= kernel_system->setGlobalClockEnable(true);
     ok &= kernel_system->setPrintTgidEnableIfPresent(true);
-    ok &= kernel_system->setKernelTraceFuncs(g_kernelTraceFuncs);
+    ok &= kernel_system->setKernelTraceFuncs(g_kernelTraceFuncs.c_str());
 
     // Set up the tags property.
     uint64_t tags = 0;
@@ -390,7 +382,7 @@ bool AtraceApp::setUpTrace()
                     if (kernel_system->isPossibleSetKernelOption(path)) {
                         ok &= kernel_system->setKernelOptionEnable(path, true);
                     } else if (required) {
-                        fprintf(stderr, "error writing file %s\n", path);
+                        fprintf(errstream, "error writing file %s\n", path);
                         ok = false;
                     }
                 }
@@ -490,35 +482,4 @@ void AtraceApp::listSupportedCategories()
             printf("  %10s - %s\n", c.name, c.longname);
         }
     }
-}
-
-// Print the command usage help to errstream.
-void AtraceApp::showHelp(const char *cmd)
-{
-    fprintf(errstream, "usage: %s [options] [categories...]\n", cmd);
-    fprintf(errstream, "options include:\n"
-                    "  -a appname      enable app-level tracing for a comma "
-                        "separated list of cmdlines\n"
-                    "  -b N            use a trace buffer size of N KB\n"
-                    "  -c              trace into a circular buffer\n"
-                    "  -f filename     use the categories written in a file as space-separated\n"
-                    "                    values in a line\n"
-                    "  -k fname,...    trace the listed kernel functions\n"
-                    "  -n              ignore signals\n"
-                    "  -s N            sleep for N seconds before tracing [default 0]\n"
-                    "  -t N            trace for N seconds [defualt 5]\n"
-                    "  -z              compress the trace dump\n"
-                    "  --async_start   start circular trace and return immediatly\n"
-                    "  --async_dump    dump the current contents of circular trace buffer\n"
-                    "  --async_stop    stop tracing and dump the current contents of circular\n"
-                    "                    trace buffer\n"
-                    "  --stream        stream trace to outstream as it enters the trace buffer\n"
-                    "                    Note: this can take significant CPU time, and is best\n"
-                    "                    used for measuring things that are not affected by\n"
-                    "                    CPU performance, like pagecache usage.\n"
-                    "  --list_categories\n"
-                    "                  list the available tracing categories\n"
-                    " -o filename      write the trace to the specified file instead\n"
-                    "                    of outstream.\n"
-            );
 }
