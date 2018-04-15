@@ -1,0 +1,145 @@
+@startuml
+
+class AtraceApp {
+  - k_coreServiceCategory : const char*
+  - g_traceOverwrite : bool
+  - g_traceDurationSeconds : int
+  - g_traceBufferSizeKB : int
+  - g_compress : bool
+  - g_nohup : bool
+  - g_initialSleepSecs : int
+  - g_categoriesFile : const char*
+  - g_kernelTraceFuncs : const char*
+  - g_debugAppCmdLine : const char*
+  - g_outputFile : const char*
+  - g_traceAborted : bool
+  - errstream : FILE *
+  - outstream : FILE *
+  --
+  + handleSignal(): void
+  + add_android_category(const char * id, const char * name, uint64_t atrace_tag): void
+  + add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles): void
+  + set_android_core_services(const char * id, const char * name): void
+  + run_atrace(int argc, char **argv): int
+}
+
+AtraceApp "-androidsystem" *-->"1" AndroidSystem
+AtraceApp "-kernelsystem" *-->"1" KernelSystem
+AtraceApp "-systime" *-->"1" SystemTime
+AtraceApp "-k_categories " -->"0..*" TracingCategory
+
+interface KernelSystem {
+  + {abstract} setKernelOptionEnable(const char* filename, bool enable): bool
+  + {abstract} isPossibleSetKernelOption(const char * filename): bool
+  + {abstract} isCategorySupported(const TracingCategory& category): bool
+  + {abstract} isCategorySupportedForRoot(const TracingCategory& category): bool
+  + {abstract} writeMarker(const char * buffer): bool
+  + {abstract} setTraceOverwriteEnable(bool enable): bool
+  + {abstract} setTracingEnabled(bool enable): bool
+  + {abstract} clearTrace(): bool
+  + {abstract} getTracePipeFd(): int
+  + {abstract} getTraceFd(): int
+  + {abstract} setTraceBufferSizeKB(int size): bool
+  + {abstract} setGlobalClockEnable(bool enable): bool
+  + {abstract} setPrintTgidEnableIfPresent(bool enable): bool
+  + {abstract} setKernelTraceFuncs(const char* funcs): bool
+  + {abstract} verifyKernelTraceFuncs(const char * comma_separ_function_list) const: bool
+}
+hide KernelSystem fields
+
+interface AndroidSystem {
+  + {abstract} has_core_services() const: bool
+  + {abstract} setCategoriesEnableFromFile(const char * filename): bool
+  + {abstract} property_get_core_service_names(std::string & content) const: void
+  + {abstract} setAppCmdlineProperty(const char * data): bool
+  + {abstract} pokeBinderServices(): bool
+  + {abstract} setTagsProperty(uint64_t tags): bool
+  + {abstract} clearAppProperties(): void
+  + {abstract} compress_trace_to(int traceFD, int outFd): void
+  + {abstract} log_dumping_trace(): void
+}
+hide AndroidSystem fields
+
+interface SystemTime {
+  + {abstract} get_monotonic() const: float
+  + {abstract} get_realtime() const: int64_t
+}
+hide SystemTime fields
+
+class TracingCategory {
+  + name: const char *
+  + longname: const char *
+  + tags: uint64_t
+  + is_enabled: bool
+}
+hide TracingCategory methods
+
+TracingCategory "-files" --> "1..*" EnableFile
+
+class EnableFile {
+  + path: const char *
+  + is_required: bool
+}
+hide EnableFile methods
+
+class KernelSystemImpl {
+  - errstream: FILE
+  - file_system: FileSystem
+  - k_traceClockPath: const char *
+  - k_traceBufferSizePath: const char *
+  - k_tracingOverwriteEnablePath: const char *
+  - k_currentTracerPath: const char *
+  - k_printTgidPath: const char *
+  - k_funcgraphAbsTimePath: const char *
+  - k_funcgraphCpuPath: const char *
+  - k_funcgraphProcPath: const char *
+  - k_funcgraphFlatPath: const char *
+  - k_ftraceFilterPath: const char *
+  - k_tracingOnPath: const char *
+  - k_tracePath: const char *
+  - k_traceStreamPath: const char *
+  - k_traceMarkerPath: const char *
+  --
+  - isTraceClock(const char * mode): bool
+  - verifyKernelTraceFuncs(const char * funcs): bool
+}
+
+KernelSystemImpl ..> KernelSystem
+KernelSystemImpl "-file_system" --> "1" FileSystem
+
+interface FileSystem {
+  + {abstract} fileExists(const char* filename): bool
+  + {abstract} fileIsWritable(const char* filename): bool
+  + {abstract} truncateFile(const char* path): bool
+  + {abstract} writeStr(const char* filename, const char* str): bool
+  + {abstract} appendStr(const char* filename, const char* str): bool
+}
+hide FileSystem fields
+
+class FileSystemImpl {
+  - errstream: FILE
+  --
+  - _writeStr(const char* filename, const char* str, int flags): bool
+}
+
+FileSystemImpl ..> FileSystem
+
+class AndroidSystemImpl {
+  - errstream: FILE
+  - k_traceTagsProperty: const char *
+  - k_coreServicesProp: const char *
+  - k_traceAppsNumberProperty: const char *
+  - k_traceAppsPropertyTemplate: const char *
+}
+hide AndroidSystemImpl methods
+
+AndroidSystemImpl ..> AndroidSystem
+
+class SystemTimeImpl {
+}
+hide SystemTimeImpl methods
+hide SystemTimeImpl fields
+
+SystemTimeImpl ..> SystemTime
+
+@enduml
