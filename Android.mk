@@ -34,6 +34,37 @@ LOCAL_CPPFLAGS := $(common_cflags)
 
 include $(BUILD_EXECUTABLE)
 
+# atrace refactored
+# =================
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= \
+		src/systemtime_impl.cpp \
+		src/androidsystem_impl.cpp \
+		src/atraceapp.cpp \
+		src/atrace.cpp \
+		src/filesystem_impl.cpp \
+		src/kernelsystem_impl.cpp \
+
+LOCAL_MODULE:= atrace_ref
+
+LOCAL_CPPFLAGS := $(common_cflags)
+
+LOCAL_C_INCLUDES += external/zlib
+
+LOCAL_MODULE_TAGS:= optional
+
+LOCAL_SHARED_LIBRARIES := \
+    libbinder \
+    libcutils \
+    libutils \
+    libz \
+
+include $(BUILD_EXECUTABLE)
+
+LOCAL_INIT_RC := atrace_ref.rc
+
 # extrace_test target
 # ===================
 

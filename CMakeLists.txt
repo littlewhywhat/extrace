@@ -32,12 +32,25 @@ set (CMAKE_CXX_FLAGS "-Wall -Werror -fno-exceptions -pedantic -Wunused-parameter
 include_directories("src")
 set(MAIN "${CMAKE_SOURCE_DIR}/src/main.cpp")
 set(ATRACE "${CMAKE_SOURCE_DIR}/src/atrace.cpp")
-set(ATRACE_ABSTRACT "${CMAKE_SOURCE_DIR}/src/atrace_abstract.cpp")
+set(SYSTEMTIME_IMPL "${CMAKE_SOURCE_DIR}/src/systemtime_impl.cpp")
+set(ANDROIDSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/androidsystem_impl.cpp")
+set(ATRACEAPP "${CMAKE_SOURCE_DIR}/src/atraceapp.cpp")
+set(KERNELSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/kernelsystem_impl.cpp")
+
 file (GLOB OBJ_SOURCES "src/*.cpp")
 file (GLOB TEST_SOURCES "src/*_test.cpp")
 
 # filter OBJ_SOURCES
-list(REMOVE_ITEM OBJ_SOURCES ${MAIN} ${ATRACE} ${ATRACE_ABSTRACT} ${TEST_SOURCES})
+list(REMOVE_ITEM OBJ_SOURCES 
+     ${MAIN}
+     # following need some android libraries so we exclude them
+     ${ATRACE}
+     ${SYSTEMTIME_IMPL}
+     ${ANDROIDSYSTEM_IMPL}
+     ${ATRACEAPP}
+     ${KERNELSYSTEM_IMPL}
+     ${TEST_SOURCES}
+)
 
 # create main executable 
 set (SOURCES ${OBJ_SOURCES} ${MAIN})
