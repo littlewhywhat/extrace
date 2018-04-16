@@ -56,7 +56,7 @@ class AtraceApp {
     void add_android_category(const char * id, const char * name, uint64_t atrace_tag);
     void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles);
     void set_android_core_services(const char * id, const char * name);
-    int run();
+    bool run();
   private:
     std::vector<TracingCategory> k_categories;
     Toolbox * toolbox = NULL;
@@ -110,7 +110,7 @@ class AtraceApp {
     // Read data from the tracing pipe and forward to outstream
     void streamTrace();
     // Read the current kernel trace and write it to outstream.
-    void dumpTrace(int outFd);
+    void dumpTrace();
 };
 
 #endif // LTTLWHWHT_ATRACEAPP_H

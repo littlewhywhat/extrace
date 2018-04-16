@@ -19,10 +19,12 @@
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
-#include <fcntl.h>  // creat, ope
+#include <fcntl.h>  // creat, ope, O_WRONLY, O_CREAT
 #include <stdlib.h> // free
 #include <unistd.h> // read, close
+#include <stdio.h>  // FILE
 #include <set>
+#include <sys/sendfile.h>
 
 KernelSystemImpl::~KernelSystemImpl()
 {
@@ -48,6 +50,37 @@ void KernelSystemImpl::set_file_system(FileSystem * file_system)
 void KernelSystemImpl::set_toolbox(Toolbox * toolbox)
 {
     this->toolbox = toolbox;
+}
+
+int KernelSystemImpl::tryOpenToWriteOrCreate(const char* filename)
+{
+    int outFd = open(filename, O_WRONLY | O_CREAT);
+    if (outFd == -1) {
+      printf("Failed to open '%s', err=%d", filename, errno);
+    }
+    return outFd;
+}
+
+bool KernelSystemImpl::try_sendfile(int fd_from, int fd_to)
+{
+    ssize_t sent = 0;
+    while ((sent = sendfile(fd_to, fd_from, NULL, 64*1024*1024)) > 0);
+    if (sent == -1) {
+        fprintf(errstream, "error sendfile: %s (%d)\n", strerror(errno),
+                errno);
+        return false;
+    }
+    return true;
+}
+
+bool KernelSystemImpl::try_send(int fd_from, int fd_to) {
+    char trace_data[4096];
+    ssize_t bytes_read = read(fd_from, trace_data, 4096);
+    if (bytes_read > 0) {
+        write(fd_to, trace_data, bytes_read);
+        return true;
+    }
+    return false;
 }
 
 bool KernelSystemImpl::setKernelOptionEnable(const char* filename, bool enable)

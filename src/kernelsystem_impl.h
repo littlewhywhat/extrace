@@ -32,6 +32,8 @@ class KernelSystemImpl : public KernelSystem {
     void set_file_system(FileSystem * file_system);
     void set_toolbox(Toolbox * toolbox);
     void set_systime(SystemTime * systime);
+    int tryOpenToWriteOrCreate(const char* filename);
+    bool try_sendfile(int fd_from, int fd_to);
     // Enable or disable a kernel option by writing a "1" or a "0" into a /sys
     // file.
     bool setKernelOptionEnable(const char* filename, bool enable) override;
@@ -52,6 +54,7 @@ class KernelSystemImpl : public KernelSystem {
     bool clearTrace() override;
     int getTracePipeFd() override;
     int getTraceFd() override;
+    bool try_send(int fd_from, int fd_to) override;
     bool setTraceBufferSizeKB(int size) override;
     // Enable or disable the kernel's use of the global clock.  Disabling the global
     // clock will result in the kernel using a per-CPU local clock.

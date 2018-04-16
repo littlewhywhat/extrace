@@ -27,6 +27,7 @@
 #include <getopt.h>      // getopt_long, no_argument
 #include <signal.h>      // sigaction
 #include <utils/Trace.h> // ATRACE_TAGs
+#include <stdlib.h>      // EXIT_FAILURE, EXIT_SUCCESS
 
 AtraceApp atrace;
 FILE * errstream = stderr;
@@ -305,5 +306,5 @@ int main(int argc, char ** argv) {
 
   registerSigHandler();
 
-  return atrace.run();
+  return atrace.run()? EXIT_SUCCESS : EXIT_FAILURE;
 }

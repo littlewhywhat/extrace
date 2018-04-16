@@ -17,12 +17,8 @@
 
 #include "atraceapp.h"
 
-#include <getopt.h> // getopt_long, no_argument
-#include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS
 #include <unistd.h> // sleep
 #include <errno.h>
-#include <sys/sendfile.h>
-#include <fcntl.h>  // O_WRONLY, O_CREAT
 #include <string.h>
 
 AtraceApp::~AtraceApp() {
@@ -154,7 +150,7 @@ void AtraceApp::set_android_core_services(const char * id, const char * name)
   k_categories.push_back({ k_coreServiceCategory, name, 0, { }, false });
 }
 
-int AtraceApp::run()
+bool AtraceApp::run()
 {
     if (g_initialSleepSecs > 0) {
         sleep(g_initialSleepSecs);
@@ -202,19 +198,7 @@ int AtraceApp::run()
         if (!g_traceAborted) {
             printf(" done\n");
             fflush(outstream);
-            int outFd = fileno(outstream);
-            if (!g_outputFile.empty()) {
-                outFd = open(g_outputFile.c_str(), O_WRONLY | O_CREAT);
-            }
-            if (outFd == -1) {
-                printf("Failed to open '%s', err=%d", g_outputFile.c_str(), errno);
-            } else {
-                dprintf(outFd, "TRACE:\n");
-                dumpTrace(outFd);
-                if (!g_outputFile.empty()) {
-                    close(outFd);
-                }
-            }
+            dumpTrace();       
         } else {
             printf("\ntrace aborted.\n");
             fflush(outstream);
@@ -228,7 +212,7 @@ int AtraceApp::run()
     if (traceStop)
         cleanUpTrace();
 
-    return g_traceAborted ? EXIT_FAILURE : EXIT_SUCCESS;
+    return !g_traceAborted;
 }
 
 // Check whether the category is supported on the device with the current
@@ -408,49 +392,55 @@ void AtraceApp::stopTrace()
 // Read data from the tracing pipe and forward to outstream
 void AtraceApp::streamTrace()
 {
-    char trace_data[4096];
-    int traceFD = kernel_system->getTracePipeFd();
-    if (traceFD == -1) {
-        fprintf(errstream, "error opening trace stream\n");
+    int trace_stream = kernel_system->getTracePipeFd();
+    if (trace_stream == -1) {
+        fprintf(errstream, "error streaming trace\n");
         return;
     }
     while (!g_traceAborted) {
-        ssize_t bytes_read = read(traceFD, trace_data, 4096);
-        if (bytes_read > 0) {
-            write(fileno(outstream), trace_data, bytes_read);
-            fflush(outstream);
-        } else {
+        if (!kernel_system->try_send(trace_stream, fileno(outstream))) {
             if (!g_traceAborted) {
-                fprintf(errstream, "read returned %zd bytes err %d (%s)\n",
-                        bytes_read, errno, strerror(errno));
+              fprintf(errstream, "error streaming trace");
             }
             break;
         }
+        fflush(outstream);
     }
 }
 
 // Read the current kernel trace and write it to outstream.
-void AtraceApp::dumpTrace(int outFd)
+void AtraceApp::dumpTrace()
 {
+    int outFd = fileno(outstream);
+    if (!g_outputFile.empty()) {
+      outFd = kernel_system->tryOpenToWriteOrCreate(g_outputFile.c_str());
+      if (outFd == -1) {
+        fprintf(errstream, "error dumping trace\n");
+        return;
+      }
+    } 
+    dprintf(outFd, "TRACE:\n");
     android_system->log_dumping_trace();
+
     int traceFD = kernel_system->getTraceFd();
     if (traceFD == -1) {
-        fprintf(errstream, "error opening trace\n");
+        fprintf(errstream, "error dumping trace\n");
         return;
     }
-
     if (g_compress) {
         android_system->compress_trace_to(traceFD, outFd);
     } else {
-        ssize_t sent = 0;
-        while ((sent = sendfile(outFd, traceFD, NULL, 64*1024*1024)) > 0);
-        if (sent == -1) {
+        // ssize_t sent = 0;
+        // while ((sent = sendfile(outFd, traceFD, NULL, 64*1024*1024)) > 0);
+        if (!kernel_system->try_sendfile(outFd, traceFD)) {
             fprintf(errstream, "error dumping trace: %s (%d)\n", strerror(errno),
                     errno);
         }
     }
-
     close(traceFD);
+    if (!g_outputFile.empty()) {
+        close(outFd);
+    }
 }
 
 
