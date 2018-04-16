@@ -31,7 +31,6 @@ class AtraceApp {
   + add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles): void
   + set_android_core_services(const char * id, const char * name): void
   + run(): int
-  - writeClockSyncMarker(): bool 
   - isCategorySupported(const TracingCategory& category): bool 
   - disableKernelTraceEvents(): bool 
   - setCategoryEnable(const char* name, bool enable): bool 
@@ -46,7 +45,6 @@ class AtraceApp {
 
 AtraceApp "-androidsystem" *-->"1" AndroidSystem
 AtraceApp "-kernelsystem" *-->"1" KernelSystem
-AtraceApp "-systime" *-->"1" SystemTime
 AtraceApp "-k_categories " -->"0..*" TracingCategory
 AtraceApp "-toolbox " -->"1" Toolbox
 
@@ -55,7 +53,7 @@ interface KernelSystem {
   + {abstract} isPossibleSetKernelOption(const char * filename): bool
   + {abstract} isCategorySupported(const TracingCategory& category): bool
   + {abstract} isCategorySupportedForRoot(const TracingCategory& category): bool
-  + {abstract} writeMarker(const char * buffer): bool
+  + {abstract} writeClockSyncMarker(): bool 
   + {abstract} setTraceOverwriteEnable(bool enable): bool
   + {abstract} setTracingEnabled(bool enable): bool
   + {abstract} clearTrace(): bool
@@ -122,11 +120,13 @@ class KernelSystemImpl {
   --
   - isTraceClock(const char * mode): bool
   - verifyKernelTraceFuncs(const char * funcs): bool
+  - writeMarker(const char * buffer): bool
 }
 
 KernelSystemImpl ..> KernelSystem
 KernelSystemImpl "-file_system" --> "1" FileSystem
 KernelSystemImpl "-toolbox" --> "1" Toolbox
+KernelSystemImpl "-systime" *-->"1" SystemTime
 
 interface FileSystem {
   + {abstract} fileExists(const char* filename): bool

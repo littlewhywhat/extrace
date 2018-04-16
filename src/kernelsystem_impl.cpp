@@ -28,11 +28,16 @@ KernelSystemImpl::~KernelSystemImpl()
 {
     delete this->file_system;
     delete this->toolbox;
+    delete this->systime;
 }
 
 void KernelSystemImpl::set_errstream(FILE * errstream)
 {
     this->errstream = errstream;
+}
+
+void KernelSystemImpl::set_systime(SystemTime * systime) {
+    this->systime = systime;
 }
 
 void KernelSystemImpl::set_file_system(FileSystem * file_system)
@@ -96,6 +101,19 @@ bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& categor
         }
     }
     return ok;
+}
+
+bool KernelSystemImpl::writeClockSyncMarker()
+{
+  char buffer[128];
+  float now_in_seconds = systime->get_monotonic();
+  snprintf(buffer, 128, "trace_event_clock_sync: parent_ts=%f\n", now_in_seconds);
+  bool ok = true;
+  ok &= writeMarker(buffer);
+  int64_t realtime_in_ms = systime->get_realtime();
+  snprintf(buffer, 128, "trace_event_clock_sync: realtime_ts=%" PRId64 "\n", realtime_in_ms);
+  ok &= writeMarker(buffer);
+  return ok;
 }
 
 bool KernelSystemImpl::writeMarker(const char * buffer)

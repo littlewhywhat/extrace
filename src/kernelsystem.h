@@ -29,7 +29,7 @@ class KernelSystem {
     virtual bool isPossibleSetKernelOption(const char * filename) = 0;
     virtual bool isCategorySupported(const TracingCategory& category) = 0;
     virtual bool isCategorySupportedForRoot(const TracingCategory& category) = 0;
-    virtual bool writeMarker(const char * buffer) = 0;
+    virtual bool writeClockSyncMarker() = 0;
     // Enable or disable overwriting of the kernel trace buffers.  Disabling this
     // will cause tracing to stop once the trace buffers have filled up.
     virtual bool setTraceOverwriteEnable(bool enable) = 0;

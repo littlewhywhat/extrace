@@ -21,6 +21,7 @@
 #include "kernelsystem.h"
 #include "filesystem.h"
 #include "toolbox.h"
+#include "systemtime.h"
 
 #include <stdio.h>
 
@@ -30,6 +31,7 @@ class KernelSystemImpl : public KernelSystem {
     void set_errstream(FILE * errstream);
     void set_file_system(FileSystem * file_system);
     void set_toolbox(Toolbox * toolbox);
+    void set_systime(SystemTime * systime);
     // Enable or disable a kernel option by writing a "1" or a "0" into a /sys
     // file.
     bool setKernelOptionEnable(const char* filename, bool enable) override;
@@ -44,7 +46,7 @@ class KernelSystemImpl : public KernelSystem {
     // that exists.  It performs the same logic as isCategorySupported, but it
     // uses file existance rather than writability in the /sys/ file checks.
     bool isCategorySupportedForRoot(const TracingCategory& category) override;
-    bool writeMarker(const char * buffer) override;
+    bool writeClockSyncMarker() override;
     bool setTraceOverwriteEnable(bool enable) override;
     bool setTracingEnabled(bool enable) override;
     bool clearTrace() override;
@@ -63,6 +65,9 @@ class KernelSystemImpl : public KernelSystem {
     FILE * errstream = NULL;
     FileSystem * file_system = NULL;
     Toolbox * toolbox = NULL;
+    SystemTime * systime = NULL;
+
+    bool writeMarker(const char * buffer);
     // Read the trace_clock sysfs file and return true if it matches the requested
     // value.  The trace_clock file format is:
     // local [global] counter uptime perf

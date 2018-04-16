@@ -26,7 +26,6 @@
 #include <string.h>
 
 AtraceApp::~AtraceApp() {
-  delete systime;
   delete kernel_system;
   delete android_system;
 }
@@ -44,10 +43,6 @@ void AtraceApp::set_android_system(AndroidSystem * android_system) {
 
 void AtraceApp::set_kernel_system(KernelSystem * kernel_system) {
     this->kernel_system = kernel_system;
-}
-
-void AtraceApp::set_systime(SystemTime * systime) {
-    this->systime = systime;
 }
 
 void AtraceApp::set_errstream(FILE * errstream) {
@@ -182,7 +177,7 @@ int AtraceApp::run()
         // another.
         ok = kernel_system->clearTrace();
 
-        writeClockSyncMarker();
+        kernel_system->writeClockSyncMarker();
         if (ok && !async && !traceStream) {
             // Sleep to allow the trace to be captured.
             struct timespec timeLeft;
@@ -234,21 +229,6 @@ int AtraceApp::run()
         cleanUpTrace();
 
     return g_traceAborted ? EXIT_FAILURE : EXIT_SUCCESS;
-}
-
-bool AtraceApp::writeClockSyncMarker()
-{
-  char buffer[128];
-  float now_in_seconds = systime->get_monotonic();
-  snprintf(buffer, 128, "trace_event_clock_sync: parent_ts=%f\n", now_in_seconds);
-  bool ok = true;
-  ok &= kernel_system->writeMarker(buffer);
-  // ok &= writeStr(k_traceMarkerPath, buffer);
-  int64_t realtime_in_ms = systime->get_realtime();
-  snprintf(buffer, 128, "trace_event_clock_sync: realtime_ts=%" PRId64 "\n", realtime_in_ms);
-  ok &= kernel_system->writeMarker(buffer);
-  // ok &= writeStr(k_traceMarkerPath, buffer);
-  return ok;
 }
 
 // Check whether the category is supported on the device with the current

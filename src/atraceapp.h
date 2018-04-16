@@ -20,7 +20,6 @@
 
 #include "androidsystem.h"
 #include "kernelsystem.h"
-#include "systemtime.h"
 #include "tracingcategory.h"
 #include "toolbox.h"
 
@@ -34,7 +33,6 @@ class AtraceApp {
     void handleSignal();
     void set_android_system(AndroidSystem * android_system);
     void set_kernel_system(KernelSystem * kernel_system);
-    void set_systime(SystemTime * systime);
     void set_errstream(FILE * errstream);
     void set_outstream(FILE * outstream);
     void set_toolbox(Toolbox * toolbox);
@@ -62,7 +60,6 @@ class AtraceApp {
   private:
     std::vector<TracingCategory> k_categories;
     Toolbox * toolbox = NULL;
-    SystemTime * systime = NULL;
     KernelSystem * kernel_system = NULL;
     AndroidSystem * android_system = NULL;
 
@@ -91,7 +88,7 @@ class AtraceApp {
     /* Global state */
     bool g_traceAborted = false;
 
-    bool writeClockSyncMarker();
+    
     // Check whether the category is supported on the device with the current
     // rootness.  A category is supported only if all its required /sys/ files are
     // writable and if enabling the category will enable one or more tracing tags
