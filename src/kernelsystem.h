@@ -21,15 +21,17 @@
 #include "tracingcategory.h"
 #include <set>
 #include <string>
+#include <stdio.h>
 
 class KernelSystem {
   public:
     virtual ~KernelSystem() {}
+    virtual int tryOpenToWriteOrCreate(const char* filename) = 0;
+    virtual bool try_sendfile(int fd_from, int fd_to) = 0;
     virtual bool setKernelOptionEnable(const char* filename, bool enable) = 0;
     virtual bool isPossibleSetKernelOption(const char * filename) = 0;
-    virtual bool isCategorySupported(const TracingCategory& category) = 0;
-    virtual bool isCategorySupportedForRoot(const TracingCategory& category) = 0;
-    virtual bool writeMarker(const char * buffer) = 0;
+    virtual bool isCategorySupported(const TracingCategory& category) const = 0;
+    virtual bool writeClockSyncMarker() = 0;
     // Enable or disable overwriting of the kernel trace buffers.  Disabling this
     // will cause tracing to stop once the trace buffers have filled up.
     virtual bool setTraceOverwriteEnable(bool enable) = 0;
@@ -38,6 +40,7 @@ class KernelSystem {
     virtual bool clearTrace() = 0;
     virtual int getTracePipeFd() = 0;
     virtual int getTraceFd() = 0;
+    virtual bool try_send(int fd_from, int fd_to) = 0;
     virtual bool setTraceBufferSizeKB(int size) = 0;
     virtual bool setGlobalClockEnable(bool enable) = 0;
     virtual bool setPrintTgidEnableIfPresent(bool enable) = 0;
