@@ -27,6 +27,7 @@
 #include <getopt.h>      // getopt_long, no_argument
 #include <signal.h>      // sigaction
 #include <utils/Trace.h> // ATRACE_TAGs
+#include <stdlib.h>      // EXIT_FAILURE, EXIT_SUCCESS
 
 AtraceApp atrace;
 FILE * errstream = stderr;
@@ -87,11 +88,11 @@ int main(int argc, char ** argv) {
   kernel_system_impl->set_errstream(errstream);
   kernel_system_impl->set_file_system(file_system);
   kernel_system_impl->set_toolbox(toolbox);
+  kernel_system_impl->set_systime(new SystemTimeImpl());
   AndroidSystemImpl * android_system_impl = new AndroidSystemImpl();
   android_system_impl->set_errstream(errstream);
 
   atrace.set_toolbox(toolbox);
-  atrace.set_systime(new SystemTimeImpl());
   atrace.set_kernel_system(kernel_system_impl);
   atrace.set_android_system(android_system_impl);
   atrace.set_errstream(errstream);
@@ -305,5 +306,5 @@ int main(int argc, char ** argv) {
 
   registerSigHandler();
 
-  return atrace.run();
+  return atrace.run()? EXIT_SUCCESS : EXIT_FAILURE;
 }

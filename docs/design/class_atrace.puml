@@ -30,8 +30,7 @@ class AtraceApp {
   + add_android_category(const char * id, const char * name, uint64_t atrace_tag): void
   + add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles): void
   + set_android_core_services(const char * id, const char * name): void
-  + run(): int
-  - writeClockSyncMarker(): bool 
+  + run(): bool
   - isCategorySupported(const TracingCategory& category): bool 
   - disableKernelTraceEvents(): bool 
   - setCategoryEnable(const char* name, bool enable): bool 
@@ -41,12 +40,11 @@ class AtraceApp {
   - startTrace(): bool 
   - stopTrace(): void 
   - streamTrace(): void 
-  - dumpTrace(int outFd): void 
+  - dumpTrace(): void 
 }
 
 AtraceApp "-androidsystem" *-->"1" AndroidSystem
 AtraceApp "-kernelsystem" *-->"1" KernelSystem
-AtraceApp "-systime" *-->"1" SystemTime
 AtraceApp "-k_categories " -->"0..*" TracingCategory
 AtraceApp "-toolbox " -->"1" Toolbox
 
@@ -54,18 +52,19 @@ interface KernelSystem {
   + {abstract} setKernelOptionEnable(const char* filename, bool enable): bool
   + {abstract} isPossibleSetKernelOption(const char * filename): bool
   + {abstract} isCategorySupported(const TracingCategory& category): bool
-  + {abstract} isCategorySupportedForRoot(const TracingCategory& category): bool
-  + {abstract} writeMarker(const char * buffer): bool
+  + {abstract} writeClockSyncMarker(): bool 
   + {abstract} setTraceOverwriteEnable(bool enable): bool
   + {abstract} setTracingEnabled(bool enable): bool
   + {abstract} clearTrace(): bool
   + {abstract} getTracePipeFd(): int
   + {abstract} getTraceFd(): int
+  + {abstract} try_openToWriteOrCreate(const char * filename): int
+  + {abstract} try_sendfile(int fd_from, int fd_to): bool
+  + {abstract} try_send(int fd_from, int fd_to): bool
   + {abstract} setTraceBufferSizeKB(int size): bool
   + {abstract} setGlobalClockEnable(bool enable): bool
   + {abstract} setPrintTgidEnableIfPresent(bool enable): bool
   + {abstract} setKernelTraceFuncs(const char* funcs): bool
-  + {abstract} verifyKernelTraceFuncs(const char * comma_separ_function_list) const: bool
 }
 hide KernelSystem fields
 
@@ -120,13 +119,16 @@ class KernelSystemImpl {
   - k_traceStreamPath: const char *
   - k_traceMarkerPath: const char *
   --
+  - isCategorySupportedForRoot(const TracingCategory& category): bool
   - isTraceClock(const char * mode): bool
   - verifyKernelTraceFuncs(const char * funcs): bool
+  - writeMarker(const char * buffer): bool
 }
 
 KernelSystemImpl ..> KernelSystem
 KernelSystemImpl "-file_system" --> "1" FileSystem
 KernelSystemImpl "-toolbox" --> "1" Toolbox
+KernelSystemImpl "-systime" *-->"1" SystemTime
 
 interface FileSystem {
   + {abstract} fileExists(const char* filename): bool

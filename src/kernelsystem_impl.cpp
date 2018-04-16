@@ -19,20 +19,27 @@
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
-#include <fcntl.h>  // creat, ope
+#include <fcntl.h>  // creat, ope, O_WRONLY, O_CREAT
 #include <stdlib.h> // free
 #include <unistd.h> // read, close
+#include <stdio.h>  // FILE
 #include <set>
+#include <sys/sendfile.h>
 
 KernelSystemImpl::~KernelSystemImpl()
 {
     delete this->file_system;
     delete this->toolbox;
+    delete this->systime;
 }
 
 void KernelSystemImpl::set_errstream(FILE * errstream)
 {
     this->errstream = errstream;
+}
+
+void KernelSystemImpl::set_systime(SystemTime * systime) {
+    this->systime = systime;
 }
 
 void KernelSystemImpl::set_file_system(FileSystem * file_system)
@@ -45,6 +52,37 @@ void KernelSystemImpl::set_toolbox(Toolbox * toolbox)
     this->toolbox = toolbox;
 }
 
+int KernelSystemImpl::tryOpenToWriteOrCreate(const char* filename)
+{
+    int outFd = open(filename, O_WRONLY | O_CREAT);
+    if (outFd == -1) {
+      printf("Failed to open '%s', err=%d", filename, errno);
+    }
+    return outFd;
+}
+
+bool KernelSystemImpl::try_sendfile(int fd_from, int fd_to)
+{
+    ssize_t sent = 0;
+    while ((sent = sendfile(fd_to, fd_from, NULL, 64*1024*1024)) > 0);
+    if (sent == -1) {
+        fprintf(errstream, "error sendfile: %s (%d)\n", strerror(errno),
+                errno);
+        return false;
+    }
+    return true;
+}
+
+bool KernelSystemImpl::try_send(int fd_from, int fd_to) {
+    char trace_data[4096];
+    ssize_t bytes_read = read(fd_from, trace_data, 4096);
+    if (bytes_read > 0) {
+        write(fd_to, trace_data, bytes_read);
+        return true;
+    }
+    return false;
+}
+
 bool KernelSystemImpl::setKernelOptionEnable(const char* filename, bool enable)
 {
     return file_system->writeStr(filename, enable ? "1" : "0");
@@ -55,7 +93,23 @@ bool KernelSystemImpl::isPossibleSetKernelOption(const char* filename)
     return filename != NULL && file_system->fileIsWritable(filename);
 }
 
-bool KernelSystemImpl::isCategorySupported(const TracingCategory& category)
+bool KernelSystemImpl::isCategorySupported(const TracingCategory& category) const
+{
+    if (_isCategorySupported(category)) {
+        return true;
+    } else {
+        if (isCategorySupportedForRoot(category)) {
+            fprintf(errstream, "error: category \"%s\" requires root "
+                    "privileges.\n", category.name);
+        } else {
+            fprintf(errstream, "error: category \"%s\" is not supported "
+                    "on this device.\n", category.name);
+        }
+        return false;
+    }
+}
+
+bool KernelSystemImpl::_isCategorySupported(const TracingCategory& category) const
 {
     bool ok = true;
     for (const auto & file : category.files) {
@@ -77,7 +131,7 @@ bool KernelSystemImpl::isCategorySupported(const TracingCategory& category)
     return ok;
 }
 
-bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& category)
+bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& category) const
 {
     bool ok = category.tags != 0;
     for (const auto & file : category.files) {
@@ -96,6 +150,19 @@ bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& categor
         }
     }
     return ok;
+}
+
+bool KernelSystemImpl::writeClockSyncMarker()
+{
+  char buffer[128];
+  float now_in_seconds = systime->get_monotonic();
+  snprintf(buffer, 128, "trace_event_clock_sync: parent_ts=%f\n", now_in_seconds);
+  bool ok = true;
+  ok &= writeMarker(buffer);
+  int64_t realtime_in_ms = systime->get_realtime();
+  snprintf(buffer, 128, "trace_event_clock_sync: realtime_ts=%" PRId64 "\n", realtime_in_ms);
+  ok &= writeMarker(buffer);
+  return ok;
 }
 
 bool KernelSystemImpl::writeMarker(const char * buffer)
