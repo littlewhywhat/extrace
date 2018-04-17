@@ -169,7 +169,6 @@ TraceApp "1" -- "1" TraceAction: does >
 
 class TraceSession {
   - delay_at_start: int
-  - ignores_os_signals: bool
 }
 hide TraceSession circle
 hide TraceSession methods
@@ -189,11 +188,22 @@ AsyncTraceSession --|> TraceSession
 
 class SyncTraceSession {
   - duration: int
+  - ignores_os_signals: bool
 }
 hide SyncTraceSession circle
 hide SyncTraceSession methods
 
 SyncTraceSession --|> TraceSession
+SyncTraceSession -- DumpAction: does >
+
+class StreamTraceSession {
+}
+hide StreamTraceSession circle
+hide StreamTraceSession methods
+hide StreamTraceSession fields
+
+StreamTraceSession --|> TraceSession
+StreamTraceSession -- TraceBuffer: streams >
 
 class TraceAction {
 }

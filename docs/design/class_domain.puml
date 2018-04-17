@@ -3,16 +3,39 @@
 title Class Diagram
 
 class TraceApp {
-  + startSession(): void
-  + stopSession(): void
-  + dumpTrace(): void
+  + tryAct(): bool
 }
 hide TraceApp fields
 
-TraceApp *--> "1" TraceSession
+TraceApp *--> "1" TraceAction
 
-class TraceSession {
-  + start();
+interface TraceAction {
+  + {abstract} tryExecute(): bool
 }
+hide TraceAction fields
+
+class DumpTraceAction {
+  - tryDumpBuffer(): bool
+}
+hide DumpTraceAction fields
+
+DumpTraceAction ..> TraceAction
+DumpTraceAction "-traceBuffer" --> "1" TraceBuffer
+
+class StartTraceAction {
+  - tryStartSession(): bool
+}
+hide StartTraceAction fields
+
+StartTraceAction ..> TraceAction
+
+class StopTraceAction {
+  - tryStopSession(): bool
+}
+hide StopTraceAction fields
+
+StopTraceAction ..> TraceAction
+
+
 
 @enduml
