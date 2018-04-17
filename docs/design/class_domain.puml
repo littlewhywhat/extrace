@@ -1,0 +1,18 @@
+@startuml
+
+title Class Diagram
+
+class TraceApp {
+  + startSession(): void
+  + stopSession(): void
+  + dumpTrace(): void
+}
+hide TraceApp fields
+
+TraceApp *--> "1" TraceSession
+
+class TraceSession {
+  + start();
+}
+
+@enduml

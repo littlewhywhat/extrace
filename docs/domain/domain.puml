@@ -165,7 +165,7 @@ hide TraceApp circle
 hide TraceApp methods
 hide TraceApp fields
 
-TraceApp "1" -- "1" TraceSession: starts >
+TraceApp "1" -- "1" TraceAction: does >
 
 class TraceSession {
   - delay_at_start: int
@@ -186,7 +186,6 @@ hide AsyncTraceSession methods
 hide AsyncTraceSession fields
 
 AsyncTraceSession --|> TraceSession
-AsyncTraceSession "1" -- "1" TraceAction: does >
 
 class SyncTraceSession {
   - duration: int
@@ -195,9 +194,6 @@ hide SyncTraceSession circle
 hide SyncTraceSession methods
 
 SyncTraceSession --|> TraceSession
-SyncTraceSession "1" -- "1" StartTrace: does >
-SyncTraceSession "1" -- "1" StopTrace: does >
-SyncTraceSession "1" -- "1" DumpTraceBuffer: does >
 
 class TraceAction {
 }
@@ -205,32 +201,32 @@ hide TraceAction circle
 hide TraceAction methods
 hide TraceAction fields
 
-class StartTrace {
+class StartAction {
 }
-hide StartTrace circle
-hide StartTrace methods
-hide StartTrace fields
+hide StartAction circle
+hide StartAction methods
+hide StartAction fields
 
-StartTrace --|> TraceAction
+StartAction --|> TraceAction
 
-class StopTrace {
+class StopAction {
 }
-hide StopTrace circle
-hide StopTrace methods
-hide StopTrace fields
+hide StopAction circle
+hide StopAction methods
+hide StopAction fields
 
-StopTrace --|> TraceAction
+StopAction --|> TraceAction
 
-class DumpTraceBuffer {
+class DumpAction {
 }
-hide DumpTraceBuffer circle
-hide DumpTraceBuffer methods
-hide DumpTraceBuffer fields
+hide DumpAction circle
+hide DumpAction methods
+hide DumpAction fields
 
-DumpTraceBuffer --|> TraceAction
+DumpAction --|> TraceAction
 
-' TODO
-' TraceBuffer (size, circular)
-' TraceSession (mode-(async-(action-(start,dump,stop)),sync),ignore_signals,duration,initial_sleep)
+StartAction "1" -- "1" TraceSession: starts >
+StopAction "1" -- "1" AsyncTraceSession: stops >
+DumpAction "1" -- "1" TraceBuffer: dumps >
 
 @enduml
