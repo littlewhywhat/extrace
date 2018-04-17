@@ -15,13 +15,18 @@
  */
 #include "extraceconsoleapp.h"
 #include "extraceconsoleappbuilder.h"
+#include "fmachinetrace.h"
+#include "fmachinetraceapp.h"
+#include "fmachinetracesession.h"
 
 ExtraceConsoleApp * ExtraceConsoleAppBuilder::build(void) const
 {
-  // TODO
-  // FMachineTrace * fMachineTrace = new FMachineTrace();
-  // MachineTraceSession * machineTraceSession = new FMachineTraceSession(fMachineTrace);
-  // ExtraceApp * extraceApp = new ExtraceAppImpl(machineTraceSession);
-  ExtraceConsoleApp * consoleApp = new ExtraceConsoleApp();
-  return consoleApp;
+  FMachineTrace * fMachineTrace = new FMachineTrace();
+  FMachineTraceSession * fmachineTraceSession = new FMachineTraceSession();
+  fmachineTraceSession->set_machinetrace(fMachineTrace);
+  FMachineTraceApp * fmachinetraceapp = new FMachineTraceApp();
+  fmachinetraceapp->set_machinetracesession(fmachineTraceSession);
+  ExtraceConsoleApp * extraceConsoleApp = new ExtraceConsoleApp();
+  extraceConsoleApp->set_machinetraceapp(fmachinetraceapp);
+  return extraceConsoleApp;
 }
