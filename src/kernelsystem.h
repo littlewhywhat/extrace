@@ -30,8 +30,7 @@ class KernelSystem {
     virtual bool try_sendfile(int fd_from, int fd_to) = 0;
     virtual bool setKernelOptionEnable(const char* filename, bool enable) = 0;
     virtual bool isPossibleSetKernelOption(const char * filename) = 0;
-    virtual bool isCategorySupported(const TracingCategory& category) = 0;
-    virtual bool isCategorySupportedForRoot(const TracingCategory& category) = 0;
+    virtual bool isCategorySupported(const TracingCategory& category) const = 0;
     virtual bool writeClockSyncMarker() = 0;
     // Enable or disable overwriting of the kernel trace buffers.  Disabling this
     // will cause tracing to stop once the trace buffers have filled up.

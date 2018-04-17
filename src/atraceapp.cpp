@@ -256,16 +256,8 @@ bool AtraceApp::setCategoryEnable(const char* name, bool enable)
             if (isCategorySupported(c)) {
                 c.is_enabled = enable;
                 return true;
-            } else {
-                if (kernel_system->isCategorySupportedForRoot(c)) {
-                    fprintf(errstream, "error: category \"%s\" requires root "
-                            "privileges.\n", name);
-                } else {
-                    fprintf(errstream, "error: category \"%s\" is not supported "
-                            "on this device.\n", name);
-                }
-                return false;
             }
+            return false;
         }
     }
     fprintf(errstream, "error: unknown tracing category \"%s\"\n", name);

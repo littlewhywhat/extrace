@@ -52,7 +52,6 @@ interface KernelSystem {
   + {abstract} setKernelOptionEnable(const char* filename, bool enable): bool
   + {abstract} isPossibleSetKernelOption(const char * filename): bool
   + {abstract} isCategorySupported(const TracingCategory& category): bool
-  + {abstract} isCategorySupportedForRoot(const TracingCategory& category): bool
   + {abstract} writeClockSyncMarker(): bool 
   + {abstract} setTraceOverwriteEnable(bool enable): bool
   + {abstract} setTracingEnabled(bool enable): bool
@@ -66,7 +65,6 @@ interface KernelSystem {
   + {abstract} setGlobalClockEnable(bool enable): bool
   + {abstract} setPrintTgidEnableIfPresent(bool enable): bool
   + {abstract} setKernelTraceFuncs(const char* funcs): bool
-  + {abstract} verifyKernelTraceFuncs(const char * comma_separ_function_list) const: bool
 }
 hide KernelSystem fields
 
@@ -121,6 +119,7 @@ class KernelSystemImpl {
   - k_traceStreamPath: const char *
   - k_traceMarkerPath: const char *
   --
+  - isCategorySupportedForRoot(const TracingCategory& category): bool
   - isTraceClock(const char * mode): bool
   - verifyKernelTraceFuncs(const char * funcs): bool
   - writeMarker(const char * buffer): bool

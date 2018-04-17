@@ -93,7 +93,23 @@ bool KernelSystemImpl::isPossibleSetKernelOption(const char* filename)
     return filename != NULL && file_system->fileIsWritable(filename);
 }
 
-bool KernelSystemImpl::isCategorySupported(const TracingCategory& category)
+bool KernelSystemImpl::isCategorySupported(const TracingCategory& category) const
+{
+    if (_isCategorySupported(category)) {
+        return true;
+    } else {
+        if (isCategorySupportedForRoot(category)) {
+            fprintf(errstream, "error: category \"%s\" requires root "
+                    "privileges.\n", category.name);
+        } else {
+            fprintf(errstream, "error: category \"%s\" is not supported "
+                    "on this device.\n", category.name);
+        }
+        return false;
+    }
+}
+
+bool KernelSystemImpl::_isCategorySupported(const TracingCategory& category) const
 {
     bool ok = true;
     for (const auto & file : category.files) {
@@ -115,7 +131,7 @@ bool KernelSystemImpl::isCategorySupported(const TracingCategory& category)
     return ok;
 }
 
-bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& category)
+bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& category) const
 {
     bool ok = category.tags != 0;
     for (const auto & file : category.files) {

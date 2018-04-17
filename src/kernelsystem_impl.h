@@ -36,18 +36,9 @@ class KernelSystemImpl : public KernelSystem {
     bool try_sendfile(int fd_from, int fd_to);
     // Enable or disable a kernel option by writing a "1" or a "0" into a /sys
     // file.
+    bool isCategorySupported(const TracingCategory& category) const override;
     bool setKernelOptionEnable(const char* filename, bool enable) override;
     bool isPossibleSetKernelOption(const char* filename) override;
-    // Check whether the category is supported on the device with the current
-    // rootness.  A category is supported only if all its required /sys/ files are
-    // writable and if enabling the category will enable one or more tracing tags
-    // or /sys/ files.
-    bool isCategorySupported(const TracingCategory& category) override;
-    // Check whether the category would be supported on the device if the user
-    // were root.  This function assumes that root is able to write to any file
-    // that exists.  It performs the same logic as isCategorySupported, but it
-    // uses file existance rather than writability in the /sys/ file checks.
-    bool isCategorySupportedForRoot(const TracingCategory& category) override;
     bool writeClockSyncMarker() override;
     bool setTraceOverwriteEnable(bool enable) override;
     bool setTracingEnabled(bool enable) override;
@@ -76,6 +67,16 @@ class KernelSystemImpl : public KernelSystem {
     // local [global] counter uptime perf
     bool isTraceClock(const char *mode);
     bool verifyKernelTraceFuncs(const std::set<std::string> & funcs) const;
+    // Check whether the category is supported on the device with the current
+    // rootness.  A category is supported only if all its required /sys/ files are
+    // writable and if enabling the category will enable one or more tracing tags
+    // or /sys/ files.
+    bool _isCategorySupported(const TracingCategory& category) const;
+    // Check whether the category would be supported on the device if the user
+    // were root.  This function assumes that root is able to write to any file
+    // that exists.  It performs the same logic as isCategorySupported, but it
+    // uses file existance rather than writability in the /sys/ file checks.
+    bool isCategorySupportedForRoot(const TracingCategory& category) const;
     const char * k_traceClockPath =  "/sys/kernel/debug/tracing/trace_clock";
     const char * k_traceBufferSizePath =  "/sys/kernel/debug/tracing/buffer_size_kb";
     const char * k_tracingOverwriteEnablePath =  "/sys/kernel/debug/tracing/options/overwrite";
