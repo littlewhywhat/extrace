@@ -15,38 +15,31 @@
  */
 #include "extraceconsoleapp.h"
 
+#include <stdio.h>
+
+static const char * CATEGORY_SINGLE_OPTION_NAME = "category";
+
 void ExtraceConsoleApp::register_args_to(ArgsParser & argsParser) const
 {
-  argsParser.register_boolean("not_defined", "not_defined");
-  // TODO
-  // argsParser.register_boolean("--async_start");
+  argsParser.register_string("-c", CATEGORY_SINGLE_OPTION_NAME);
 }
 
 bool ExtraceConsoleApp::admits(const Arguments & arguments) const
 {
-  arguments.is_enabled("not_defined");
-  // TODO difficult arguments
-  // if (async_start && async_stop && async_continue)
-  return true;
+  return arguments.has_string(CATEGORY_SINGLE_OPTION_NAME);
 }
 
 void ExtraceConsoleApp::setup_with(const Arguments & arguments)
 {
-  arguments.is_enabled("not_defined");
-  // TODO
-  // this->traceSession.set_buffer_size(arguments.get_integer(BUFFER_SIZE_ID));
+  this->category = arguments.get_string(CATEGORY_SINGLE_OPTION_NAME);
 }
 
 void ExtraceConsoleApp::do_run()
 {
-  // TODO
-  // MachineTrace trace;
-  // this->traceSession.run(trace);
+  printf("Selected category is %s.\n", this->category.c_str());
 }
 
 bool ExtraceConsoleApp::do_succeeded(void) const 
 { 
-  // TODO
-  // return !this->TraceSession.report.is_empty();
   return true;
 }
