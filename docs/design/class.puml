@@ -2,66 +2,78 @@
 
 title Class Diagram
 
+interface ConsoleApp {
+  + {abstract} setup(int argc, const char ** argv) : void
+  + {abstract} is_ready(void) const : bool
+  + {abstract} run() : void
+  + {abstract} succeeded(void) const : bool
+}
+hide ConsoleApp fields
+
+abstract class AbstractConsoleApp {
+  - isReady: bool
+  --
+  - do_run(): void
+  - do_succeeded(void) const: bool
+  - register_args_to(ArgsParser & argsParser) const: void
+  - admits(const Arguments & arguments) const: bool
+  - setup_with(const Arguments & arguments): void
+}
+
+AbstractConsoleApp ..> ConsoleApp
+AbstractConsoleApp --> ArgsParser: uses
+AbstractConsoleApp --> Arguments: uses
+
+class ArgsParser {
+  - boolean_opt_names: std::map<std::string, std::string>
+  - integer_opt_names: std::map<std::string, std::string>
+  - string_opt_names: std::map<std::string, std::string>
+  --
+  + is_boolean_spec(const char * spec): bool
+  + is_integer_spec(const char * spec): bool
+  + is_string_spec(const char * spec): bool
+  + register_boolean(const char * specifier, const char * option_name): void
+  + register_integer(const char * specifier, const char * option_name): void
+  + register_string(const char * specifier, const char * option_name): void
+  + parse(Arguments & arguments, int argc, const char ** argv): int
+}
+
+ArgsParser --> Arguments: parses
+
+class Arguments {
+  - booleans: std::set<std::string>
+  - single_integers: std::map<std::string, int>
+  - single_strings: std::map<std::string, std::string>
+  --
+  + put_boolean(const char * option_name): void
+  + is_enabled(const char * option_name) const: bool
+  + put_integer(const char * option_name, int value): void
+  + has_integer(const char * option_name) const: bool
+  + get_integer(const char * option_name) const: int
+  + put_string(const char * option_name, const std::string & value): void
+  + has_string(const char * option_name) const: bool
+  + std::string & get_string(const char * option_name) const: const
+}
+
 class ConsoleAppMain {
-  + set_consoleapp(ConsoleApp * consoleApp)
   + run(int argc, const char ** argv): int
 }
 hide ConsoleAppMain fields
 
-abstract class ConsoleApp {
-  - isReady: bool
-  --
-  + setup(int argc, const char ** argv): void
-  + is_ready(void): bool
-  + set_arguments(Arguments * arguments): void
-  + set_argsparser(ArgsParser * parser): void
-  ..virtual..
-  + {abstract} run(void): void
-  + {abstract} succeeded(void): bool
-  # {abstract} register_args_to(ConsoleArgsParser & parser) const: void
-  # {abstract} admits(const Arguments & arguments) const: bool
-  # {abstract} setup_with(const Arguments & arguments): void
-}
+ConsoleAppMain "-consoleApp" -- "1" ConsoleApp
 
 class ExtraceConsoleApp {
-  + set_machinetrace(MachineTraceApp * machineTraceApp): void
-  ..overwrite..
-  + run(void): void
-  + succeeded(void): bool
-  - register_args_to(ConsoleArgsParser & parser) const: void
-  - admits(const Arguments & arguments) const: bool
-  - setup_with(const Arguments & arguments): void
 }
+hide ExtraceConsoleApp methods
 hide ExtraceConsoleApp fields
 
-class MachineTraceApp {
-  + set_machinetracesession(MachineTraceSession * machineTraceSession): void
-  + run(void): void
-  + succeeded(void): bool
-}
-hide MachineTraceApp fields
+ExtraceConsoleApp --|> AbstractConsoleApp
 
-class MachineTraceSession {
-  - duration_in_sec: int
-  - start_delay_in_sec: int
-  - buffer_size: int
-  - mode: AsyncMode
-  - categories: vector<string>
-  --
-  + set_machinetrace(MachineTrace * machineTrace): void
-  + run(void): void
+class ExtraceConsoleAppBuilder {
+  + build(void) const: ExtraceConsoleApp * 
 }
+hide ExtraceConsoleAppBuilder fields
 
-class MachineTrace {
-  {abstract} + set(all): void
-  {abstract} + run(void): void
-}
-hide MachineTrace fields
-
-ConsoleAppMain "- consoleApp" *--> ConsoleApp: runs
-ExtraceConsoleApp -|> ConsoleApp
-ExtraceConsoleApp "- machineTraceApp" *--> MachineTraceApp: runs
-MachineTraceApp "- machineTraceSession" *--> MachineTraceSession: runs
-MachineTraceSession "- machineTrace" *--> MachineTrace: runs
+ExtraceConsoleAppBuilder --> ExtraceConsoleApp: builds
 
 @enduml
