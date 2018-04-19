@@ -48,7 +48,7 @@ hide Trace circle
 hide Trace methods
 hide Trace fields
 
-Trace "2" -- "1" TraceBuffer: logs into >
+Trace -- TraceComponent: starts
 
 class KernelTrace {
 }
@@ -56,7 +56,7 @@ hide KernelTrace circle
 hide KernelTrace methods
 hide KernelTrace fields
 
-KernelTrace --|> Trace
+KernelTrace --|> TraceComponent
 KernelTrace "1" -- "1..*" KernelTraceFile: has >
 KernelTrace "1" -- "1..*" KernelTraceable: traces >
 KernelTrace "1" -- "1..*" KernelTraceable: supports >
@@ -82,9 +82,26 @@ hide AndroidTrace circle
 hide AndroidTrace methods
 hide AndroidTrace fields
 
-AndroidTrace --|> Trace
+AndroidTrace --|> TraceComponent
 AndroidTrace "1" -- "1..*" AndroidTraceable: traces >
-AndroidTrace "1" -- "1..*" AndroidProperty: has >
+
+class AndroidSystem {
+}
+hide AndroidSystem circle
+hide AndroidSystem methods
+hide AndroidSystem fields
+
+AndroidSystem "1" -- "1..*" AndroidProperty: reads >
+AndroidSystem "1" -- "1..*" AndroidProperty: writes >
+
+class TraceComponent {
+}
+hide TraceComponent methods
+hide TraceComponent fields
+hide TraceComponent circle
+
+' this is done transparently
+TraceComponent "1" -- "1" TraceBuffer: logs into >
 
 class KernelFunction {
 }
@@ -118,15 +135,44 @@ AndroidCoreService --|> AndroidApp
 
 class AndroidProperty {
   - name : string
-  - content : string
 }
 hide AndroidProperty circle
 hide AndroidProperty methods
 
-AndroidProperty "1" -- "1..*" AndroidCoreService: stores names of >
-AndroidProperty "1" -- "1" AndroidApp: enable trace of > 
-AndroidProperty "1" -- "0..16" AndroidApp: stores number of traced >
-AndroidProperty "1" -- "1" AndroidTraceCategory: stores tag of > 
+class AndroidCoreServiceProperty {
+}
+hide AndroidCoreServiceProperty circle
+hide AndroidCoreServiceProperty methods
+
+AndroidCoreServiceProperty --|> AndroidProperty
+AndroidCoreServiceProperty "1" -- "1" AndroidCoreService: stores
+
+class AndroidTraceCategoriesProperty {
+}
+hide AndroidTraceCategoriesProperty circle
+hide AndroidTraceCategoriesProperty methods
+hide AndroidTraceCategoriesProperty fields
+
+AndroidTraceCategoriesProperty --|> AndroidProperty
+AndroidTraceCategoriesProperty "1" -- "1..*" AndroidTraceCategory: stores
+
+class AndroidTraceAppsProperty {
+}
+hide AndroidTraceAppsProperty circle
+hide AndroidTraceAppsProperty methods
+hide AndroidTraceAppsProperty fields
+
+AndroidTraceAppsProperty --|> AndroidProperty
+AndroidTraceAppsProperty -- "1..16" AndroidApp: stores
+
+class AndroidTraceAppCounterProperty {
+  - count: int
+}
+hide AndroidTraceAppCounterProperty circle
+hide AndroidTraceAppCounterProperty methods
+
+AndroidTraceAppCounterProperty --|> AndroidProperty
+AndroidTraceAppCounterProperty -- AndroidApp: counts
 
 class TraceBuffer {
   - size: int
@@ -169,15 +215,12 @@ TraceApp "1" -- "1" TraceSession: starts >
 
 class TraceSession {
   - delay_at_start: int
-  - ignores_os_signals: bool
 }
 hide TraceSession circle
 hide TraceSession methods
 
 TraceSession "1" - "1..*" KernelTraceable: traces >
 TraceSession "1" - "1..*" AndroidTraceable: traces >
-TraceSession "1" -- "1" KernelTrace: uses >
-TraceSession "1" -- "1" AndroidTrace: uses >
 
 class AsyncTraceSession {
 }
@@ -190,6 +233,7 @@ AsyncTraceSession "1" -- "1" TraceAction: does >
 
 class SyncTraceSession {
   - duration: int
+  - ignores_os_signals: bool
 }
 hide SyncTraceSession circle
 hide SyncTraceSession methods
@@ -197,7 +241,18 @@ hide SyncTraceSession methods
 SyncTraceSession --|> TraceSession
 SyncTraceSession "1" -- "1" StartTrace: does >
 SyncTraceSession "1" -- "1" StopTrace: does >
-SyncTraceSession "1" -- "1" DumpTraceBuffer: does >
+SyncTraceSession "1" -- "1" DumpTrace: does >
+
+class StreamTraceSession {
+}
+hide StreamTraceSession circle
+hide StreamTraceSession fields
+hide StreamTraceSession methods
+
+StreamTraceSession --|> TraceSession
+StreamTraceSession "1" -- "1" StartTrace: does >
+StreamTraceSession "1" -- "1" StopTrace: does >
+StreamTraceSession "1" -- "1" StreamTrace: does >
 
 class TraceAction {
 }
@@ -212,6 +267,7 @@ hide StartTrace methods
 hide StartTrace fields
 
 StartTrace --|> TraceAction
+StartTrace -- Trace: starts >
 
 class StopTrace {
 }
@@ -220,14 +276,25 @@ hide StopTrace methods
 hide StopTrace fields
 
 StopTrace --|> TraceAction
+StopTrace -- Trace: stops >
 
-class DumpTraceBuffer {
+class StreamTrace {
 }
-hide DumpTraceBuffer circle
-hide DumpTraceBuffer methods
-hide DumpTraceBuffer fields
+hide StreamTrace circle
+hide StreamTrace methods
+hide StreamTrace fields
 
-DumpTraceBuffer --|> TraceAction
+StreamTrace --|> TraceAction
+StreamTrace -- Trace: streams >
+
+class DumpTrace {
+}
+hide DumpTrace circle
+hide DumpTrace methods
+hide DumpTrace fields
+
+DumpTrace --|> TraceAction
+DumpTrace -- TraceBuffer: dumps >
 
 ' TODO
 ' TraceBuffer (size, circular)

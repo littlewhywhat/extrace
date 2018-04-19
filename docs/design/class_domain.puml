@@ -1,0 +1,214 @@
+@startuml
+
+title Class Diagram
+
+class TraceApp {
+  + startSession(): void
+}
+hide TraceApp fields
+
+TraceApp *--> "1" TraceSession
+
+abstract class TraceSession {
+  + {abstract} run(): void
+  --
+  - do(action: TraceAction): void
+}
+
+TraceSession "-trace" --> "1" Trace
+
+class AsyncTraceSession {
+}
+hide AsyncTraceSession methods
+hide AsyncTraceSession fields
+
+AsyncTraceSession --|> TraceSession
+AsyncTraceSession "-action" --> "1" TraceAction 
+
+class TraceAction {
+  + {abstract} tryExecuteOn(Trace & trace): bool
+}
+hide TraceAction fields
+
+class StartTrace {
+}
+hide StartTrace methods
+hide StartTrace fields
+
+StartTrace --|> TraceAction
+
+class StopTrace {
+}
+hide StopTrace methods
+hide StopTrace fields
+
+StopTrace --|> TraceAction
+
+class StreamTrace {
+}
+hide StreamTrace methods
+hide StreamTrace fields
+
+StreamTrace --|> TraceAction
+
+class DumpTrace {
+}
+hide DumpTrace methods
+hide DumpTrace fields
+
+DumpTrace --|> TraceAction
+
+abstract Trace {
+  + tryStart(): bool
+  + tryStop(): bool
+  + tryStream(): bool
+  + tryDump(): bool
+  --
+  - trySetup(TraceComponent & component)
+}
+hide Trace fields
+
+Trace "-components" --> "1..*" TraceComponent
+Trace "-traceSwitch" -- "1" SwitchFile
+
+interface TraceComponent {
+  + trySetup(): bool
+  + tryReset(): bool
+}
+hide TraceComponent fields
+
+class AndroidComponent {
+  + addApp(app: AndroidApp): void
+  + addCategory(category: AndroidTraceCategory): void
+  - prepareApps(): void
+  - prepareCategories(): void
+  - pokeAndroidTraceSystem(): void
+}
+hide AndroidComponent fields
+
+AndroidComponent ..> TraceComponent
+AndroidComponent "-androidApps" -- "0..*" AndroidApp
+AndroidComponent "-androidTraceCategories" -- "0..*" AndroidTraceCategory
+AndroidComponent "-androidTraceSystem" -- "1" AndroidTraceSystem
+
+class AndroidApp {
+  - name: string
+}
+hide AndroidApp methods
+
+class AndroidTraceCategory {
+  - tag: uint64
+}
+hide AndroidTraceCategory methods
+
+class AndroidTraceSystem {
+  - {static} appsPropertyId: string
+  - {static} appCntPropertyId: string
+  - {static} categoriesPropertyId: string
+  --
+  + prepare(apps: vector<AndroidApp>): void
+  + prepare(categories: vector<AndroidTraceCategory): void
+  + reset(): void
+  + pokeAndroidSystem(): void
+}
+hide AndroidTraceSystem fields
+
+AndroidTraceSystem "-androidSystem" -- "1" AndroidSystem
+
+class AndroidSystem {
+  + readProperty(id: string): AndroidProperty
+  + saveProperty(androidProperty: AndroidProperty): void
+  + poke(): void
+  + getCoreService(): AndroidApp
+}
+hide AndroidSystem fields
+
+AndroidSystem "-properties" -- "0..*" AndroidProperty
+
+class AndroidProperty {
+  - content: string
+  - name: string
+}
+hide AndroidProperty methods
+
+class KernelComponent {
+  + addFunction(function: KernelFunction)
+  + addCategory(category: KernelTraceCategory)
+  - tryPrepareFunctions(): bool
+  - tryPrepareCategory(category: KernelTraceCategory): bool
+}
+hide KernelComponent fields
+
+KernelComponent ..> TraceComponent
+KernelComponent "-functions" -- "0..*" KernelFunction
+KernelComponent "-categories" -- "0..*" KernelTraceCategory
+KernelComponent "-traceSystem" -- "1" KernelTraceSystem
+
+class KernelTraceSystem {
+  - map<KernelTraceCategory, list<SwitchFile>>: 
+  --
+  + tryPrepareFunctions(functions: vector<KernelFunction>): bool
+  + tryPrepareCategory(category: KernelTraceCategory): bool
+  + tryReset(): bool
+  + isSupportedCategory(category: KernelTraceCategory): bool
+}
+hide KernelTraceSystem fields
+
+KernelTraceSystem "-kernelSystem" -- "1" KernelSystem
+KernelTraceSystem -- "0..*" SwitchFile
+KernelTraceSystem -- "1" ListFile
+
+class KernelFunction {
+  - name: string
+}
+hide KernelFunction methods
+
+class KernelTraceCategory {
+  - name: string
+}
+hide KernelTraceCategory methods
+
+class KernelSystem {
+  + tryReadListFile(path: string): ListFile
+  + tryWriteListFile(file: ListFile): bool
+  + tryEnableSwitchFile(file: SwitchFile): bool
+  + tryDisableSwitchFile(file: SwitchFile): bool
+  + canBeEnabled(file: SwitchFile): bool
+}
+hide KernelSystem fields
+
+class SwitchFile {
+  - isRequired: bool
+  - path: string
+}
+hide SwitchFile methods
+
+class ListFile {
+  - tokens: vector<string>
+}
+hide ListFile methods
+
+' class SyncTraceSession {
+  ' - duration: int
+  ' - ignores_os_signals: bool
+' }
+' hide SyncTraceSession circleu
+' hide SyncTraceSession methods
+' 
+' SyncTraceSession --|> TraceSession
+' SyncTraceSession "1" -- "1" StartTrace: does >
+' SyncTraceSession "1" -- "1" StopTrace: does >
+' SyncTraceSession "1" -- "1" DumpTraceBuffer: does >
+' 
+' class StreamTraceSession {
+' }
+' hide StreamTraceSession circle
+' hide StreamTraceSession fields
+' hide StreamTraceSession methods
+' 
+' StreamTraceSession --|> TraceSession
+' StreamTraceSession "1" -- "1" StartTrace: does >
+' StreamTraceSession "1" -- "1" StopTrace: does >
+' StreamTraceSession "1" -- "1" StreamTrace: does >
+
+@enduml
