@@ -1,7 +1,7 @@
 @startuml
 
 class AtraceApp {
-  - k_coreServiceCategory : const char*
+  - enableCoreServices : bool
   - g_traceOverwrite : bool
   - g_traceDurationSeconds : int
   - g_traceBufferSizeKB : int
@@ -26,9 +26,9 @@ class AtraceApp {
   + enable_compression(): void
   + nosignals(): void
   + setCategory(const char * name): void
-  + add_android_category(const char * id, const char * name, uint64_t atrace_tag): void
+  + add_android_category(const char * id): void
   + add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles): void
-  + set_android_core_services(const char * id, const char * name): void
+  + enable_android_core(): bool
   + run(): bool
   - isCategorySupported(const TracingCategory& category): bool 
   - disableKernelTraceEvents(): bool 
@@ -67,10 +67,12 @@ hide KernelSystem fields
 
 interface AndroidSystem {
   + {abstract} has_core_services() const: bool
+  + {abstract} getCategories() const: const std::vector<TracingCategory> &
+  + {abstract} tryEnableCategories(std::vector<std::string> categories): bool
+  + {abstract} disableAllCategories(): void
   + {abstract} property_get_core_service_names(std::string & content) const: void
   + {abstract} setAppCmdlineProperty(const char * data): bool
   + {abstract} pokeBinderServices(): bool
-  + {abstract} setTagsProperty(uint64_t tags): bool
   + {abstract} clearAppProperties(): void
   + {abstract} compress_trace_to(int traceFD, int outFd): void
   + {abstract} log_dumping_trace(): void
@@ -150,10 +152,13 @@ class AndroidSystemImpl {
   - k_coreServicesProp: const char *
   - k_traceAppsNumberProperty: const char *
   - k_traceAppsPropertyTemplate: const char *
+  --
+  + add_category(const char * id, const char * name, uint64_t atrace_tag): void
+  - setTagsProperty(uint64_t tags): bool
 }
-hide AndroidSystemImpl methods
 
 AndroidSystemImpl ..> AndroidSystem
+AndroidSystemImpl "-categories" -- "0..*" TracingCategory
 
 class SystemTimeImpl {
 }

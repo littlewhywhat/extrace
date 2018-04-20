@@ -140,20 +140,14 @@ bool AtraceApp::setCategory(const char* name)
     return false;
 }
 
-void AtraceApp::add_android_category(const char * id, const char * name, uint64_t atrace_tag)
+void AtraceApp::add_android_category(const char * id)
 {
-  k_categories.push_back({ id, name, atrace_tag, {}, false });
+  androidCategories.push_back(id);
 }
 
 void AtraceApp::add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files)
 {
   k_categories.push_back({id, name, 0, files, false });
-}
-
-void AtraceApp::set_android_core_services(const char * id, const char * name)
-{
-  k_coreServiceCategory = id;
-  k_categories.push_back({ k_coreServiceCategory, name, 0, { }, false });
 }
 
 bool AtraceApp::run()
@@ -227,9 +221,9 @@ bool AtraceApp::run()
 // or /sys/ files.
 bool AtraceApp::isCategorySupported(const TracingCategory& category)
 {
-    if (strcmp(category.name, k_coreServiceCategory) == 0) {
-        return android_system->has_core_services();
-    }
+    // if (strcmp(category.name, k_coreServiceCategory) == 0) {
+    //     return android_system->has_core_services();
+    // }
 
     bool ok = true;
     if (category.tags == 0) {
@@ -268,23 +262,20 @@ bool AtraceApp::setUpTrace()
     ok &= kernel_system->setKernelTraceFuncs(g_kernelTraceFuncs.c_str());
 
     // Set up the tags property.
-    uint64_t tags = 0;
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        TracingCategory &c = k_categories[i];
-        if (c.is_enabled) {
-            tags |= c.tags;
-        }
-    }
-    ok &= android_system->setTagsProperty(tags);
-
+    ok &= android_system->tryEnableCategories(androidCategories);
+    
     std::string packageList(g_debugAppCmdLine);
-    if (k_coreServiceCategory) {
-        std::string value;
-        android_system->property_get_core_service_names(value);
-        if (!packageList.empty()) {
-            packageList += ",";
+    if (enableCoreServices) {
+        if (android_system->has_core_services()) {
+            std::string value;
+            android_system->property_get_core_service_names(value);
+            if (!packageList.empty()) {
+                packageList += ",";
+            }
+            packageList += value;
+        } else {
+            fprintf(errstream, "Can't enable core services - not supported\n");
         }
-        packageList += value;
     }
     ok &= android_system->setAppCmdlineProperty(packageList.data());
     ok &= android_system->pokeBinderServices();
@@ -323,7 +314,7 @@ void AtraceApp::cleanUpTrace()
     disableKernelTraceEvents();
 
     // Reset the system properties.
-    android_system->setTagsProperty(0);
+    android_system->disableAllCategories();
     android_system->clearAppProperties();
     android_system->pokeBinderServices();
 
@@ -402,6 +393,9 @@ void AtraceApp::dumpTrace()
     }
 }
 
+void AtraceApp::enableAndroidCore() {
+    enableCoreServices = true;
+}
 
 void AtraceApp::listSupportedCategories()
 {
@@ -410,5 +404,9 @@ void AtraceApp::listSupportedCategories()
         if (isCategorySupported(c)) {
             printf("  %10s - %s\n", c.name, c.longname);
         }
+    }
+    const auto & androidCategories = android_system->getCategories();
+    for (const auto & category : androidCategories) {
+        printf("  %10s - %s\n", category.name, category.longname);
     }
 }
