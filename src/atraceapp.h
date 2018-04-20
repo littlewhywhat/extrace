@@ -35,7 +35,6 @@ class AtraceApp {
     void set_kernel_system(KernelSystem * kernel_system);
     void set_errstream(FILE * errstream);
     void set_outstream(FILE * outstream);
-    void set_toolbox(Toolbox * toolbox);
     void set_traceBufferSizeKB(int size);
     void enable_trace_overwrite();
     void set_kernelTraceFuncs(const char * funcs);
@@ -61,7 +60,6 @@ class AtraceApp {
     std::vector<std::string> m_Apps;
     std::vector<std::string> m_Functions;
 
-    Toolbox * toolbox = NULL;
     KernelSystem * kernel_system = NULL;
     AndroidSystem * android_system = NULL;
 

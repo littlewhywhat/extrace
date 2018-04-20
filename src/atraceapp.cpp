@@ -49,11 +49,6 @@ void AtraceApp::set_outstream(FILE * outstream) {
     this->outstream = outstream;
 }
 
-void AtraceApp::set_toolbox(Toolbox * toolbox)
-{
-    this->toolbox = toolbox;
-}
-
 void AtraceApp::set_traceBufferSizeKB(int size) 
 {
     g_traceBufferSizeKB = size;
