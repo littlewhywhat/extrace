@@ -8,7 +8,6 @@ class AtraceApp {
   - g_compress : bool
   - g_nohup : bool
   - g_initialSleepSecs : int
-  - g_categoriesFile : string
   - g_kernelTraceFuncs : string
   - g_debugAppCmdLine : string
   - g_outputFile : string
@@ -34,7 +33,6 @@ class AtraceApp {
   - isCategorySupported(const TracingCategory& category): bool 
   - disableKernelTraceEvents(): bool 
   - setCategoryEnable(const char* name, bool enable): bool 
-  - setCategoriesEnableFromFile(): bool 
   - setUpTrace(): bool 
   - cleanUpTrace(): void 
   - startTrace(): bool 

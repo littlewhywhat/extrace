@@ -233,6 +233,7 @@ int main(int argc, char ** argv) {
           break;
       }
 
+      std::set<std::string> tokens;
       switch(ret) {
           case 'a':
               atrace.set_debugAppCmdLine(optarg);
@@ -247,7 +248,17 @@ int main(int argc, char ** argv) {
           break;
 
           case 'f':
-              atrace.set_categoriesFile(optarg);
+              if (!toolbox->parseFileToTokens(optarg, " ", tokens)) {
+                fprintf(errstream, "error parsing category file \"%s\"\n", optarg);
+                return EXIT_FAILURE;
+              }
+              for (const auto & token : tokens) {
+                if (!atrace.setCategory(token.c_str())) {
+                  fprintf(errstream, "error enabling tracing category \"%s\" from file\n", token.c_str());
+                  return EXIT_FAILURE;
+                }
+              }
+              tokens.clear();
           break;
 
           case 'k':
