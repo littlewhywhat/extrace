@@ -22,8 +22,7 @@
 #include <string.h>
 
 AtraceApp::~AtraceApp() {
-  delete kernel_system;
-  delete android_system;
+  delete m_Trace;
 }
 
 void AtraceApp::handleSignal()
@@ -33,11 +32,15 @@ void AtraceApp::handleSignal()
     }
 }
 
-void AtraceApp::set_android_system(AndroidSystem * android_system) {
+void AtraceApp::setTrace(Trace * trace) {
+  m_Trace = trace;
+}
+
+void AtraceApp::set_android_system(shared_ptr<AndroidSystem> & android_system) {
     this->android_system = android_system;
 }
 
-void AtraceApp::set_kernel_system(KernelSystem * kernel_system) {
+void AtraceApp::set_kernel_system(shared_ptr<KernelSystem> & kernel_system) {
     this->kernel_system = kernel_system;
 }
 
@@ -47,16 +50,6 @@ void AtraceApp::set_errstream(FILE * errstream) {
 
 void AtraceApp::set_outstream(FILE * outstream) {
     this->outstream = outstream;
-}
-
-void AtraceApp::set_traceBufferSizeKB(int size) 
-{
-    g_traceBufferSizeKB = size;
-}
-
-void AtraceApp::enable_trace_overwrite() 
-{
-    g_traceOverwrite = true;
 }
 
 void AtraceApp::nosignals() 
@@ -109,26 +102,6 @@ void AtraceApp::enable_streaming()
     traceStream = true;
 }
 
-void AtraceApp::add_kernel_category(const char* name)
-{
-  m_KernelCategories.push_back(name);
-}
-
-void AtraceApp::add_android_category(const char * id)
-{
-  androidCategories.push_back(id);
-}
-
-void AtraceApp::addApp(const char * appname)
-{
-  m_Apps.push_back(appname);
-}
-
-void AtraceApp::addFunc(const char * function)
-{
-  m_Functions.push_back(function);
-}
-
 bool AtraceApp::run()
 {
     if (g_initialSleepSecs > 0) {
@@ -136,8 +109,8 @@ bool AtraceApp::run()
     }
 
     bool ok = true;
-    ok &= setUpTrace();
-    ok &= startTrace();
+    ok &= m_Trace->setUp();
+    ok &= m_Trace->start();
 
     if (ok && traceStart) {
         if (!traceStream) {
@@ -172,7 +145,7 @@ bool AtraceApp::run()
 
     // Stop the trace and restore the default settings.
     if (traceStop)
-        stopTrace();
+        m_Trace->stop();
     if (ok && traceDump) {
         if (!g_traceAborted) {
             printf(" done\n");
@@ -189,70 +162,9 @@ bool AtraceApp::run()
 
     // Reset the trace buffer size to 1.
     if (traceStop)
-        cleanUpTrace();
+        m_Trace->cleanUp();
 
     return !g_traceAborted;
-}
-
-
-// Set all the kernel tracing settings to the desired state for this trace
-// capture.
-bool AtraceApp::setUpTrace()
-{
-    bool ok = true;
-
-    // Set up the tracing options.
-    ok &= kernel_system->setTraceOverwriteEnable(g_traceOverwrite);
-    ok &= kernel_system->setTraceBufferSizeKB(g_traceBufferSizeKB);
-    ok &= kernel_system->setGlobalClockEnable(true);
-    ok &= kernel_system->setPrintTgidEnableIfPresent(true);
-    ok &= kernel_system->setKernelTraceFuncs(m_Functions);
-
-    // Set up the tags property.
-    ok &= android_system->tryEnableCategories(androidCategories);
-    ok &= android_system->setAppCmdlineProperty(m_Apps);
-    ok &= android_system->pokeBinderServices();
-
-    // Disable all the sysfs enables.  This is done as a separate loop from
-    // the enables to allow the same enable to exist in multiple categories.
-    ok &= kernel_system->disableKernelTraceEvents();
-
-    // Enable all the sysfs enables that are in an enabled category.
-    ok &= kernel_system->enableKernelTraceEvents(m_KernelCategories);
-
-    return ok;
-}
-
-// Reset all the kernel tracing settings to their default state.
-void AtraceApp::cleanUpTrace()
-{
-    // Disable all tracing that we're able to.
-    kernel_system->disableKernelTraceEvents();
-
-    // Reset the system properties.
-    android_system->disableAllCategories();
-    android_system->clearAppProperties();
-    android_system->pokeBinderServices();
-
-    // Set the options back to their defaults.
-    kernel_system->setTraceOverwriteEnable(true);
-    kernel_system->setTraceBufferSizeKB(1);
-    kernel_system->setGlobalClockEnable(false);
-    kernel_system->setPrintTgidEnableIfPresent(false);
-    kernel_system->setKernelTraceFuncs(vector<string>());
-}
-
-
-// Enable tracing in the kernel.
-bool AtraceApp::startTrace()
-{
-    return kernel_system->setTracingEnabled(true);
-}
-
-// Disable tracing in the kernel.
-void AtraceApp::stopTrace()
-{
-    kernel_system->setTracingEnabled(false);
 }
 
 // Read data from the tracing pipe and forward to outstream

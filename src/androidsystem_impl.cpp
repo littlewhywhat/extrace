@@ -202,7 +202,7 @@ const std::vector<TracingCategory> & AndroidSystemImpl::getCategories() const {
     return m_CategoriesList;
 }
 
-bool AndroidSystemImpl::tryEnableCategories(std::vector<std::string> categories) {
+bool AndroidSystemImpl::tryEnableCategories(const vector<string> & categories) {
     uint64_t tags = 0;
     for (const auto & id : categories) {
         if (m_Categories.find(id) == m_Categories.end()) {

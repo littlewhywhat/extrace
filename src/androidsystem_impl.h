@@ -27,7 +27,7 @@ class AndroidSystemImpl : public AndroidSystem {
   public:
     bool has_core_services() const override;
     const std::vector<TracingCategory> & getCategories() const;
-    bool tryEnableCategories(std::vector<std::string> categories);
+    bool tryEnableCategories(const vector<string> & categories);
     void disableAllCategories();
     void property_get_core_service_names(std::string & content) const override;
     bool setAppCmdlineProperty(const vector<string> & appNames) override;

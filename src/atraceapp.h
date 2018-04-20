@@ -22,22 +22,24 @@
 #include "kernelsystem.h"
 #include "tracingcategory.h"
 #include "toolbox.h"
+#include "trace.h"
 
 #include <stdio.h>    // FILE
 #include <inttypes.h> // uint64_t
 #include <vector>
+#include <memory>
+
+using namespace std;
 
 class AtraceApp {
   public:
     ~AtraceApp();
     void handleSignal();
-    void set_android_system(AndroidSystem * android_system);
-    void set_kernel_system(KernelSystem * kernel_system);
+    void setTrace(Trace * trace);
+    void set_android_system(shared_ptr<AndroidSystem> & android_system);
+    void set_kernel_system(shared_ptr<KernelSystem> & kernel_system);
     void set_errstream(FILE * errstream);
     void set_outstream(FILE * outstream);
-    void set_traceBufferSizeKB(int size);
-    void enable_trace_overwrite();
-    void set_kernelTraceFuncs(const char * funcs);
     void nosignals();
     void set_initialSleepSecs(int secs);
     void set_traceDurationSeconds(int secs);
@@ -49,10 +51,6 @@ class AtraceApp {
     void set_start(bool option);
     void enable_streaming();
     void listSupportedCategories();
-    void add_android_category(const char * id);
-    void add_kernel_category(const char * id);
-    void addApp(const char * appname);
-    void addFunc(const char * function);
     bool run();
   private:
     std::vector<std::string> m_KernelCategories;
@@ -60,8 +58,9 @@ class AtraceApp {
     std::vector<std::string> m_Apps;
     std::vector<std::string> m_Functions;
 
-    KernelSystem * kernel_system = NULL;
-    AndroidSystem * android_system = NULL;
+    Trace * m_Trace = NULL;
+    shared_ptr<KernelSystem> kernel_system;
+    shared_ptr<AndroidSystem> android_system;
 
     FILE * errstream = NULL;
     FILE * outstream = NULL;
@@ -73,8 +72,6 @@ class AtraceApp {
     bool traceDump = true;
     bool traceStream = false;
     int g_traceDurationSeconds = 5;
-    bool g_traceOverwrite = false;
-    int g_traceBufferSizeKB = 2048;
     bool g_compress = false;
     bool g_nohup = false;
     int g_initialSleepSecs = 0;
@@ -83,15 +80,6 @@ class AtraceApp {
     /* Global state */
     bool g_traceAborted = false;
 
-    // Set all the kernel tracing settings to the desired state for this trace
-    // capture.
-    bool setUpTrace();
-    // Reset all the kernel tracing settings to their default state.
-    void cleanUpTrace();
-    // Enable tracing in the kernel.
-    bool startTrace();
-    // Disable tracing in the kernel.
-    void stopTrace();
     // Read data from the tracing pipe and forward to outstream
     void streamTrace();
     // Read the current kernel trace and write it to outstream.
