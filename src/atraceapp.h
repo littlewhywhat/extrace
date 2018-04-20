@@ -39,7 +39,6 @@ class AtraceApp {
     void set_debugAppCmdLine(const char * app);
     void set_traceBufferSizeKB(int size);
     void enable_trace_overwrite();
-    void set_categoriesFile(const char * file);
     void set_kernelTraceFuncs(const char * funcs);
     void nosignals();
     void set_initialSleepSecs(int secs);
@@ -80,7 +79,6 @@ class AtraceApp {
     bool g_compress = false;
     bool g_nohup = false;
     int g_initialSleepSecs = 0;
-    std::string g_categoriesFile;
     std::string g_kernelTraceFuncs;
     std::string g_debugAppCmdLine;
     std::string g_outputFile;
@@ -97,7 +95,6 @@ class AtraceApp {
     // Disable all /sys/ enable files.
     bool disableKernelTraceEvents();
     bool setCategoryEnable(const char* name, bool enable);
-    bool setCategoriesEnableFromFile();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     bool setUpTrace();

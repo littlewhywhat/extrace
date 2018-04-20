@@ -69,11 +69,6 @@ void AtraceApp::enable_trace_overwrite()
     g_traceOverwrite = true;
 }
 
-void AtraceApp::set_categoriesFile(const char * file) 
-{
-    g_categoriesFile = file;
-}
-
 void AtraceApp::set_kernelTraceFuncs(const char * funcs) 
 {
     g_kernelTraceFuncs = funcs;
@@ -264,20 +259,6 @@ bool AtraceApp::setCategoryEnable(const char* name, bool enable)
     return false;
 }
 
-bool AtraceApp::setCategoriesEnableFromFile() {
-    if (g_categoriesFile.empty()) {
-        return true;
-    }
-    bool ok = true;
-    std::set<std::string> tokens;
-    ok &= toolbox->parseFileToTokens(g_categoriesFile.c_str(), " ", tokens);
-
-    for (const auto & token : tokens) {
-        ok &= setCategoryEnable(token.c_str(), true);
-    }
-    return ok;
-}
-
 // Set all the kernel tracing settings to the desired state for this trace
 // capture.
 bool AtraceApp::setUpTrace()
@@ -285,7 +266,6 @@ bool AtraceApp::setUpTrace()
     bool ok = true;
 
     // Set up the tracing options.
-    ok &= setCategoriesEnableFromFile();
     ok &= kernel_system->setTraceOverwriteEnable(g_traceOverwrite);
     ok &= kernel_system->setTraceBufferSizeKB(g_traceBufferSizeKB);
     ok &= kernel_system->setGlobalClockEnable(true);
