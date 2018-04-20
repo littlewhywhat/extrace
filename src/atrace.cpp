@@ -237,7 +237,11 @@ int main(int argc, char ** argv) {
       std::set<std::string> tokens;
       switch(ret) {
           case 'a':
-              atrace.set_debugAppCmdLine(optarg);
+              toolbox->parseToTokens(optarg, ",", tokens);
+              for (const auto & token : tokens) {
+                atrace.addApp(token.c_str());
+              }
+              tokens.clear();    
           break;
 
           case 'b':
@@ -268,7 +272,11 @@ int main(int argc, char ** argv) {
           break;
 
           case 'k':
-              atrace.set_kernelTraceFuncs(optarg);
+              toolbox->parseToTokens(optarg, ",", tokens);
+              for (const auto & token : tokens) {
+                atrace.addFunc(token.c_str());
+              }
+              tokens.clear();
           break;
 
           case 'n':
@@ -311,7 +319,17 @@ int main(int argc, char ** argv) {
                   atrace.listSupportedCategories();
                   return EXIT_SUCCESS;
               } else if (!strcmp(long_options[option_index].name, "acore")) {
-                  atrace.enableAndroidCore();
+                if (android_system_impl->has_core_services()) {
+                  std::string value;
+                  android_system_impl->property_get_core_service_names(value);
+                  toolbox->parseToTokens(value.c_str(), ",", tokens);
+                  for (const auto & token : tokens) {
+                    atrace.addApp(token.c_str());
+                  }
+                  tokens.clear();
+                } else {
+                  fprintf(errstream, "Can't enable core services - not supported\n");
+                }
               }
           break;
 

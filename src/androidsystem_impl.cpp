@@ -50,32 +50,22 @@ void AndroidSystemImpl::property_get_core_service_names(std::string & content) c
     property_get(k_coreServicesProp, value, "");
     content += value;
 }
-bool AndroidSystemImpl::setAppCmdlineProperty(const char * cmdline) {
+bool AndroidSystemImpl::setAppCmdlineProperty(const vector<string> & appNames) {
+    if (appNames.size() > MAX_PACKAGES) {
+        fprintf(errstream, "error: only 16 packages could be traced at once\n");
+        clearAppProperties();
+        return false;
+    }
     char buf[PROPERTY_KEY_MAX];
-    int i = 0;
-    const char* start = cmdline;
-    while (start != NULL) {
-        if (i == MAX_PACKAGES) {
-            fprintf(errstream, "error: only 16 packages could be traced at once\n");
-            clearAppProperties();
-            return false;
-        }
-        char* end = strchr(start, ',');
-        if (end != NULL) {
-            *end = '\0';
-            end++;
-        }
+    for (size_t i = 0; i < appNames.size(); i++) {
         snprintf(buf, sizeof(buf), k_traceAppsPropertyTemplate, i);
-        if (property_set(buf, start) < 0) {
+        if (property_set(buf, appNames[i].c_str()) < 0) {
             fprintf(errstream, "error setting trace app %d property to %s\n", i, buf);
             clearAppProperties();
             return false;
         }
-        start = end;
-        i++;
     }
-
-    snprintf(buf, sizeof(buf), "%d", i);
+    snprintf(buf, sizeof(buf), "%d", appNames.size());
     if (property_set(k_traceAppsNumberProperty, buf) < 0) {
         fprintf(errstream, "error setting trace app number property to %s\n", buf);
         clearAppProperties();

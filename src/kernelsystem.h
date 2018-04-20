@@ -43,7 +43,7 @@ class KernelSystem {
     virtual bool setTraceBufferSizeKB(int size) = 0;
     virtual bool setGlobalClockEnable(bool enable) = 0;
     virtual bool setPrintTgidEnableIfPresent(bool enable) = 0;
-    virtual bool setKernelTraceFuncs(const char* funcs) = 0;
+    virtual bool setKernelTraceFuncs(const vector<string> & funcs) = 0;
     virtual bool enableKernelTraceEvents(const vector<string> & ids) = 0;
     virtual const vector<TracingCategory> & getCategories() const = 0;
     // Disable all /sys/ enable files.
