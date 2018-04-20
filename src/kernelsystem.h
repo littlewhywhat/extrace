@@ -23,14 +23,13 @@
 #include <string>
 #include <stdio.h>
 
+using namespace std;
+
 class KernelSystem {
   public:
     virtual ~KernelSystem() {}
     virtual int tryOpenToWriteOrCreate(const char* filename) = 0;
     virtual bool try_sendfile(int fd_from, int fd_to) = 0;
-    virtual bool setKernelOptionEnable(const char* filename, bool enable) = 0;
-    virtual bool isPossibleSetKernelOption(const char * filename) = 0;
-    virtual bool isCategorySupported(const TracingCategory& category) const = 0;
     virtual bool writeClockSyncMarker() = 0;
     // Enable or disable overwriting of the kernel trace buffers.  Disabling this
     // will cause tracing to stop once the trace buffers have filled up.
@@ -45,7 +44,13 @@ class KernelSystem {
     virtual bool setGlobalClockEnable(bool enable) = 0;
     virtual bool setPrintTgidEnableIfPresent(bool enable) = 0;
     virtual bool setKernelTraceFuncs(const char* funcs) = 0;
-    virtual bool verifyKernelTraceFuncs(const std::set<std::string> & funcs) const = 0;
+    virtual bool enableKernelTraceEvents(const vector<string> & ids) = 0;
+    virtual const vector<TracingCategory> & getCategories() const = 0;
+    // Disable all /sys/ enable files.
+    virtual bool disableKernelTraceEvents() = 0;
+    // Enable or disable a kernel option by writing a "1" or a"0" into a /sys
+    // file.
+    virtual bool isCategorySupported(const TracingCategory& category) const = 0;
 };
 
 #endif // LTTLWHWHT_KERNELSYSTEM_H

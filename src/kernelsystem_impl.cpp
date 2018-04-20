@@ -315,3 +315,52 @@ bool KernelSystemImpl::verifyKernelTraceFuncs(const std::set<std::string> & func
     }
     return ok;
 }
+
+void KernelSystemImpl::add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files)
+{
+  m_Categories[id] = {id, name, 0, files, false };
+  m_CategoriesList.push_back({id, name, 0, files, false });
+}
+
+// Disable all /sys/ enable files.
+bool KernelSystemImpl::disableKernelTraceEvents() {
+    bool ok = true;
+    for (const auto & category : m_CategoriesList) {
+        for (const auto & file : category.files) {
+            const char* path = file.path;
+            if (isPossibleSetKernelOption(path)) {
+                ok &= setKernelOptionEnable(path, false);
+            }
+        }
+    }
+    return ok;
+}
+
+bool KernelSystemImpl::enableKernelTraceEvents(const std::vector<string> & ids) {
+    bool ok = true;
+    for (const auto & id : ids) {
+        if (m_Categories.find(id) == m_Categories.end()) {
+            fprintf(errstream, "wrong kernel category id '%s'\n", id.c_str());
+            return false;
+        } else {
+            const auto & category = m_Categories[id];
+            for (const auto & file : category.files) {
+                const char* path = file.path;
+                bool required = file.required == EnableFile::REQ;
+                if (path != NULL) {
+                    if (isPossibleSetKernelOption(path)) {
+                        ok &= setKernelOptionEnable(path, true);
+                    } else if (required) {
+                        fprintf(errstream, "error writing file %s\n", path);
+                        ok = false;
+                    }
+                }
+            }
+        }
+    }
+    return ok;
+}
+
+const vector<TracingCategory> & KernelSystemImpl::getCategories() const {
+    return m_CategoriesList;
+}
