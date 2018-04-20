@@ -43,7 +43,6 @@ class AtraceApp {
 
 AtraceApp "-androidsystem" *-->"1" AndroidSystem
 AtraceApp "-kernelsystem" *-->"1" KernelSystem
-AtraceApp "-toolbox " -->"1" Toolbox
 
 interface KernelSystem {
 

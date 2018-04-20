@@ -93,7 +93,6 @@ int main(int argc, char ** argv) {
   AndroidSystemImpl * android_system_impl = new AndroidSystemImpl();
   android_system_impl->set_errstream(errstream);
 
-  atrace.set_toolbox(toolbox);
   atrace.set_kernel_system(kernel_system_impl);
   atrace.set_android_system(android_system_impl);
   atrace.set_errstream(errstream);
