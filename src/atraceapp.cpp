@@ -54,11 +54,6 @@ void AtraceApp::set_toolbox(Toolbox * toolbox)
     this->toolbox = toolbox;
 }
 
-void AtraceApp::set_debugAppCmdLine(const char * app) 
-{
-    g_debugAppCmdLine = app;
-}
-
 void AtraceApp::set_traceBufferSizeKB(int size) 
 {
     g_traceBufferSizeKB = size;
@@ -67,11 +62,6 @@ void AtraceApp::set_traceBufferSizeKB(int size)
 void AtraceApp::enable_trace_overwrite() 
 {
     g_traceOverwrite = true;
-}
-
-void AtraceApp::set_kernelTraceFuncs(const char * funcs) 
-{
-    g_kernelTraceFuncs = funcs;
 }
 
 void AtraceApp::nosignals() 
@@ -132,6 +122,16 @@ void AtraceApp::add_kernel_category(const char* name)
 void AtraceApp::add_android_category(const char * id)
 {
   androidCategories.push_back(id);
+}
+
+void AtraceApp::addApp(const char * appname)
+{
+  m_Apps.push_back(appname);
+}
+
+void AtraceApp::addFunc(const char * function)
+{
+  m_Functions.push_back(function);
 }
 
 bool AtraceApp::run()
@@ -211,25 +211,11 @@ bool AtraceApp::setUpTrace()
     ok &= kernel_system->setTraceBufferSizeKB(g_traceBufferSizeKB);
     ok &= kernel_system->setGlobalClockEnable(true);
     ok &= kernel_system->setPrintTgidEnableIfPresent(true);
-    ok &= kernel_system->setKernelTraceFuncs(g_kernelTraceFuncs.c_str());
+    ok &= kernel_system->setKernelTraceFuncs(m_Functions);
 
     // Set up the tags property.
     ok &= android_system->tryEnableCategories(androidCategories);
-    
-    std::string packageList(g_debugAppCmdLine);
-    if (enableCoreServices) {
-        if (android_system->has_core_services()) {
-            std::string value;
-            android_system->property_get_core_service_names(value);
-            if (!packageList.empty()) {
-                packageList += ",";
-            }
-            packageList += value;
-        } else {
-            fprintf(errstream, "Can't enable core services - not supported\n");
-        }
-    }
-    ok &= android_system->setAppCmdlineProperty(packageList.data());
+    ok &= android_system->setAppCmdlineProperty(m_Apps);
     ok &= android_system->pokeBinderServices();
 
     // Disable all the sysfs enables.  This is done as a separate loop from
@@ -258,7 +244,7 @@ void AtraceApp::cleanUpTrace()
     kernel_system->setTraceBufferSizeKB(1);
     kernel_system->setGlobalClockEnable(false);
     kernel_system->setPrintTgidEnableIfPresent(false);
-    kernel_system->setKernelTraceFuncs(NULL);
+    kernel_system->setKernelTraceFuncs(vector<string>());
 }
 
 
@@ -326,10 +312,6 @@ void AtraceApp::dumpTrace()
     if (!g_outputFile.empty()) {
         close(outFd);
     }
-}
-
-void AtraceApp::enableAndroidCore() {
-    enableCoreServices = true;
 }
 
 void AtraceApp::listSupportedCategories()

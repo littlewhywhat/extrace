@@ -9,7 +9,6 @@ class AtraceApp {
   - g_nohup : bool
   - g_initialSleepSecs : int
   - g_kernelTraceFuncs : string
-  - g_debugAppCmdLine : string
   - g_outputFile : string
   - g_traceAborted : bool
   - async : bool
@@ -21,6 +20,8 @@ class AtraceApp {
   - outstream : FILE *
   - m_KernelCategories: vector<string>
   - m_AndroidCategories: vector<string>
+  - m_Functions: vector<string>
+  - m_Apps: vector<string>
   --
   + handleSignal(): void
   + enable_trace_overwrite(): void
@@ -29,7 +30,8 @@ class AtraceApp {
   + nosignals(): void
   + add_android_category(const char * id): void
   + add_kernel_category(const char * id): void
-  + enable_android_core(): bool
+  + addApp(const char * appname): void
+  + addFunction(const char * function): void
   + run(): bool
   - setUpTrace(): bool 
   - cleanUpTrace(): void 
@@ -57,7 +59,7 @@ interface KernelSystem {
   + {abstract} setTraceBufferSizeKB(int size): bool
   + {abstract} setGlobalClockEnable(bool enable): bool
   + {abstract} setPrintTgidEnableIfPresent(bool enable): bool
-  + {abstract} setKernelTraceFuncs(const char* funcs): bool
+  + {abstract} setKernelTraceFuncs(const vector<string> & funcs): bool
   + {abstract} isCategorySupported(const TracingCategory& category): bool 
   + {abstract} disableKernelTraceEvents(): bool 
   + {abstract} enableKernelTraceEvents(const vector<string> & ids): bool
@@ -71,7 +73,7 @@ interface AndroidSystem {
   + {abstract} tryEnableCategories(std::vector<std::string> categories): bool
   + {abstract} disableAllCategories(): void
   + {abstract} property_get_core_service_names(std::string & content) const: void
-  + {abstract} setAppCmdlineProperty(const char * data): bool
+  + {abstract} setAppCmdlineProperty(const vector<string> & apps): bool
   + {abstract} pokeBinderServices(): bool
   + {abstract} clearAppProperties(): void
   + {abstract} compress_trace_to(int traceFD, int outFd): void
@@ -123,7 +125,7 @@ class KernelSystemImpl {
   - isPossibleSetKernelOption(const char * filename): bool
   - isCategorySupportedForRoot(const TracingCategory& category): bool
   - isTraceClock(const char * mode): bool
-  - verifyKernelTraceFuncs(const char * funcs): bool
+  - verifyKernelTraceFuncs(const vector<string> & funcs): bool
   - writeMarker(const char * buffer): bool
 }
 
@@ -131,7 +133,7 @@ KernelSystemImpl ..> KernelSystem
 KernelSystemImpl "-file_system" --> "1" FileSystem
 KernelSystemImpl "-toolbox" --> "1" Toolbox
 KernelSystemImpl "-systime" *-->"1" SystemTime
-KernelSystemImpl "-k_categories " -->"0..*" TracingCategory
+KernelSystemImpl "-m_Categories " -->"0..*" TracingCategory
 
 interface FileSystem {
   + {abstract} fileExists(const char* filename): bool

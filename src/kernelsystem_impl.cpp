@@ -234,11 +234,11 @@ bool KernelSystemImpl::setPrintTgidEnableIfPresent(bool enable)
     return true;
 }
 
-bool KernelSystemImpl::setKernelTraceFuncs(const char* commasepfuncs)
+bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
 {
     bool ok = true;
 
-    if (commasepfuncs == NULL || commasepfuncs[0] == '\0') {
+    if (funcs.empty()) {
         // Disable kernel function tracing.
         if (file_system->fileIsWritable(k_currentTracerPath)) {
             ok &= file_system->writeStr(k_currentTracerPath, "nop");
@@ -256,8 +256,6 @@ bool KernelSystemImpl::setKernelTraceFuncs(const char* commasepfuncs)
 
         // Set the requested filter functions.
         ok &= file_system->truncateFile(k_ftraceFilterPath);
-        std::set<std::string> funcs;
-        toolbox->parseToTokens(commasepfuncs, ",", funcs);
         for (const auto & func: funcs) {
             ok &= file_system->appendStr(k_ftraceFilterPath, func.c_str());
         }
@@ -293,7 +291,7 @@ bool KernelSystemImpl::isTraceClock(const char *mode)
     return strcmp(mode, start) == 0;
 }
 
-bool KernelSystemImpl::verifyKernelTraceFuncs(const std::set<std::string> & funcs) const
+bool KernelSystemImpl::verifyKernelTraceFuncs(const vector<string> & funcs) const
 {
     char buf[4097];    
     if (!file_system->readStr(k_ftraceFilterPath, buf, 4097)) {

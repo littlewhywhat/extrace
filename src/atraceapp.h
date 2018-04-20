@@ -36,7 +36,6 @@ class AtraceApp {
     void set_errstream(FILE * errstream);
     void set_outstream(FILE * outstream);
     void set_toolbox(Toolbox * toolbox);
-    void set_debugAppCmdLine(const char * app);
     void set_traceBufferSizeKB(int size);
     void enable_trace_overwrite();
     void set_kernelTraceFuncs(const char * funcs);
@@ -53,11 +52,15 @@ class AtraceApp {
     void listSupportedCategories();
     void add_android_category(const char * id);
     void add_kernel_category(const char * id);
-    void enableAndroidCore();
+    void addApp(const char * appname);
+    void addFunc(const char * function);
     bool run();
   private:
     std::vector<std::string> m_KernelCategories;
     std::vector<std::string> androidCategories;
+    std::vector<std::string> m_Apps;
+    std::vector<std::string> m_Functions;
+
     Toolbox * toolbox = NULL;
     KernelSystem * kernel_system = NULL;
     AndroidSystem * android_system = NULL;
@@ -78,9 +81,7 @@ class AtraceApp {
     bool g_nohup = false;
     int g_initialSleepSecs = 0;
     std::string g_kernelTraceFuncs;
-    std::string g_debugAppCmdLine;
     std::string g_outputFile;
-    bool enableCoreServices = false;
     /* Global state */
     bool g_traceAborted = false;
 

@@ -52,7 +52,7 @@ class KernelSystemImpl : public KernelSystem {
     bool setGlobalClockEnable(bool enable) override;
     bool setPrintTgidEnableIfPresent(bool enable) override;
     // Set the comma separated list of functions that the kernel is to trace.
-    bool setKernelTraceFuncs(const char* funcs) override;
+    bool setKernelTraceFuncs(const vector<string> & funcs) override;
     bool enableKernelTraceEvents(const vector<string> & ids);
     const vector<TracingCategory> & getCategories() const override;
     // Disable all /sys/ enable files.
@@ -75,7 +75,7 @@ class KernelSystemImpl : public KernelSystem {
     bool isTraceClock(const char *mode);
     bool setKernelOptionEnable(const char* filename, bool enable);
     bool isPossibleSetKernelOption(const char* filename);
-    bool verifyKernelTraceFuncs(const std::set<std::string> & funcs) const;
+    bool verifyKernelTraceFuncs(const vector<string> & funcs) const;
     // Check whether the category is supported on the device with the current
     // rootness.  A category is supported only if all its required /sys/ files are
     // writable and if enabling the category will enable one or more tracing tags

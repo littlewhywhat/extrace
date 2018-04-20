@@ -30,7 +30,7 @@ class AndroidSystemImpl : public AndroidSystem {
     bool tryEnableCategories(std::vector<std::string> categories);
     void disableAllCategories();
     void property_get_core_service_names(std::string & content) const override;
-    bool setAppCmdlineProperty(const char * cmdline) override;
+    bool setAppCmdlineProperty(const vector<string> & appNames) override;
     bool pokeBinderServices() override;
     void clearAppProperties() override;
     void compress_trace_to(int traceFD, int outFd) override;
