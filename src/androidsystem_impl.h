@@ -19,25 +19,33 @@
 #define LTTLWHWHT_ANDROIDSYSTEM_IMPL_H
 
 #include "androidsystem.h"
+#include "tracingcategory.h"
+
+#include <map>
 
 class AndroidSystemImpl : public AndroidSystem {
   public:
     bool has_core_services() const override;
-    // bool setCategoriesEnableFromFile(const char * categories_file) override;
+    const std::vector<TracingCategory> & getCategories() const;
+    bool tryEnableCategories(std::vector<std::string> categories);
+    void disableAllCategories();
     void property_get_core_service_names(std::string & content) const override;
     bool setAppCmdlineProperty(const char * cmdline) override;
     bool pokeBinderServices() override;
-    bool setTagsProperty(uint64_t tags) override;
     void clearAppProperties() override;
     void compress_trace_to(int traceFD, int outFd) override;
     void log_dumping_trace() override;
     void set_errstream(FILE * errstream);
+    void add_category(const char * id, const char * name, uint64_t atrace_tag);
   private:
     FILE * errstream = NULL;
     const char* k_traceTagsProperty = "debug.atrace.tags.enableflags";
     const char* k_coreServicesProp = "ro.atrace.core.services";
     const char* k_traceAppsNumberProperty = "debug.atrace.app_number";
     const char* k_traceAppsPropertyTemplate = "debug.atrace.app_%d";
+    std::vector<TracingCategory> m_CategoriesList;
+    std::map<std::string, TracingCategory> m_Categories;
+    bool setTagsProperty(uint64_t tags);
 };
 
 #endif // LTTLWHWHT_ANDROIDSYSTEM_IMPL_H

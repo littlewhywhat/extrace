@@ -52,20 +52,19 @@ class AtraceApp {
     void enable_streaming();
     void listSupportedCategories();
     bool setCategory(const char* name);
-    void add_android_category(const char * id, const char * name, uint64_t atrace_tag);
+    void add_android_category(const char * id);
     void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles);
-    void set_android_core_services(const char * id, const char * name);
+    void enableAndroidCore();
     bool run();
   private:
     std::vector<TracingCategory> k_categories;
+    std::vector<std::string> androidCategories;
     Toolbox * toolbox = NULL;
     KernelSystem * kernel_system = NULL;
     AndroidSystem * android_system = NULL;
 
     FILE * errstream = NULL;
     FILE * outstream = NULL;
-
-    const char* k_coreServiceCategory = NULL;
 
     /* Command line options */
     bool async = false;
@@ -82,7 +81,7 @@ class AtraceApp {
     std::string g_kernelTraceFuncs;
     std::string g_debugAppCmdLine;
     std::string g_outputFile;
-
+    bool enableCoreServices = false;
     /* Global state */
     bool g_traceAborted = false;
 

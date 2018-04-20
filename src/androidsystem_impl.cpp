@@ -34,6 +34,11 @@ void AndroidSystemImpl::set_errstream(FILE * errstream) {
     this->errstream = errstream;
 }
 
+void AndroidSystemImpl::add_category(const char * id, const char * name, uint64_t atrace_tag) {
+    m_Categories[id] = { id, name, atrace_tag, {}, false };
+    m_CategoriesList.push_back({ id, name, atrace_tag, {}, false });
+}
+
 bool AndroidSystemImpl::has_core_services() const {
     char value[PROPERTY_VALUE_MAX];
     property_get(k_coreServicesProp, value, "");
@@ -201,4 +206,24 @@ void AndroidSystemImpl::compress_trace_to(int traceFD, int outFd) {
 }
 void AndroidSystemImpl::log_dumping_trace() {
     ALOGI("Dumping trace");
+}
+
+const std::vector<TracingCategory> & AndroidSystemImpl::getCategories() const {
+    return m_CategoriesList;
+}
+
+bool AndroidSystemImpl::tryEnableCategories(std::vector<std::string> categories) {
+    uint64_t tags = 0;
+    for (const auto & id : categories) {
+        if (m_Categories.find(id) == m_Categories.end()) {
+            fprintf(errstream, "category is not supported - %s", id.c_str());
+            return false;
+        }
+        tags |= m_Categories[id].tags;
+    }
+    return setTagsProperty(tags);
+}
+
+void AndroidSystemImpl::disableAllCategories() {
+  setTagsProperty(0);
 }

@@ -18,18 +18,23 @@
 #ifndef LTTLWHWHT_ANDROIDSYSTEM_H
 #define LTTLWHWHT_ANDROIDSYSTEM_H
 
+#include "tracingcategory.h"
+
 #include <string>
 #include <inttypes.h>
+#include <vector>
 
 class AndroidSystem {
   public:
     virtual ~AndroidSystem() {}
     virtual bool has_core_services() const = 0;
     // virtual bool setCategoriesEnableFromFile(const char * filename) = 0;
+    virtual const std::vector<TracingCategory> & getCategories() const = 0;
+    virtual bool tryEnableCategories(std::vector<std::string> categories) = 0;
+    virtual void disableAllCategories() = 0;
     virtual void property_get_core_service_names(std::string & content) const = 0;
     virtual bool setAppCmdlineProperty(const char * data) = 0;
     virtual bool pokeBinderServices() = 0;
-    virtual bool setTagsProperty(uint64_t tags) = 0;
     virtual void clearAppProperties() = 0;
     virtual void compress_trace_to(int traceFD, int outFd) = 0;
     virtual void log_dumping_trace() = 0;
