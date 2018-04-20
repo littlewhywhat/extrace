@@ -1,14 +1,10 @@
 @startuml
 
 class AtraceApp {
-  - enableCoreServices : bool
-  - g_traceOverwrite : bool
   - g_traceDurationSeconds : int
-  - g_traceBufferSizeKB : int
   - g_compress : bool
   - g_nohup : bool
   - g_initialSleepSecs : int
-  - g_kernelTraceFuncs : string
   - g_outputFile : string
   - g_traceAborted : bool
   - async : bool
@@ -18,34 +14,49 @@ class AtraceApp {
   - traceStream : bool
   - errstream : FILE *
   - outstream : FILE *
-  - m_KernelCategories: vector<string>
-  - m_AndroidCategories: vector<string>
-  - m_Functions: vector<string>
-  - m_Apps: vector<string>
   --
   + handleSignal(): void
-  + enable_trace_overwrite(): void
   + enable_streaming(): void
   + enable_compression(): void
   + nosignals(): void
-  + add_android_category(const char * id): void
-  + add_kernel_category(const char * id): void
-  + addApp(const char * appname): void
-  + addFunction(const char * function): void
   + run(): bool
-  - setUpTrace(): bool 
-  - cleanUpTrace(): void 
-  - startTrace(): bool 
-  - stopTrace(): void 
   - streamTrace(): void 
   - dumpTrace(): void 
 }
 
-AtraceApp "-androidsystem" *-->"1" AndroidSystem
-AtraceApp "-kernelsystem" *-->"1" KernelSystem
+AtraceApp "-androidsystem" -->"1" AndroidSystem
+AtraceApp "-kernelsystem" -->"1" KernelSystem
+AtraceApp "-trace" *-->"1" Trace
+
+interface Trace {
+  - setUp(): bool 
+  - cleanUp(): void 
+  - start(): bool 
+  - stop(): void 
+}
+hide Trace fields
+
+class TraceImpl {
+  - m_TraceOverwrite : bool
+  - m_TraceBufferSizeKB : uint32_t
+  - m_KernelCategories: vector<string>
+  - m_AndroidCategories: vector<string>
+  - m_Functions: vector<string>
+  - m_Apps: vector<string>
+  - m_ErrorStream: FILE *
+  + add_android_category(const char * id): void
+  + add_kernel_category(const char * id): void
+  + addApp(const char * appname): void
+  + addFunction(const char * function): void
+  + enable_trace_overwrite(): void
+}
+
+TraceImpl ..> Trace
+TraceImpl "-androidsystem" -->"1" AndroidSystem
+TraceImpl "-kernelsystem" -->"1" KernelSystem
+
 
 interface KernelSystem {
-
   + {abstract} writeClockSyncMarker(): bool 
   + {abstract} setTraceOverwriteEnable(bool enable): bool
   + {abstract} setTracingEnabled(bool enable): bool

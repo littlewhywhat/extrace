@@ -32,7 +32,7 @@ class AndroidSystem {
     virtual bool has_core_services() const = 0;
     // virtual bool setCategoriesEnableFromFile(const char * filename) = 0;
     virtual const vector<TracingCategory> & getCategories() const = 0;
-    virtual bool tryEnableCategories(vector<string> categories) = 0;
+    virtual bool tryEnableCategories(const vector<string> & categories) = 0;
     virtual void disableAllCategories() = 0;
     virtual void property_get_core_service_names(string & content) const = 0;
     virtual bool setAppCmdlineProperty(const vector<string> & appNames) = 0;

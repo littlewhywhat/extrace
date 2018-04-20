@@ -47,6 +47,8 @@ LOCAL_SRC_FILES:= \
 		src/filesystem_impl.cpp \
 		src/kernelsystem_impl.cpp \
 		src/androidtoolbox.cpp \
+    src/trace_impl.cpp \
+		
 
 LOCAL_MODULE:= atrace_ref
 

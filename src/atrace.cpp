@@ -23,6 +23,7 @@
 #include "kernelsystem_impl.h"
 #include "atraceapp.h"
 #include "androidtoolbox.h"
+#include "trace_impl.h"
 
 #include <getopt.h>      // getopt_long, no_argument
 #include <signal.h>      // sigaction
@@ -93,8 +94,17 @@ int main(int argc, char ** argv) {
   AndroidSystemImpl * android_system_impl = new AndroidSystemImpl();
   android_system_impl->set_errstream(errstream);
 
-  atrace.set_kernel_system(kernel_system_impl);
-  atrace.set_android_system(android_system_impl);
+  auto sp_android_system_impl = shared_ptr<AndroidSystem>(android_system_impl);
+  auto sp_kernel_system_impl  = shared_ptr<KernelSystem>(kernel_system_impl);
+
+  TraceImpl * trace = new TraceImpl();
+  trace->setErrorStream(errstream);
+  trace->setKernelSystem(sp_kernel_system_impl);
+  trace->setAndroidSystem(sp_android_system_impl);
+
+  atrace.setTrace(trace);
+  atrace.set_kernel_system(sp_kernel_system_impl);
+  atrace.set_android_system(sp_android_system_impl);
   atrace.set_errstream(errstream);
   atrace.set_outstream(stdout);
   android_system_impl->add_category( "gfx",        "Graphics",         ATRACE_TAG_GRAPHICS         );
@@ -224,11 +234,7 @@ int main(int argc, char ** argv) {
 
       if (ret < 0) {
           for (int i = optind; i < argc; i++) {
-              atrace.add_kernel_category(argv[i]);
-              // if (!atrace.setCategory(argv[i])) {
-              //     fprintf(errstream, "error enabling tracing category \"%s\"\n", argv[i]);
-              //     return EXIT_FAILURE;
-              // }
+              trace->addKernelCategory(argv[i]);
           }
           break;
       }
@@ -238,23 +244,23 @@ int main(int argc, char ** argv) {
           case 'a':
               toolbox->parseToTokens(optarg, ",", tokens);
               for (const auto & token : tokens) {
-                atrace.addApp(token.c_str());
+                trace->addApp(token.c_str());
               }
               tokens.clear();    
           break;
 
           case 'b':
-              atrace.set_traceBufferSizeKB(atoi(optarg));
+              trace->setTraceBufferSizeKB(atoi(optarg));
           break;
 
           case 'c':
-              atrace.enable_trace_overwrite();
+              trace->enableTraceOverwrite();
           break;
 
           case 'd':
               toolbox->parseToTokens(optarg, ",", tokens);
               for (const auto & androidCategory : tokens) {
-                  atrace.add_android_category(androidCategory.c_str());
+                  trace->addAndroidCategory(androidCategory.c_str());
               }
               tokens.clear();
           break;
@@ -265,7 +271,7 @@ int main(int argc, char ** argv) {
                 return EXIT_FAILURE;
               }
               for (const auto & token : tokens) {
-                 atrace.add_kernel_category(token.c_str());
+                 trace->addKernelCategory(token.c_str());
               }
               tokens.clear();
           break;
@@ -273,7 +279,7 @@ int main(int argc, char ** argv) {
           case 'k':
               toolbox->parseToTokens(optarg, ",", tokens);
               for (const auto & token : tokens) {
-                atrace.addFunc(token.c_str());
+                trace->addFunction(token.c_str());
               }
               tokens.clear();
           break;
@@ -303,7 +309,7 @@ int main(int argc, char ** argv) {
                   atrace.set_async(true);
                   atrace.set_stop(false);
                   atrace.set_dump(false);
-                  atrace.enable_trace_overwrite();
+                  trace->enableTraceOverwrite();
               } else if (!strcmp(long_options[option_index].name, "async_stop")) {
                   atrace.set_async(true);
                   atrace.set_start(false);
@@ -323,7 +329,7 @@ int main(int argc, char ** argv) {
                   android_system_impl->property_get_core_service_names(value);
                   toolbox->parseToTokens(value.c_str(), ",", tokens);
                   for (const auto & token : tokens) {
-                    atrace.addApp(token.c_str());
+                    trace->addApp(token.c_str());
                   }
                   tokens.clear();
                 } else {
