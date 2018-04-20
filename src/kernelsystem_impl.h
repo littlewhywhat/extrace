@@ -24,6 +24,9 @@
 #include "systemtime.h"
 
 #include <stdio.h>
+#include <map>
+
+using namespace std;
 
 class KernelSystemImpl : public KernelSystem {
   public:
@@ -34,11 +37,6 @@ class KernelSystemImpl : public KernelSystem {
     void set_systime(SystemTime * systime);
     int tryOpenToWriteOrCreate(const char* filename);
     bool try_sendfile(int fd_from, int fd_to);
-    // Enable or disable a kernel option by writing a "1" or a "0" into a /sys
-    // file.
-    bool isCategorySupported(const TracingCategory& category) const override;
-    bool setKernelOptionEnable(const char* filename, bool enable) override;
-    bool isPossibleSetKernelOption(const char* filename) override;
     bool writeClockSyncMarker() override;
     bool setTraceOverwriteEnable(bool enable) override;
     bool setTracingEnabled(bool enable) override;
@@ -55,17 +53,28 @@ class KernelSystemImpl : public KernelSystem {
     bool setPrintTgidEnableIfPresent(bool enable) override;
     // Set the comma separated list of functions that the kernel is to trace.
     bool setKernelTraceFuncs(const char* funcs) override;
+    bool enableKernelTraceEvents(const vector<string> & ids);
+    const vector<TracingCategory> & getCategories() const override;
+    // Disable all /sys/ enable files.
+    bool disableKernelTraceEvents();
+    void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files);
+    bool isCategorySupported(const TracingCategory& category) const;
   private:
     FILE * errstream = NULL;
     FileSystem * file_system = NULL;
     Toolbox * toolbox = NULL;
     SystemTime * systime = NULL;
 
+    map<string, TracingCategory> m_Categories;
+    vector<TracingCategory> m_CategoriesList;
+
     bool writeMarker(const char * buffer);
     // Read the trace_clock sysfs file and return true if it matches the requested
     // value.  The trace_clock file format is:
     // local [global] counter uptime perf
     bool isTraceClock(const char *mode);
+    bool setKernelOptionEnable(const char* filename, bool enable);
+    bool isPossibleSetKernelOption(const char* filename);
     bool verifyKernelTraceFuncs(const std::set<std::string> & funcs) const;
     // Check whether the category is supported on the device with the current
     // rootness.  A category is supported only if all its required /sys/ files are

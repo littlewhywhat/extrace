@@ -124,30 +124,14 @@ void AtraceApp::enable_streaming()
     traceStream = true;
 }
 
-bool AtraceApp::setCategory(const char* name)
+void AtraceApp::add_kernel_category(const char* name)
 {
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        TracingCategory& c = k_categories[i];
-        if (strcmp(name, c.name) == 0) {
-            if (isCategorySupported(c)) {
-                c.is_enabled = true;
-                return true;
-            }
-            return false;
-        }
-    }
-    fprintf(errstream, "error: unknown tracing category \"%s\"\n", name);
-    return false;
+  m_KernelCategories.push_back(name);
 }
 
 void AtraceApp::add_android_category(const char * id)
 {
   androidCategories.push_back(id);
-}
-
-void AtraceApp::add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files)
-{
-  k_categories.push_back({id, name, 0, files, false });
 }
 
 bool AtraceApp::run()
@@ -215,38 +199,6 @@ bool AtraceApp::run()
     return !g_traceAborted;
 }
 
-// Check whether the category is supported on the device with the current
-// rootness.  A category is supported only if all its required /sys/ files are
-// writable and if enabling the category will enable one or more tracing tags
-// or /sys/ files.
-bool AtraceApp::isCategorySupported(const TracingCategory& category)
-{
-    // if (strcmp(category.name, k_coreServiceCategory) == 0) {
-    //     return android_system->has_core_services();
-    // }
-
-    bool ok = true;
-    if (category.tags == 0) {
-        ok = kernel_system->isCategorySupported(category);
-    }
-    return ok;
-}
-
-
-// Disable all /sys/ enable files.
-bool AtraceApp::disableKernelTraceEvents() {
-    bool ok = true;
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        const TracingCategory &c = k_categories[i];
-        for (const auto & file : c.files) {
-            const char* path = file.path;
-            if (kernel_system->isPossibleSetKernelOption(path)) {
-                ok &= kernel_system->setKernelOptionEnable(path, false);
-            }
-        }
-    }
-    return ok;
-}
 
 // Set all the kernel tracing settings to the desired state for this trace
 // capture.
@@ -282,27 +234,10 @@ bool AtraceApp::setUpTrace()
 
     // Disable all the sysfs enables.  This is done as a separate loop from
     // the enables to allow the same enable to exist in multiple categories.
-    ok &= disableKernelTraceEvents();
+    ok &= kernel_system->disableKernelTraceEvents();
 
     // Enable all the sysfs enables that are in an enabled category.
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        const TracingCategory &c = k_categories[i];
-        if (c.is_enabled) {
-            for (const auto & file : c.files) {
-                // const char* path = enable_file_paths[c.files[j].file_id];
-                const char* path = file.path;
-                bool required = file.required == EnableFile::REQ;
-                if (path != NULL) {
-                    if (kernel_system->isPossibleSetKernelOption(path)) {
-                        ok &= kernel_system->setKernelOptionEnable(path, true);
-                    } else if (required) {
-                        fprintf(errstream, "error writing file %s\n", path);
-                        ok = false;
-                    }
-                }
-            }
-        }
-    }
+    ok &= kernel_system->enableKernelTraceEvents(m_KernelCategories);
 
     return ok;
 }
@@ -311,7 +246,7 @@ bool AtraceApp::setUpTrace()
 void AtraceApp::cleanUpTrace()
 {
     // Disable all tracing that we're able to.
-    disableKernelTraceEvents();
+    kernel_system->disableKernelTraceEvents();
 
     // Reset the system properties.
     android_system->disableAllCategories();
@@ -399,10 +334,10 @@ void AtraceApp::enableAndroidCore() {
 
 void AtraceApp::listSupportedCategories()
 {
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        const TracingCategory& c = k_categories[i];
-        if (isCategorySupported(c)) {
-            printf("  %10s - %s\n", c.name, c.longname);
+    const auto & kernelCategories = kernel_system->getCategories();
+    for (const auto & category : kernelCategories) {
+        if (kernel_system->isCategorySupported(category)) {
+            printf("  %10s - %s\n", category.name, category.longname);
         }
     }
     const auto & androidCategories = android_system->getCategories();

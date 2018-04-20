@@ -120,33 +120,33 @@ int main(int argc, char ** argv) {
   android_system_impl->add_category( "database",   "Database",         ATRACE_TAG_DATABASE         );
   android_system_impl->add_category( "network",    "Network",          ATRACE_TAG_NETWORK          );
 
-  atrace.add_kernel_category("sched",         "CPU Scheduling",
+  kernel_system_impl->add_kernel_category("sched",         "CPU Scheduling",
   {
      { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_switch/enable" },
      { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_wakeup/enable" },
      { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_blocked_reason/enable" },
      { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_cpu_hotplug/enable" },
   });
-  atrace.add_kernel_category("irq",           "IRQ Events",
+  kernel_system_impl->add_kernel_category("irq",           "IRQ Events",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/irq/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ipi/enable" },
   });
-  atrace.add_kernel_category("freq",          "CPU Frequency",
+  kernel_system_impl->add_kernel_category("freq",          "CPU Frequency",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_frequency/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/clock_set_rate/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/cpu_frequency_limits/enable" },
   });
-  atrace.add_kernel_category("membus",        "Memory Bus Utilization",
+  kernel_system_impl->add_kernel_category("membus",        "Memory Bus Utilization",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/memory_bus/enable" },
   });
-  atrace.add_kernel_category("idle",          "CPU Idle",
+  kernel_system_impl->add_kernel_category("idle",          "CPU Idle",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_idle/enable" },
   });
-  atrace.add_kernel_category("disk",          "Disk I/O",
+  kernel_system_impl->add_kernel_category("disk",          "Disk I/O",
   {
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_enter/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_exit/enable" },
@@ -159,45 +159,45 @@ int main(int argc, char ** argv) {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_issue/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_complete/enable" },
   });
-  atrace.add_kernel_category("mmc",           "eMMC commands",
+  kernel_system_impl->add_kernel_category("mmc",           "eMMC commands",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/mmc/enable" },
   });
-  atrace.add_kernel_category("load",          "CPU Load",
+  kernel_system_impl->add_kernel_category("load",          "CPU Load",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/cpufreq_interactive/enable" },
   });
-  atrace.add_kernel_category("sync",          "Synchronization",
+  kernel_system_impl->add_kernel_category("sync",          "Synchronization",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/sync/enable" },
   });
-  atrace.add_kernel_category("workq",         "Kernel Workqueues",
+  kernel_system_impl->add_kernel_category("workq",         "Kernel Workqueues",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/workqueue/enable" },
   });
-  atrace.add_kernel_category("memreclaim",    "Kernel Memory Reclaim",
+  kernel_system_impl->add_kernel_category("memreclaim",    "Kernel Memory Reclaim",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_begin/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_end/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_wake/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_sleep/enable" },
   });
-  atrace.add_kernel_category("regulators",    "Voltage and Current Regulators",
+  kernel_system_impl->add_kernel_category("regulators",    "Voltage and Current Regulators",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/regulator/enable" },
   });
-  atrace.add_kernel_category("binder_driver", "Binder Kernel driver",
+  kernel_system_impl->add_kernel_category("binder_driver", "Binder Kernel driver",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction_received/enable" },
   });
-  atrace.add_kernel_category("binder_lock",   "Binder global lock trace",
+  kernel_system_impl->add_kernel_category("binder_lock",   "Binder global lock trace",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_lock/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_locked/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_unlock/enable" },
   });
-  atrace.add_kernel_category("pagecache",     "Page cache",
+  kernel_system_impl->add_kernel_category("pagecache",     "Page cache",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/filemap/enable" },
   });
@@ -225,10 +225,11 @@ int main(int argc, char ** argv) {
 
       if (ret < 0) {
           for (int i = optind; i < argc; i++) {
-              if (!atrace.setCategory(argv[i])) {
-                  fprintf(errstream, "error enabling tracing category \"%s\"\n", argv[i]);
-                  return EXIT_FAILURE;
-              }
+              atrace.add_kernel_category(argv[i]);
+              // if (!atrace.setCategory(argv[i])) {
+              //     fprintf(errstream, "error enabling tracing category \"%s\"\n", argv[i]);
+              //     return EXIT_FAILURE;
+              // }
           }
           break;
       }
@@ -261,10 +262,7 @@ int main(int argc, char ** argv) {
                 return EXIT_FAILURE;
               }
               for (const auto & token : tokens) {
-                if (!atrace.setCategory(token.c_str())) {
-                  fprintf(errstream, "error enabling tracing category \"%s\" from file\n", token.c_str());
-                  return EXIT_FAILURE;
-                }
+                 atrace.add_kernel_category(token.c_str());
               }
               tokens.clear();
           break;

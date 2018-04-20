@@ -51,13 +51,12 @@ class AtraceApp {
     void set_start(bool option);
     void enable_streaming();
     void listSupportedCategories();
-    bool setCategory(const char* name);
     void add_android_category(const char * id);
-    void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &sysfiles);
+    void add_kernel_category(const char * id);
     void enableAndroidCore();
     bool run();
   private:
-    std::vector<TracingCategory> k_categories;
+    std::vector<std::string> m_KernelCategories;
     std::vector<std::string> androidCategories;
     Toolbox * toolbox = NULL;
     KernelSystem * kernel_system = NULL;
@@ -85,14 +84,6 @@ class AtraceApp {
     /* Global state */
     bool g_traceAborted = false;
 
-    
-    // Check whether the category is supported on the device with the current
-    // rootness.  A category is supported only if all its required /sys/ files are
-    // writable and if enabling the category will enable one or more tracing tags
-    // or /sys/ files.
-    bool isCategorySupported(const TracingCategory& category);
-    // Disable all /sys/ enable files.
-    bool disableKernelTraceEvents();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     bool setUpTrace();
