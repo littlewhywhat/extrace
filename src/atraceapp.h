@@ -94,7 +94,6 @@ class AtraceApp {
     bool isCategorySupported(const TracingCategory& category);
     // Disable all /sys/ enable files.
     bool disableKernelTraceEvents();
-    bool setCategoryEnable(const char* name, bool enable);
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     bool setUpTrace();
