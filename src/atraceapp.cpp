@@ -126,7 +126,18 @@ void AtraceApp::enable_streaming()
 
 bool AtraceApp::setCategory(const char* name)
 {
-    return setCategoryEnable(name, true);
+    for (size_t i = 0; i < k_categories.size(); i++) {
+        TracingCategory& c = k_categories[i];
+        if (strcmp(name, c.name) == 0) {
+            if (isCategorySupported(c)) {
+                c.is_enabled = true;
+                return true;
+            }
+            return false;
+        }
+    }
+    fprintf(errstream, "error: unknown tracing category \"%s\"\n", name);
+    return false;
 }
 
 void AtraceApp::add_android_category(const char * id, const char * name, uint64_t atrace_tag)
@@ -243,22 +254,6 @@ bool AtraceApp::disableKernelTraceEvents() {
     return ok;
 }
 
-bool AtraceApp::setCategoryEnable(const char* name, bool enable)
-{
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        TracingCategory& c = k_categories[i];
-        if (strcmp(name, c.name) == 0) {
-            if (isCategorySupported(c)) {
-                c.is_enabled = enable;
-                return true;
-            }
-            return false;
-        }
-    }
-    fprintf(errstream, "error: unknown tracing category \"%s\"\n", name);
-    return false;
-}
-
 // Set all the kernel tracing settings to the desired state for this trace
 // capture.
 bool AtraceApp::setUpTrace()
@@ -282,16 +277,8 @@ bool AtraceApp::setUpTrace()
     }
     ok &= android_system->setTagsProperty(tags);
 
-    bool coreServicesTagEnabled = false;
-    for (size_t i = 0; i < k_categories.size(); i++) {
-        const TracingCategory &c = k_categories[i];
-        if (strcmp(c.name, k_coreServiceCategory) == 0) {
-            coreServicesTagEnabled = c.is_enabled;
-        }
-    }
-
     std::string packageList(g_debugAppCmdLine);
-    if (coreServicesTagEnabled) {
+    if (k_coreServiceCategory) {
         std::string value;
         android_system->property_get_core_service_names(value);
         if (!packageList.empty()) {

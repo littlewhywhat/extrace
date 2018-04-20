@@ -32,7 +32,6 @@ class AtraceApp {
   + run(): bool
   - isCategorySupported(const TracingCategory& category): bool 
   - disableKernelTraceEvents(): bool 
-  - setCategoryEnable(const char* name, bool enable): bool 
   - setUpTrace(): bool 
   - cleanUpTrace(): void 
   - startTrace(): bool 
