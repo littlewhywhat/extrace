@@ -28,27 +28,23 @@
 #include <zlib.h>
 
 KernelSystemImpl::~KernelSystemImpl()
-{
-    delete this->file_system;
-    delete this->toolbox;
-    delete this->systime;
-}
+{}
 
 void KernelSystemImpl::set_errstream(FILE * errstream)
 {
     this->errstream = errstream;
 }
 
-void KernelSystemImpl::set_systime(SystemTime * systime) {
+void KernelSystemImpl::set_systime(shared_ptr<SystemTime> & systime) {
     this->systime = systime;
 }
 
-void KernelSystemImpl::set_file_system(FileSystem * file_system)
+void KernelSystemImpl::set_file_system(shared_ptr<FileSystem> & file_system)
 {
     this->file_system = file_system;
 }
 
-void KernelSystemImpl::set_toolbox(Toolbox * toolbox)
+void KernelSystemImpl::set_toolbox(shared_ptr<Toolbox> & toolbox)
 {
     this->toolbox = toolbox;
 }
@@ -155,6 +151,7 @@ bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& categor
 
 bool KernelSystemImpl::writeClockSyncMarker()
 {
+  printf("writeClockSyncMarker\n");
   char buffer[128];
   float now_in_seconds = systime->get_monotonic();
   snprintf(buffer, 128, "trace_event_clock_sync: parent_ts=%f\n", now_in_seconds);

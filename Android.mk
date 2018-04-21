@@ -42,13 +42,19 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
 		src/systemtime_impl.cpp \
 		src/androidsystem_impl.cpp \
-		src/atraceapp.cpp \
 		src/atrace.cpp \
 		src/filesystem_impl.cpp \
 		src/kernelsystem_impl.cpp \
 		src/androidtoolbox.cpp \
     src/trace_impl.cpp \
-		
+		src/startaction.cpp \
+		src/stopaction.cpp \
+		src/dumpaction.cpp \
+		src/streamaction.cpp \
+		src/sleepaction.cpp \
+		src/cleanupaction.cpp \
+		src/signal.cpp \
+		src/actionrunner_impl.cpp \
 
 LOCAL_MODULE:= atrace_ref
 
