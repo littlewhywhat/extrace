@@ -1,32 +1,120 @@
 @startuml
 
-class AtraceApp {
-  - g_traceDurationSeconds : int
-  - g_compress : bool
-  - g_nohup : bool
-  - g_initialSleepSecs : int
-  - g_outputFile : string
-  - g_traceAborted : bool
-  - async : bool
-  - traceStart : bool
-  - traceStop : bool
-  - traceDump : bool
-  - traceStream : bool
-  - errstream : FILE *
-  - outstream : FILE *
+class AtraceMain {
+ - handleSignal(int /*signo*/): void
+ - registerSigHandler(): void
+ - listSupportedCategories() : void
+ - showHelp(const char *cmd): void
+ - setupDependencies(): void
+ - setupAndroidSystemImpl(): void
+ - setupKernelSystemImpl(): void
+ - addAppsToTrace(const char * commaSepApps): void
+ - addFunctionsToTrace(const char * commaSepFuncs): void
+ - addAndroidCategoriesToTrace(const char * commaSepCats): void
+ - addCoreServicesToTrace(): bool
+ - addKernelCategoriesFromFileToTrace(const char * filename): bool
+ + main(int argc, char ** argv): int
+}
+hide AtraceMain fields
+
+AtraceMain "-toolBox"        -- "1" AndroidToolbox
+AtraceMain "-systemTimeImpl" -- "1" SystemTimeImpl
+AtraceMain "-fileSystem"     -- "1" FileSystemImpl
+AtraceMain "-kernelSystem"   -- "1" KernelSystemImpl
+AtraceMain "-androidSystem"  -- "1" AndroidSystemImpl
+AtraceMain "-trace"          -- "1" TraceImpl
+AtraceMain "-initSleep"      -- "1" SleepAction
+AtraceMain "-startAction"    -- "1" StartAction
+AtraceMain "-midSleep"       -- "1" SleepAction
+AtraceMain "-streamAction"   -- "1" StreamAction
+AtraceMain "-stopAction"     -- "1" StopAction
+AtraceMain "-dumpAction"     -- "1" DumpAction
+AtraceMain "-cleanUpAction"  -- "1" CleanUpAction
+AtraceMain "-signal_impl"    -- "1" Signal
+
+interface Action {
+  + {abstract} bool tryRun()
+}
+hide Action fields
+
+interface ActionRunner {
+  + {abstract} bool tryRunActions()
+}
+hide ActionRunner fields
+
+ActionRunner --> "0..*" Action: runs
+
+class ActionRunnerImpl {
+  + addAction(Action * action)
+}
+hide ActionRunnerImpl fields
+
+ActionRunnerImpl ..> ActionRunner
+ActionRunnerImpl "-m_Actions" -- "0..*" Action
+
+class CleanUpAction {
+  - m_ErrorStream: FILE *
+}
+hide CleanUpAction methods
+
+CleanUpAction ..> Action
+CleanUpAction "-m_Trace" -- "1" Trace
+
+class DumpAction {
+  - m_ErrorStream: FILE *
+  - m_OutputStream: FILE *
+  - m_Compress: bool
+  - m_OutputFile: string
   --
-  + handleSignal(): void
-  + enable_streaming(): void
-  + enable_compression(): void
-  + nosignals(): void
-  + run(): bool
-  - streamTrace(): void 
-  - dumpTrace(): void 
+  + enableCompression(): void
 }
 
-AtraceApp "-androidsystem" -->"1" AndroidSystem
-AtraceApp "-kernelsystem" -->"1" KernelSystem
-AtraceApp "-trace" *-->"1" Trace
+DumpAction ..> Action
+DumpAction "-m_KernelSystem" -- "1" KernelSystem
+
+class SleepAction {
+  - m_ErrorStream: FILE *
+  - m_DurationSeconds: uint32_t
+}
+hide SleepAction methods
+
+SleepAction ..> Action
+SleepAction "-m_Signal" -- "1" Signal
+
+class StartAction {
+  - m_ErrorStream: FILE *
+  - m_OutputStream: FILE *
+}
+hide StartAction methods
+
+StartAction ..> Action
+StartAction "-m_Trace" -- "1" Trace
+StartAction "-m_KernelSystem" -- "1" KernelSystem
+
+class StopAction {
+  - m_ErrorStream: FILE *
+}
+hide StopAction methods
+
+StopAction ..> Action
+StopAction "-m_Trace" -- "1" Trace
+
+class StreamAction {
+  - m_ErrorStream: FILE *
+  - m_OutputStream: FILE *
+}
+hide StreamAction methods
+
+StreamAction ..> Action
+StreamAction "-m_Signal" -- "1" Signal
+StreamAction "-m_KernelSystem" -- "1" KernelSystem
+
+class Signal {
+  - m_Fired: bool
+  --
+  + fire()
+  + fired() bool
+}
 
 interface Trace {
   - setUp(): bool 

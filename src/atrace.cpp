@@ -21,53 +21,87 @@
 #include "systemtime_impl.h"
 #include "androidsystem_impl.h"
 #include "kernelsystem_impl.h"
-#include "atraceapp.h"
 #include "androidtoolbox.h"
 #include "trace_impl.h"
+#include "signal.h"
+#include "startaction.h"
+#include "stopaction.h"
+#include "sleepaction.h"
+#include "dumpaction.h"
+#include "streamaction.h"
+#include "cleanupaction.h"
+#include "filesystem.h"
+#include "systemtime.h"
+#include "androidsystem.h"
+#include "kernelsystem.h"
+#include "toolbox.h"
+#include "trace.h"
+#include "action.h"
+#include "actionrunner_impl.h"
 
 #include <getopt.h>      // getopt_long, no_argument
 #include <signal.h>      // sigaction
 #include <utils/Trace.h> // ATRACE_TAGs
 #include <stdlib.h>      // EXIT_FAILURE, EXIT_SUCCESS
+#include <memory>
 
-AtraceApp atrace;
-FILE * errstream = stderr;
+using namespace std;
+
+bool handleSignals = true;
+
+auto * errorStream    = stderr;
+auto * outputStream   = stdout;
+auto toolBox        = new AndroidToolbox();
+auto systemTimeImpl = new SystemTimeImpl();
+auto fileSystem     = new FileSystemImpl();
+auto kernelSystem   = new KernelSystemImpl();
+auto androidSystem  = new AndroidSystemImpl();
+auto trace          = new TraceImpl();
+auto initSleep      = new SleepAction();
+auto startAction    = new StartAction();
+auto midSleep       = new SleepAction();
+auto streamAction   = new StreamAction();
+auto stopAction     = new StopAction();
+auto dumpAction     = new DumpAction();
+auto cleanUpAction  = new CleanUpAction();
+auto signal_impl    = new Signal();
 
 void handleSignal(int /*signo*/)
 {
-    atrace.handleSignal();
+  signal_impl->fire();
 }
 
 void registerSigHandler()
 {
-    struct sigaction sa;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sa.sa_handler = handleSignal;
-    sigaction(SIGHUP, &sa, NULL);
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGQUIT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
+  struct sigaction sa;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = handleSignal;
+  sigaction(SIGHUP, &sa, NULL);
+  sigaction(SIGINT, &sa, NULL);
+  sigaction(SIGQUIT, &sa, NULL);
+  sigaction(SIGTERM, &sa, NULL);
 }
 
-void listSupportedCategories(KernelSystem * kernel_system, AndroidSystem * android_system) {
-  const auto & kernelCategories = kernel_system->getCategories();
+void listSupportedCategories() {
+  const auto & kernelCategories = kernelSystem->getCategories();
   for (const auto & category : kernelCategories) {
-      if (kernel_system->isCategorySupported(category)) {
+      if (kernelSystem->isCategorySupported(category)) {
           printf("  %10s - %s\n", category.name, category.longname);
       }
   }
-  const auto & androidCategories = android_system->getCategories();
+  const auto & androidCategories = androidSystem->getCategories();
   for (const auto & category : androidCategories) {
+      // is there a way to check?
       printf("  %10s - %s\n", category.name, category.longname);
   }
 }
 
-// Print the command usage help to errstream.
+// Print the command usage help to errorStream.
 void showHelp(const char *cmd)
 {
-    fprintf(errstream, "usage: %s [options] [categories...]\n", cmd);
-    fprintf(errstream, "options include:\n"
+    fprintf(errorStream, "usage: %s [options] [categories...]\n", cmd);
+    fprintf(errorStream, "options include:\n"
                     "  -a appname      enable app-level tracing for a comma "
                         "separated list of cmdlines\n"
                     "  -b N            use a trace buffer size of N KB\n"
@@ -95,80 +129,103 @@ void showHelp(const char *cmd)
             );
 }
 
-int main(int argc, char ** argv) {
-  Toolbox * toolbox = new AndroidToolbox();
-  FileSystemImpl * file_system = new FileSystemImpl();
-  file_system->set_errstream(errstream);
-  KernelSystemImpl * kernel_system_impl = new KernelSystemImpl();
-  kernel_system_impl->set_errstream(errstream);
-  kernel_system_impl->set_file_system(file_system);
-  kernel_system_impl->set_toolbox(toolbox);
-  kernel_system_impl->set_systime(new SystemTimeImpl());
-  AndroidSystemImpl * android_system_impl = new AndroidSystemImpl();
-  android_system_impl->set_errstream(errstream);
+void setupDependencies() {
+  auto sp_ToolBox       = shared_ptr<Toolbox>(toolBox);
+  auto sp_SystemTime    = shared_ptr<SystemTime>(systemTimeImpl);
+  auto sp_FileSystem    = shared_ptr<FileSystem>(fileSystem);
+  auto sp_KernelSystem  = shared_ptr<KernelSystem>(kernelSystem);
+  auto sp_AndroidSystem = shared_ptr<AndroidSystem>(androidSystem);
+  auto sp_Trace         = shared_ptr<Trace>(trace);
+  auto sp_Signal        = shared_ptr<Signal>(signal_impl);
+  
+  fileSystem->set_errstream(errorStream);
+  kernelSystem->set_errstream(errorStream);
+  kernelSystem->set_file_system(sp_FileSystem);
+  kernelSystem->set_toolbox(sp_ToolBox);
+  kernelSystem->set_systime(sp_SystemTime);
+  androidSystem->set_errstream(errorStream);
 
-  auto sp_android_system_impl = shared_ptr<AndroidSystem>(android_system_impl);
-  auto sp_kernel_system_impl  = shared_ptr<KernelSystem>(kernel_system_impl);
+  trace->setErrorStream(errorStream);
+  trace->setKernelSystem(sp_KernelSystem);
+  trace->setAndroidSystem(sp_AndroidSystem);
 
-  TraceImpl * trace = new TraceImpl();
-  trace->setErrorStream(errstream);
-  trace->setKernelSystem(sp_kernel_system_impl);
-  trace->setAndroidSystem(sp_android_system_impl);
+  initSleep->setSignal(sp_Signal);
 
-  atrace.setTrace(trace);
-  atrace.set_kernel_system(sp_kernel_system_impl);
-  atrace.set_android_system(sp_android_system_impl);
-  atrace.set_errstream(errstream);
-  atrace.set_outstream(stdout);
-  android_system_impl->add_category( "gfx",        "Graphics",         ATRACE_TAG_GRAPHICS         );
-  android_system_impl->add_category( "input",      "Input",            ATRACE_TAG_INPUT            );
-  android_system_impl->add_category( "view",       "View System",      ATRACE_TAG_VIEW             );
-  android_system_impl->add_category( "webview",    "WebView",          ATRACE_TAG_WEBVIEW          );
-  android_system_impl->add_category( "wm",         "Window Manager",   ATRACE_TAG_WINDOW_MANAGER   );
-  android_system_impl->add_category( "am",         "Activity Manager", ATRACE_TAG_ACTIVITY_MANAGER );
-  android_system_impl->add_category( "sm",         "Sync Manager",     ATRACE_TAG_SYNC_MANAGER     );
-  android_system_impl->add_category( "audio",      "Audio",            ATRACE_TAG_AUDIO            );
-  android_system_impl->add_category( "video",      "Video",            ATRACE_TAG_VIDEO            );
-  android_system_impl->add_category( "camera",     "Camera",           ATRACE_TAG_CAMERA           );
-  android_system_impl->add_category( "hal",        "Hardware Modules", ATRACE_TAG_HAL              );
-  android_system_impl->add_category( "app",        "Application",      ATRACE_TAG_APP              );
-  android_system_impl->add_category( "res",        "Resource Loading", ATRACE_TAG_RESOURCES        );
-  android_system_impl->add_category( "dalvik",     "Dalvik VM",        ATRACE_TAG_DALVIK           );
-  android_system_impl->add_category( "rs",         "RenderScript",     ATRACE_TAG_RS               );
-  android_system_impl->add_category( "bionic",     "Bionic C Library", ATRACE_TAG_BIONIC           );
-  android_system_impl->add_category( "power",      "Power Management", ATRACE_TAG_POWER            );
-  android_system_impl->add_category( "pm",         "Package Manager",  ATRACE_TAG_PACKAGE_MANAGER  );
-  android_system_impl->add_category( "ss",         "System Server",    ATRACE_TAG_SYSTEM_SERVER    );
-  android_system_impl->add_category( "database",   "Database",         ATRACE_TAG_DATABASE         );
-  android_system_impl->add_category( "network",    "Network",          ATRACE_TAG_NETWORK          );
+  startAction->setTrace(sp_Trace);
+  startAction->setErrorStream(errorStream);
+  startAction->setOutputStream(outputStream);
+  startAction->setKernelSystem(sp_KernelSystem);
 
-  kernel_system_impl->add_kernel_category("sched",         "CPU Scheduling",
+  midSleep->setSignal(sp_Signal);
+
+  streamAction->setErrorStream(errorStream);
+  streamAction->setOutputStream(outputStream);
+  streamAction->setKernelSystem(sp_KernelSystem);
+  streamAction->setSignal(sp_Signal);
+
+  stopAction->setTrace(sp_Trace);
+  stopAction->setErrorStream(errorStream);
+
+  dumpAction->setErrorStream(errorStream);
+  dumpAction->setOutputStream(outputStream);
+  dumpAction->setKernelSystem(sp_KernelSystem);
+
+  cleanUpAction->setTrace(sp_Trace);
+  cleanUpAction->setErrorStream(errorStream);
+}
+
+void setupAndroidSystemImpl() {
+  androidSystem->add_category( "gfx",        "Graphics",         ATRACE_TAG_GRAPHICS         );
+  androidSystem->add_category( "input",      "Input",            ATRACE_TAG_INPUT            );
+  androidSystem->add_category( "view",       "View System",      ATRACE_TAG_VIEW             );
+  androidSystem->add_category( "webview",    "WebView",          ATRACE_TAG_WEBVIEW          );
+  androidSystem->add_category( "wm",         "Window Manager",   ATRACE_TAG_WINDOW_MANAGER   );
+  androidSystem->add_category( "am",         "Activity Manager", ATRACE_TAG_ACTIVITY_MANAGER );
+  androidSystem->add_category( "sm",         "Sync Manager",     ATRACE_TAG_SYNC_MANAGER     );
+  androidSystem->add_category( "audio",      "Audio",            ATRACE_TAG_AUDIO            );
+  androidSystem->add_category( "video",      "Video",            ATRACE_TAG_VIDEO            );
+  androidSystem->add_category( "camera",     "Camera",           ATRACE_TAG_CAMERA           );
+  androidSystem->add_category( "hal",        "Hardware Modules", ATRACE_TAG_HAL              );
+  androidSystem->add_category( "app",        "Application",      ATRACE_TAG_APP              );
+  androidSystem->add_category( "res",        "Resource Loading", ATRACE_TAG_RESOURCES        );
+  androidSystem->add_category( "dalvik",     "Dalvik VM",        ATRACE_TAG_DALVIK           );
+  androidSystem->add_category( "rs",         "RenderScript",     ATRACE_TAG_RS               );
+  androidSystem->add_category( "bionic",     "Bionic C Library", ATRACE_TAG_BIONIC           );
+  androidSystem->add_category( "power",      "Power Management", ATRACE_TAG_POWER            );
+  androidSystem->add_category( "pm",         "Package Manager",  ATRACE_TAG_PACKAGE_MANAGER  );
+  androidSystem->add_category( "ss",         "System Server",    ATRACE_TAG_SYSTEM_SERVER    );
+  androidSystem->add_category( "database",   "Database",         ATRACE_TAG_DATABASE         );
+  androidSystem->add_category( "network",    "Network",          ATRACE_TAG_NETWORK          );
+}
+
+void setupKernelSystemImpl() {
+  kernelSystem->add_kernel_category("sched",         "CPU Scheduling",
   {
      { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_switch/enable" },
      { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_wakeup/enable" },
      { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_blocked_reason/enable" },
      { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_cpu_hotplug/enable" },
   });
-  kernel_system_impl->add_kernel_category("irq",           "IRQ Events",
+  kernelSystem->add_kernel_category("irq",           "IRQ Events",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/irq/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ipi/enable" },
   });
-  kernel_system_impl->add_kernel_category("freq",          "CPU Frequency",
+  kernelSystem->add_kernel_category("freq",          "CPU Frequency",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_frequency/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/clock_set_rate/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/cpu_frequency_limits/enable" },
   });
-  kernel_system_impl->add_kernel_category("membus",        "Memory Bus Utilization",
+  kernelSystem->add_kernel_category("membus",        "Memory Bus Utilization",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/memory_bus/enable" },
   });
-  kernel_system_impl->add_kernel_category("idle",          "CPU Idle",
+  kernelSystem->add_kernel_category("idle",          "CPU Idle",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_idle/enable" },
   });
-  kernel_system_impl->add_kernel_category("disk",          "Disk I/O",
+  kernelSystem->add_kernel_category("disk",          "Disk I/O",
   {
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_enter/enable" },
      { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_exit/enable" },
@@ -181,54 +238,119 @@ int main(int argc, char ** argv) {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_issue/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_complete/enable" },
   });
-  kernel_system_impl->add_kernel_category("mmc",           "eMMC commands",
+  kernelSystem->add_kernel_category("mmc",           "eMMC commands",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/mmc/enable" },
   });
-  kernel_system_impl->add_kernel_category("load",          "CPU Load",
+  kernelSystem->add_kernel_category("load",          "CPU Load",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/cpufreq_interactive/enable" },
   });
-  kernel_system_impl->add_kernel_category("sync",          "Synchronization",
+  kernelSystem->add_kernel_category("sync",          "Synchronization",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/sync/enable" },
   });
-  kernel_system_impl->add_kernel_category("workq",         "Kernel Workqueues",
+  kernelSystem->add_kernel_category("workq",         "Kernel Workqueues",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/workqueue/enable" },
   });
-  kernel_system_impl->add_kernel_category("memreclaim",    "Kernel Memory Reclaim",
+  kernelSystem->add_kernel_category("memreclaim",    "Kernel Memory Reclaim",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_begin/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_end/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_wake/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_sleep/enable" },
   });
-  kernel_system_impl->add_kernel_category("regulators",    "Voltage and Current Regulators",
+  kernelSystem->add_kernel_category("regulators",    "Voltage and Current Regulators",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/regulator/enable" },
   });
-  kernel_system_impl->add_kernel_category("binder_driver", "Binder Kernel driver",
+  kernelSystem->add_kernel_category("binder_driver", "Binder Kernel driver",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction_received/enable" },
   });
-  kernel_system_impl->add_kernel_category("binder_lock",   "Binder global lock trace",
+  kernelSystem->add_kernel_category("binder_lock",   "Binder global lock trace",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_lock/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_locked/enable" },
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_unlock/enable" },
   });
-  kernel_system_impl->add_kernel_category("pagecache",     "Page cache",
+  kernelSystem->add_kernel_category("pagecache",     "Page cache",
   {
      { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/filemap/enable" },
   });
+}
 
+void addAppsToTrace(const char * commaSepApps) {
+  std::set<std::string> tokens;
+  toolBox->parseToTokens(commaSepApps, ",", tokens);
+  for (const auto & token : tokens) {
+    trace->addApp(token.c_str());
+  }
+}
+
+void addFunctionsToTrace(const char * commaSepFuncs) {
+  std::set<std::string> tokens;
+  toolBox->parseToTokens(commaSepFuncs, ",", tokens);
+  for (const auto & token : tokens) {
+    trace->addFunction(token.c_str());
+  }
+}
+
+void addAndroidCategoriesToTrace(const char * commaSepCats) {
+  std::set<std::string> tokens;
+  toolBox->parseToTokens(commaSepCats, ",", tokens);
+  for (const auto & token : tokens) {
+      trace->addAndroidCategory(token.c_str());
+  }
+}
+
+bool addCoreServicesToTrace() {
+  std::set<std::string> tokens;
+  if (androidSystem->has_core_services()) {
+    std::string value;
+    androidSystem->property_get_core_service_names(value);
+    toolBox->parseToTokens(value.c_str(), ",", tokens);
+    for (const auto & token : tokens) {
+      trace->addApp(token.c_str());
+    }
+    return true;
+  }
+  fprintf(errorStream, "Can't enable core services - not supported\n");
+  return false;
+}
+
+bool addKernelCategoriesFromFileToTrace(const char * filename) {
+  std::set<std::string> tokens;
+  if (!toolBox->parseFileToTokens(filename, " ", tokens)) {
+    fprintf(errorStream, "error parsing category file \"%s\"\n", filename);
+    return false;
+  }
+  for (const auto & token : tokens) {
+     trace->addKernelCategory(token.c_str());
+  }
+  return true;
+}
+
+int main(int argc, char ** argv) {
   if (argc == 2 && 0 == strcmp(argv[1], "--help")) {
     showHelp(argv[0]);
     return EXIT_SUCCESS;
   }
 
+  setupAndroidSystemImpl();
+  setupKernelSystemImpl();
+  setupDependencies();
+
+  handleSignals = true;
+
+  bool hasS          = false;
+  bool hasAsyncStart = false;
+  bool hasStream     = false;
+  bool hasAsyncStop  = false;
+  bool hasAsyncDump  = false;
+  bool hasT          = false;
   for (;;) {
       int ret;
       int option_index = 0;
@@ -252,14 +374,9 @@ int main(int argc, char ** argv) {
           break;
       }
 
-      std::set<std::string> tokens;
       switch(ret) {
           case 'a':
-              toolbox->parseToTokens(optarg, ",", tokens);
-              for (const auto & token : tokens) {
-                trace->addApp(token.c_str());
-              }
-              tokens.clear();    
+              addAppsToTrace(optarg);
           break;
 
           case 'b':
@@ -271,95 +388,110 @@ int main(int argc, char ** argv) {
           break;
 
           case 'd':
-              toolbox->parseToTokens(optarg, ",", tokens);
-              for (const auto & androidCategory : tokens) {
-                  trace->addAndroidCategory(androidCategory.c_str());
-              }
-              tokens.clear();
+              addAndroidCategoriesToTrace(optarg);
           break;
 
           case 'f':
-              if (!toolbox->parseFileToTokens(optarg, " ", tokens)) {
-                fprintf(errstream, "error parsing category file \"%s\"\n", optarg);
+              if (!addKernelCategoriesFromFileToTrace(optarg))
                 return EXIT_FAILURE;
-              }
-              for (const auto & token : tokens) {
-                 trace->addKernelCategory(token.c_str());
-              }
-              tokens.clear();
           break;
 
           case 'k':
-              toolbox->parseToTokens(optarg, ",", tokens);
-              for (const auto & token : tokens) {
-                trace->addFunction(token.c_str());
-              }
-              tokens.clear();
+              addFunctionsToTrace(optarg);
           break;
 
           case 'n':
-              atrace.nosignals();
+              handleSignals = false;
           break;
 
           case 's':
-              atrace.set_initialSleepSecs(atoi(optarg));
+              hasS = true;
+              initSleep->setDurationSeconds(atoi(optarg));
           break;
 
           case 't':
-              atrace.set_traceDurationSeconds(atoi(optarg));
+              hasT = true;
+              midSleep->setDurationSeconds(atoi(optarg));
           break;
 
           case 'z':
-              atrace.enable_compression();
+              dumpAction->enableCompression();
           break;
 
           case 'o':
-              atrace.set_outputFile(optarg);
+              dumpAction->setOutputFile(optarg);
           break;
 
           case 0:
               if (!strcmp(long_options[option_index].name, "async_start")) {
-                  atrace.set_async(true);
-                  atrace.set_stop(false);
-                  atrace.set_dump(false);
-                  trace->enableTraceOverwrite();
+                  hasAsyncStart = true;
               } else if (!strcmp(long_options[option_index].name, "async_stop")) {
-                  atrace.set_async(true);
-                  atrace.set_start(false);
+                  hasAsyncStop = true;
               } else if (!strcmp(long_options[option_index].name, "async_dump")) {
-                  atrace.set_async(true);
-                  atrace.set_start(false);
-                  atrace.set_stop(false);
+                  hasAsyncDump = true;
               } else if (!strcmp(long_options[option_index].name, "stream")) {
-                  atrace.enable_streaming();
-                  atrace.set_dump(false);
+                  hasStream = true;
               } else if (!strcmp(long_options[option_index].name, "list_categories")) {
-                  listSupportedCategories(kernel_system_impl, android_system_impl);
+                  listSupportedCategories();
                   return EXIT_SUCCESS;
               } else if (!strcmp(long_options[option_index].name, "acore")) {
-                if (android_system_impl->has_core_services()) {
-                  std::string value;
-                  android_system_impl->property_get_core_service_names(value);
-                  toolbox->parseToTokens(value.c_str(), ",", tokens);
-                  for (const auto & token : tokens) {
-                    trace->addApp(token.c_str());
+                  if (!addCoreServicesToTrace()) {
+                    return EXIT_FAILURE;
                   }
-                  tokens.clear();
-                } else {
-                  fprintf(errstream, "Can't enable core services - not supported\n");
-                }
               }
           break;
 
           default:
-              fprintf(errstream, "\n");
+              fprintf(errorStream, "\n");
               showHelp(argv[0]);
               return EXIT_FAILURE;
           break;
       }
   }
 
-  registerSigHandler();
+  ActionRunnerImpl actionRunnerImpl;
+  if (hasS) {
+    actionRunnerImpl.addAction(initSleep);
+  }
+  if (hasAsyncStart) {
+    actionRunnerImpl.addAction(startAction);
+    if (hasStream) {
+      actionRunnerImpl.addAction(streamAction);
+      handleSignals = true;
+    }
+  }
+  else if (hasAsyncStop) {
+    actionRunnerImpl.addAction(stopAction);
+    actionRunnerImpl.addAction(dumpAction);
+    actionRunnerImpl.addAction(cleanUpAction);
+  }
+  else if (hasAsyncDump) {
+    actionRunnerImpl.addAction(dumpAction);
+  }
+  else {
+    actionRunnerImpl.addAction(startAction);
+    actionRunnerImpl.addAction(midSleep);
+    if (hasStream) {
+      actionRunnerImpl.addAction(streamAction);
+    }
+    actionRunnerImpl.addAction(stopAction);
+    actionRunnerImpl.addAction(dumpAction);
+    actionRunnerImpl.addAction(cleanUpAction);
+  }
 
-  return atrace.run()? EXIT_SUCCESS : EXIT_FAILURE;
+  if (handleSignals)
+    registerSigHandler();
+
+  bool ok = actionRunnerImpl.tryRunActions();
+
+  delete initSleep;
+  delete startAction;
+  delete midSleep;
+  delete streamAction;
+  delete stopAction;
+  delete dumpAction;
+  delete cleanUpAction;
+  if (ok)
+    return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
