@@ -37,6 +37,7 @@ class KernelSystemImpl : public KernelSystem {
     void set_systime(SystemTime * systime);
     int tryOpenToWriteOrCreate(const char* filename);
     bool try_sendfile(int fd_from, int fd_to);
+    void compress_trace_to(int traceFD, int outFd) override;
     bool writeClockSyncMarker() override;
     bool setTraceOverwriteEnable(bool enable) override;
     bool setTracingEnabled(bool enable) override;

@@ -38,7 +38,6 @@ class AndroidSystem {
     virtual bool setAppCmdlineProperty(const vector<string> & appNames) = 0;
     virtual bool pokeBinderServices() = 0;
     virtual void clearAppProperties() = 0;
-    virtual void compress_trace_to(int traceFD, int outFd) = 0;
     virtual void log_dumping_trace() = 0;
 };
 

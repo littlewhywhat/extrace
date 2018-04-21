@@ -34,6 +34,7 @@ set(MAIN "${CMAKE_SOURCE_DIR}/src/main.cpp")
 set(ATRACE "${CMAKE_SOURCE_DIR}/src/atrace.cpp")
 set(SYSTEMTIME_IMPL "${CMAKE_SOURCE_DIR}/src/systemtime_impl.cpp")
 set(ANDROIDSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/androidsystem_impl.cpp")
+set(KERNELSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/kernelsystem_impl.cpp")
 set(ANDROIDTOOLBOX "${CMAKE_SOURCE_DIR}/src/androidtoolbox.cpp")
 
 file (GLOB OBJ_SOURCES "src/*.cpp")
@@ -46,6 +47,7 @@ list(REMOVE_ITEM OBJ_SOURCES
      ${ATRACE}
      ${SYSTEMTIME_IMPL}
      ${ANDROIDSYSTEM_IMPL}
+     ${KERNELSYSTEM_IMPL}
      ${ANDROIDTOOLBOX}
      ${TEST_SOURCES}
 )

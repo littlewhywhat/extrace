@@ -30,6 +30,7 @@ class KernelSystem {
     virtual ~KernelSystem() {}
     virtual int tryOpenToWriteOrCreate(const char* filename) = 0;
     virtual bool try_sendfile(int fd_from, int fd_to) = 0;
+    virtual bool compress_trace_to(int traceFD, int outFd) = 0;
     virtual bool writeClockSyncMarker() = 0;
     // Enable or disable overwriting of the kernel trace buffers.  Disabling this
     // will cause tracing to stop once the trace buffers have filled up.

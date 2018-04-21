@@ -206,7 +206,7 @@ void AtraceApp::dumpTrace()
         return;
     }
     if (g_compress) {
-        android_system->compress_trace_to(traceFD, outFd);
+        kernel_system->compress_trace_to(traceFD, outFd);
     } else {
         // ssize_t sent = 0;
         // while ((sent = sendfile(outFd, traceFD, NULL, 64*1024*1024)) > 0);
