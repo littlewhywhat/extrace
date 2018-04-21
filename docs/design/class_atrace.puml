@@ -60,6 +60,7 @@ interface KernelSystem {
   + {abstract} writeClockSyncMarker(): bool 
   + {abstract} setTraceOverwriteEnable(bool enable): bool
   + {abstract} setTracingEnabled(bool enable): bool
+  + {abstract} compress_trace_to(int traceFD, int outFd): void
   + {abstract} clearTrace(): bool
   + {abstract} getTracePipeFd(): int
   + {abstract} getTraceFd(): int
@@ -86,7 +87,6 @@ interface AndroidSystem {
   + {abstract} setAppCmdlineProperty(const vector<string> & apps): bool
   + {abstract} pokeBinderServices(): bool
   + {abstract} clearAppProperties(): void
-  + {abstract} compress_trace_to(int traceFD, int outFd): void
   + {abstract} log_dumping_trace(): void
 }
 hide AndroidSystem fields

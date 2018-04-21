@@ -33,7 +33,6 @@ class AndroidSystemImpl : public AndroidSystem {
     bool setAppCmdlineProperty(const vector<string> & appNames) override;
     bool pokeBinderServices() override;
     void clearAppProperties() override;
-    void compress_trace_to(int traceFD, int outFd) override;
     void log_dumping_trace() override;
     void set_errstream(FILE * errstream);
     void add_category(const char * id, const char * name, uint64_t atrace_tag);

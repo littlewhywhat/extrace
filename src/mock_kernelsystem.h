@@ -25,6 +25,7 @@ class MockKernelSystem : public KernelSystem {
   public:
     MOCK_METHOD1(tryOpenToWriteOrCreate, int(const char* filename));
     MOCK_METHOD2(try_sendfile, bool(int fd_from, int fd_to));
+    MOCK_METHOD2(compress_trace_to, bool(int from, int to));
     MOCK_METHOD0(writeClockSyncMarker, bool(void));
     MOCK_METHOD1(setTraceOverwriteEnable, bool(bool enable));
     MOCK_METHOD1(setTracingEnabled, bool(bool enable));
