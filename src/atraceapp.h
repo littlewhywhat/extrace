@@ -50,7 +50,6 @@ class AtraceApp {
     void set_dump(bool option);
     void set_start(bool option);
     void enable_streaming();
-    void listSupportedCategories();
     bool run();
   private:
     std::vector<std::string> m_KernelCategories;
