@@ -50,6 +50,19 @@ void registerSigHandler()
     sigaction(SIGTERM, &sa, NULL);
 }
 
+void listSupportedCategories(KernelSystem * kernel_system, AndroidSystem * android_system) {
+  const auto & kernelCategories = kernel_system->getCategories();
+  for (const auto & category : kernelCategories) {
+      if (kernel_system->isCategorySupported(category)) {
+          printf("  %10s - %s\n", category.name, category.longname);
+      }
+  }
+  const auto & androidCategories = android_system->getCategories();
+  for (const auto & category : androidCategories) {
+      printf("  %10s - %s\n", category.name, category.longname);
+  }
+}
+
 // Print the command usage help to errstream.
 void showHelp(const char *cmd)
 {
@@ -321,7 +334,7 @@ int main(int argc, char ** argv) {
                   atrace.enable_streaming();
                   atrace.set_dump(false);
               } else if (!strcmp(long_options[option_index].name, "list_categories")) {
-                  atrace.listSupportedCategories();
+                  listSupportedCategories(kernel_system_impl, android_system_impl);
                   return EXIT_SUCCESS;
               } else if (!strcmp(long_options[option_index].name, "acore")) {
                 if (android_system_impl->has_core_services()) {

@@ -220,17 +220,3 @@ void AtraceApp::dumpTrace()
         close(outFd);
     }
 }
-
-void AtraceApp::listSupportedCategories()
-{
-    const auto & kernelCategories = kernel_system->getCategories();
-    for (const auto & category : kernelCategories) {
-        if (kernel_system->isCategorySupported(category)) {
-            printf("  %10s - %s\n", category.name, category.longname);
-        }
-    }
-    const auto & androidCategories = android_system->getCategories();
-    for (const auto & category : androidCategories) {
-        printf("  %10s - %s\n", category.name, category.longname);
-    }
-}
