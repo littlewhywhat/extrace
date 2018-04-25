@@ -56,6 +56,8 @@ LOCAL_SRC_FILES:= \
 		src/cleanupaction.cpp \
 		src/signal.cpp \
 		src/actionrunner_impl.cpp \
+		src/argsparser.cpp \
+    src/arguments.cpp \
 
 LOCAL_MODULE:= atrace_ref
 

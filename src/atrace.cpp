@@ -38,8 +38,9 @@
 #include "trace.h"
 #include "action.h"
 #include "actionrunner_impl.h"
+#include "arguments.h"
+#include "argsparser.h"
 
-#include <getopt.h>      // getopt_long, no_argument
 #include <signal.h>      // sigaction
 #include <utils/Trace.h> // ATRACE_TAGs
 #include <stdlib.h>      // EXIT_FAILURE, EXIT_SUCCESS
@@ -100,13 +101,14 @@ void listSupportedCategories() {
 // Print the command usage help to errorStream.
 void showHelp(const char *cmd)
 {
-    fprintf(errorStream, "usage: %s [options] [categories...]\n", cmd);
+    fprintf(errorStream, "usage: %s [options]", cmd);
     fprintf(errorStream, "options include:\n"
                     "  -a appname      enable app-level tracing for a comma "
                         "separated list of cmdlines\n"
                     "  -b N            use a trace buffer size of N KB\n"
                     "  -c              trace into a circular buffer\n"
                     "  -d aname,...    trace the listed android categories\n"
+                    "  -e kname,...    trace the listed kernel categories\n"
                     "  -f filename     use the categories written in a file as space-separated\n"
                     "                    values in a line\n"
                     "  -k fname,...    trace the listed kernel functions\n"
@@ -126,6 +128,7 @@ void showHelp(const char *cmd)
                     "                  list the available tracing categories\n"
                     " -o filename      write the trace to the specified file instead\n"
                     "                    of outstream.\n"
+                    " --acore          add core services.\n"
             );
 }
 
@@ -282,30 +285,6 @@ void setupKernelSystemImpl() {
   });
 }
 
-void addAppsToTrace(const char * commaSepApps) {
-  std::set<std::string> tokens;
-  toolBox->parseToTokens(commaSepApps, ",", tokens);
-  for (const auto & token : tokens) {
-    trace->addApp(token.c_str());
-  }
-}
-
-void addFunctionsToTrace(const char * commaSepFuncs) {
-  std::set<std::string> tokens;
-  toolBox->parseToTokens(commaSepFuncs, ",", tokens);
-  for (const auto & token : tokens) {
-    trace->addFunction(token.c_str());
-  }
-}
-
-void addAndroidCategoriesToTrace(const char * commaSepCats) {
-  std::set<std::string> tokens;
-  toolBox->parseToTokens(commaSepCats, ",", tokens);
-  for (const auto & token : tokens) {
-      trace->addAndroidCategory(token.c_str());
-  }
-}
-
 bool addCoreServicesToTrace() {
   std::set<std::string> tokens;
   if (androidSystem->has_core_services()) {
@@ -333,146 +312,129 @@ bool addKernelCategoriesFromFileToTrace(const char * filename) {
   return true;
 }
 
-int main(int argc, char ** argv) {
-  if (argc == 2 && 0 == strcmp(argv[1], "--help")) {
+int main(int argc, const char ** argv) {
+  Arguments args;
+  ArgsParser argsparser;
+  argsparser.setToolbox(make_shared<AndroidToolbox>());
+
+  argsparser.register_boolean("--help", "Help");
+  argsparser.register_boolean("-c", "CircleBuffer");
+  argsparser.register_boolean("-n", "signalsIgnore");
+  argsparser.register_boolean("-z", "Compressed");
+  argsparser.register_boolean("--async_start", "AsyncStart");
+  argsparser.register_boolean("--async_stop", "AsyncStop");
+  argsparser.register_boolean("--async_dump", "AsyncDump");
+  argsparser.register_boolean("--stream", "Stream");
+  argsparser.register_boolean("--list_categories", "ListCategories");
+  argsparser.register_boolean("--acore", "CoreServices");
+  argsparser.register_string("-f", "KernelCategoriesFilename");
+  argsparser.register_string("-o", "OutputFile");
+  argsparser.register_integer("-b", "BufferSize");
+  argsparser.register_integer("-s", "InitSleep");
+  argsparser.register_integer("-t", "MidSleep");
+  argsparser.registerCommaSepList("-a", "Apps");
+  argsparser.registerCommaSepList("-d", "AndroidCategories");
+  argsparser.registerCommaSepList("-e", "KernelCategories");
+  argsparser.registerCommaSepList("-k", "KernelFunctions");
+  
+  if (argsparser.parse(args, argc, argv) != argc) {
+    fprintf(errorStream, "\n");
+    showHelp(argv[0]);
+    return EXIT_FAILURE;
+  }
+  if (args.is_enabled("Help")) {
     showHelp(argv[0]);
     return EXIT_SUCCESS;
-  }
-
+  } 
   setupAndroidSystemImpl();
   setupKernelSystemImpl();
   setupDependencies();
 
+  if (args.is_enabled("ListCategories")) {
+    listSupportedCategories();
+    return EXIT_SUCCESS;
+  }
+
   handleSignals = true;
 
-  bool hasS          = false;
-  bool hasAsyncStart = false;
-  bool hasStream     = false;
-  bool hasAsyncStop  = false;
-  bool hasAsyncDump  = false;
-  bool hasT          = false;
-  for (;;) {
-      int ret;
-      int option_index = 0;
-      static struct option long_options[] = {
-          {"async_start",     no_argument, 0,  0 },
-          {"async_stop",      no_argument, 0,  0 },
-          {"async_dump",      no_argument, 0,  0 },
-          {"list_categories", no_argument, 0,  0 },
-          {"stream",          no_argument, 0,  0 },
-          {"acore",           no_argument, 0,  0 },
-          {           0,                0, 0,  0 }
-      };
-
-      ret = getopt_long(argc, argv, "a:b:cd:f:k:ns:t:zo:",
-                        long_options, &option_index);
-
-      if (ret < 0) {
-          for (int i = optind; i < argc; i++) {
-              trace->addKernelCategory(argv[i]);
-          }
-          break;
-      }
-
-      switch(ret) {
-          case 'a':
-              addAppsToTrace(optarg);
-          break;
-
-          case 'b':
-              trace->setTraceBufferSizeKB(atoi(optarg));
-          break;
-
-          case 'c':
-              trace->enableTraceOverwrite();
-          break;
-
-          case 'd':
-              addAndroidCategoriesToTrace(optarg);
-          break;
-
-          case 'f':
-              if (!addKernelCategoriesFromFileToTrace(optarg))
-                return EXIT_FAILURE;
-          break;
-
-          case 'k':
-              addFunctionsToTrace(optarg);
-          break;
-
-          case 'n':
-              handleSignals = false;
-          break;
-
-          case 's':
-              hasS = true;
-              initSleep->setDurationSeconds(atoi(optarg));
-          break;
-
-          case 't':
-              hasT = true;
-              midSleep->setDurationSeconds(atoi(optarg));
-          break;
-
-          case 'z':
-              dumpAction->enableCompression();
-          break;
-
-          case 'o':
-              dumpAction->setOutputFile(optarg);
-          break;
-
-          case 0:
-              if (!strcmp(long_options[option_index].name, "async_start")) {
-                  hasAsyncStart = true;
-              } else if (!strcmp(long_options[option_index].name, "async_stop")) {
-                  hasAsyncStop = true;
-              } else if (!strcmp(long_options[option_index].name, "async_dump")) {
-                  hasAsyncDump = true;
-              } else if (!strcmp(long_options[option_index].name, "stream")) {
-                  hasStream = true;
-              } else if (!strcmp(long_options[option_index].name, "list_categories")) {
-                  listSupportedCategories();
-                  return EXIT_SUCCESS;
-              } else if (!strcmp(long_options[option_index].name, "acore")) {
-                  if (!addCoreServicesToTrace()) {
-                    return EXIT_FAILURE;
-                  }
-              }
-          break;
-
-          default:
-              fprintf(errorStream, "\n");
-              showHelp(argv[0]);
-              return EXIT_FAILURE;
-          break;
-      }
+  if (args.is_enabled("CoreServices")) {
+    if (!addCoreServicesToTrace()) {
+      return EXIT_FAILURE;
+    }
+  }
+  if (args.is_enabled("CircleBuffer")) {
+    trace->enableTraceOverwrite();
+  }
+  if (args.is_enabled("signalsIgnore")) {
+    handleSignals = false;
+  }
+  if (args.is_enabled("Compressed")) {
+    dumpAction->enableCompression();
+  }
+  if (args.has_string("KernelCategoriesFilename")) {
+     if (!addKernelCategoriesFromFileToTrace(
+             args.get_string("KernelCategoriesFilename").c_str())) {
+        return EXIT_FAILURE;
+     }
+  }
+  if (args.has_string("OutputFile")) {
+    dumpAction->setOutputFile(args.get_string("OutputFile").c_str());
+  }
+  if (args.has_integer("BufferSize")) {
+    trace->setTraceBufferSizeKB(args.get_integer("BufferSize"));
+  }
+  if (args.has_integer("InitSleep")) {
+    initSleep->setDurationSeconds(args.get_integer("InitSleep"));
+  }
+  if (args.has_integer("MidSleep")) {
+    midSleep->setDurationSeconds(args.get_integer("MidSleep"));
+  }
+  if (args.hasStringList("Apps")) {
+    for (const auto & appname : args.getStringList("Apps")) {
+      trace->addApp(appname.c_str());
+    }
+  }
+  if (args.hasStringList("AndroidCategories")) {
+    for (const auto & androidCategory : args.getStringList("AndroidCategories")) {
+      trace->addAndroidCategory(androidCategory.c_str());
+    }
+  }
+  if (args.hasStringList("KernelCategories")) {
+    for (const auto & kernelCategory : args.getStringList("KernelCategories")) {
+      trace->addKernelCategory(kernelCategory.c_str());
+    }
+  }
+  if (args.hasStringList("KernelFunctions")) {
+    for (const auto & kernelFunction : args.getStringList("KernelFunctions")) {
+      trace->addFunction(kernelFunction.c_str());
+    }
   }
 
   ActionRunnerImpl actionRunnerImpl;
-  if (hasS) {
+  if (args.has_integer("InitSleep")) {
     actionRunnerImpl.addAction(initSleep);
   }
-  if (hasAsyncStart) {
+  if (args.is_enabled("AsyncStart")) {
     actionRunnerImpl.addAction(startAction);
-    if (hasStream) {
+    if (args.is_enabled("Stream")) {
       actionRunnerImpl.addAction(streamAction);
       handleSignals = true;
     }
   }
-  else if (hasAsyncStop) {
+  else if (args.is_enabled("AsyncStop")) {
     actionRunnerImpl.addAction(stopAction);
     actionRunnerImpl.addAction(dumpAction);
     actionRunnerImpl.addAction(cleanUpAction);
   }
-  else if (hasAsyncDump) {
+  else if (args.is_enabled("AsyncDump")) {
     actionRunnerImpl.addAction(dumpAction);
   }
   else {
     actionRunnerImpl.addAction(startAction);
     actionRunnerImpl.addAction(midSleep);
-    if (hasStream) {
+    if (args.is_enabled("Stream")) {
       actionRunnerImpl.addAction(streamAction);
+      handleSignals = true;
     }
     actionRunnerImpl.addAction(stopAction);
     actionRunnerImpl.addAction(dumpAction);
