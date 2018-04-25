@@ -28,17 +28,25 @@ class ArgsParser {
   - boolean_opt_names: std::map<std::string, std::string>
   - integer_opt_names: std::map<std::string, std::string>
   - string_opt_names: std::map<std::string, std::string>
+  - m_CommaSepListOptNames: map<string, string>
   --
+  + isCommaSepListSpec(const char * specifier) const: bool
   + is_boolean_spec(const char * spec): bool
   + is_integer_spec(const char * spec): bool
   + is_string_spec(const char * spec): bool
   + register_boolean(const char * specifier, const char * option_name): void
   + register_integer(const char * specifier, const char * option_name): void
   + register_string(const char * specifier, const char * option_name): void
+  + registerCommaSepList(const char * specifier, const char * option_name): void
   + parse(Arguments & arguments, int argc, const char ** argv): int
+  - is_boolean_spec(const char * spec): bool
+  - is_integer_spec(const char * spec): bool
+  - is_string_spec(const char * spec): bool
+  - isCommaSepListSpec(const char * specifier) const;  : bool
 }
 
 ArgsParser --> Arguments: parses
+ArgsParser "-m_ToolBox" -- "1" Toolbox
 
 class Arguments {
   - booleans: std::set<std::string>

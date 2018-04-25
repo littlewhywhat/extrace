@@ -67,3 +67,18 @@ const std::string & Arguments::get_string(const char * option_name) const
 {
   return (*single_strings.find(option_name)).second;
 }
+
+void Arguments::putToStringList(const char * optionName, const string & value) {
+  if (m_ListStrings.find(optionName) == m_ListStrings.end()) {
+    m_ListStrings.insert(std::make_pair(optionName, vector<string>()));
+  }
+  m_ListStrings[optionName].push_back(value);
+}
+
+const vector<string> & Arguments::getStringList(const char * optionName) const {
+  return m_ListStrings.at(optionName);
+}
+
+bool Arguments::hasStringList(const char * optionName) const {
+  return m_ListStrings.find(optionName) != m_ListStrings.end();
+}

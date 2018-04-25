@@ -17,10 +17,14 @@
 #include <gtest/gtest.h>
 
 #include "argsparser.h"
+#include "androidtoolbox.h"
 
 //! Tests ArgsParser
 class ArgsParserTest : public ::testing::Test {
   public:
+    void SetUp() {
+      parser.setToolbox(make_shared<AndroidToolbox>());
+    }
     //! Tests parsing of boolean
     void test_parse_boolean() {
       const char * option_name = "option_one";
@@ -69,28 +73,58 @@ class ArgsParserTest : public ::testing::Test {
       ASSERT_TRUE(args.has_string(option_names[1]));
       ASSERT_STREQ(args.get_string(option_names[1]).c_str(), option_vals[1]);
     }
+    //! Tests parsing of string
+    void testParseCommaSepArg() {
+      // TODO refactor
+      const char * option_names[] = { "option_one", "option_two" };
+      const char * option_specs[] = { "-op1", "-op2" };
+      vector<string> optionOneValues = { "op1_value_1", "op1_value_2" };
+      vector<string> optionTwoValues = { "op2_value_1" };
+      string optionOneCommaSepValues = optionOneValues[0] + "," + optionOneValues[1];
+      const int    argc           = 5;
+      const char * argv[]         = { "argsparser_test",
+                                      option_specs[0], optionOneCommaSepValues.c_str(),
+                                      option_specs[1], optionTwoValues[0].c_str() };
+      Arguments args;
+      parser.registerCommaSepList(option_specs[0], option_names[0]);
+      parser.registerCommaSepList(option_specs[1], option_names[1]);
+      parser.parse(args, argc, argv);
+      ASSERT_TRUE(args.hasStringList(option_names[0]));
+      ASSERT_EQ(args.getStringList(option_names[0]), optionOneValues);
+      ASSERT_TRUE(args.hasStringList(option_names[1]));
+      ASSERT_EQ(args.getStringList(option_names[1]), optionTwoValues);
+    }
+
     //! Tests parsing
     void test_parse() {
       // TODO refactor
-      const char * option_names[]   = { "boolean", "integer", "string" };
-      const char * option_specs[]   = { "-op_b", "-op_i", "-op_s" };
+      const char * option_names[]   = { "boolean", "integer", "string", "commaseplist" };
+      const char * option_specs[]   = { "-op_b", "-op_i", "-op_s", "-op_csl" };
+      const vector<string> commaSepListValues = { "val1", "val2", "val3" };
+      const string commaSepList = commaSepListValues[0] + ","
+                                  + commaSepListValues[1] + ","
+                                  + commaSepListValues[2];
       const char * option_str_val = "value";
       const int    option_int_val   = 10;
-      const int    argc           = 6;
+      const int    argc           = 8;
       const char * argv[]         = { "argsparser_test",
                                       option_specs[0],
                                       option_specs[1], "10",
-                                      option_specs[2], option_str_val };
+                                      option_specs[2], option_str_val,
+                                      option_specs[3], commaSepList.c_str() };
       Arguments args;
       parser.register_boolean(option_specs[0], option_names[0]);
       parser.register_integer(option_specs[1], option_names[1]);
       parser.register_string(option_specs[2], option_names[2]);
+      parser.registerCommaSepList(option_specs[3], option_names[3]);
       parser.parse(args, argc, argv);
       ASSERT_TRUE(args.is_enabled(option_names[0]));
       ASSERT_TRUE(args.has_integer(option_names[1]));
       ASSERT_EQ(args.get_integer(option_names[1]), option_int_val);
       ASSERT_TRUE(args.has_string(option_names[2]));
       ASSERT_STREQ(args.get_string(option_names[2]).c_str(), option_str_val);
+      ASSERT_TRUE(args.hasStringList(option_names[3]));
+      ASSERT_EQ(args.getStringList(option_names[3]), commaSepListValues);
     }
     //! Tests invalid parsing
     void test_invalid_parse_boolean() {
@@ -133,4 +167,8 @@ TEST_F(ArgsParserTest, parse) {
 TEST_F(ArgsParserTest, invalid_parse) {
   test_invalid_parse_boolean();
   test_invalid_parse_int_or_string();
+}
+
+TEST_F(ArgsParserTest, parseCommaSepArg) {
+  testParseCommaSepArg();
 }

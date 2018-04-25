@@ -5,6 +5,7 @@ common_src_files := \
     src/consoleappmain.cpp \
     src/extraceconsoleapp.cpp \
     src/extraceconsoleappbuilder.cpp \
+    src/androidtoolbox.cpp \
 
 common_test_files := \
     src/argsparser_test.cpp \
@@ -91,6 +92,13 @@ LOCAL_SRC_FILES := \
 LOCAL_STATIC_LIBRARIES := \
     libgmock \
 
+
+LOCAL_SHARED_LIBRARIES := \
+    libbinder \
+    libcutils \
+    libutils \
+    libz \
+
 include $(BUILD_NATIVE_TEST)
 
 # extrace_test host
@@ -110,5 +118,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock_host \
+    libutils \
+    liblog \
 
 include $(BUILD_HOST_NATIVE_TEST)

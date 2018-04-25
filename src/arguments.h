@@ -20,6 +20,9 @@
 #include <set>
 #include <string>
 #include <map>
+#include <vector>
+
+using namespace std;
 
 //! This class contains arguments' values
 class Arguments {
@@ -40,6 +43,12 @@ class Arguments {
     bool has_string(const char * option_name) const;
     //! Returns value for single string option specified by option name
     const std::string & get_string(const char * option_name) const;
+    //! Add new value to list of strings specified by option name
+    void putToStringList(const char * optionName, const string & value);
+    //! Returns vector of values for list of string option specified by option name
+    const vector<string> & getStringList(const char * optionName) const;
+    //! Says if list of string option specified by option name exists
+    bool hasStringList(const char * optionName) const;
   private:
     //! set of enabled boolean options
     std::set<std::string> booleans;
@@ -47,6 +56,8 @@ class Arguments {
     std::map<std::string, int> single_integers;
     //! map of single string options
     std::map<std::string, std::string> single_strings;
+    //! map of string list options
+    map<string, vector<string>> m_ListStrings;   
 };
 
 #endif

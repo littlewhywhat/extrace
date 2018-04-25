@@ -36,6 +36,7 @@ set(SYSTEMTIME_IMPL "${CMAKE_SOURCE_DIR}/src/systemtime_impl.cpp")
 set(ANDROIDSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/androidsystem_impl.cpp")
 set(KERNELSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/kernelsystem_impl.cpp")
 set(ANDROIDTOOLBOX "${CMAKE_SOURCE_DIR}/src/androidtoolbox.cpp")
+set(ARGSPARSERTEST "${CMAKE_SOURCE_DIR}/src/argsparser_test.cpp")
 
 file (GLOB OBJ_SOURCES "src/*.cpp")
 file (GLOB TEST_SOURCES "src/*_test.cpp")
@@ -50,6 +51,10 @@ list(REMOVE_ITEM OBJ_SOURCES
      ${KERNELSYSTEM_IMPL}
      ${ANDROIDTOOLBOX}
      ${TEST_SOURCES}
+)
+
+list(REMOVE_ITEM TEST_SOURCES
+     ${ARGSPARSERTEST}
 )
 
 # create main executable 

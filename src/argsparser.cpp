@@ -18,6 +18,10 @@
 
 #include "stdio.h"
 
+void ArgsParser::setToolbox(const shared_ptr<Toolbox> & toolBox) {
+  m_ToolBox = toolBox;
+}
+
 bool ArgsParser::is_boolean_spec(const char * spec)
 {
   return this->boolean_opt_names.find(spec) != this->boolean_opt_names.end();
@@ -33,6 +37,10 @@ bool ArgsParser::is_string_spec(const char * spec)
   return this->string_opt_names.find(spec) != this->string_opt_names.end();
 }
 
+bool ArgsParser::isCommaSepListSpec(const char * specifier) const {
+  return m_CommaSepListOptNames.find(specifier) != m_CommaSepListOptNames.end();
+}
+
 void ArgsParser::register_boolean(const char * specifier, const char * option_name)
 {
   this->boolean_opt_names[specifier] = option_name;
@@ -46,6 +54,10 @@ void ArgsParser::register_integer(const char * specifier, const char * option_na
 void ArgsParser::register_string(const char * specifier, const char * option_name)
 {
   this->string_opt_names[specifier] = option_name;
+}
+
+void ArgsParser::registerCommaSepList(const char * specifier, const char * optionName) {
+  m_CommaSepListOptNames[specifier] = optionName;
 }
 
 int ArgsParser::parse(Arguments & arguments, int argc, const char ** argv)
@@ -64,13 +76,19 @@ int ArgsParser::parse(Arguments & arguments, int argc, const char ** argv)
     {
       break;
     }
-    if (is_integer_spec(arg))
-    {
-      arguments.put_integer(this->integer_opt_names[arg].c_str(), std::stoi(argv[i+1]));
+    const char * optarg = argv[i+1];
+    if (is_integer_spec(arg)) {
+      arguments.put_integer(this->integer_opt_names[arg].c_str(), std::stoi(optarg));
     }
-    else if (is_string_spec(arg))
-    {
-      arguments.put_string(this->string_opt_names[arg].c_str(), argv[i+1]);
+    else if (is_string_spec(arg)) {
+      arguments.put_string(this->string_opt_names[arg].c_str(), optarg);
+    }
+    else if (isCommaSepListSpec(arg)) {
+      set<string> tokens;
+      m_ToolBox->parseToTokens(optarg, ",", tokens);
+      for (auto & token : tokens) {
+        arguments.putToStringList(m_CommaSepListOptNames[arg].c_str(), token);
+      }
     }
     else
     {

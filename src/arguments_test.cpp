@@ -50,6 +50,21 @@ class ArgumentsTest : public ::testing::Test
       ASSERT_TRUE(this->args.has_string("entry"));
       ASSERT_STREQ(this->args.get_string("entry").c_str(), module.c_str());
     }
+    //! Tests list strings options
+    void testListStrings() {
+      const char * optionName = "option 1";
+      const char * valueOne = "value 1";
+      const char * valueTwo = "value 2";
+      vector<string> valueOneV = { valueOne };
+      vector<string> valueOneAndTwo = { valueOne, valueTwo };
+      ASSERT_FALSE(args.hasStringList(optionName));
+      args.putToStringList(optionName, valueOne);
+      ASSERT_TRUE(args.hasStringList(optionName));
+      ASSERT_EQ(valueOneV, args.getStringList(optionName));
+      args.putToStringList(optionName, valueTwo);
+      ASSERT_TRUE(args.hasStringList(optionName));
+      ASSERT_EQ(valueOneAndTwo, args.getStringList(optionName));
+    }
   private:
     //! Tested instance
     Arguments args;
@@ -65,4 +80,8 @@ TEST_F(ArgumentsTest, integer) {
 
 TEST_F(ArgumentsTest, string) {
   test_single_strings();
+}
+
+TEST_F(ArgumentsTest, listStrings) {
+  testListStrings();
 }
