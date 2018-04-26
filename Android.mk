@@ -58,6 +58,7 @@ LOCAL_SRC_FILES:= \
 		src/actionrunner_impl.cpp \
 		src/argsparser.cpp \
     src/arguments.cpp \
+    src/extraceapp.cpp
 
 LOCAL_MODULE:= atrace_ref
 
@@ -89,11 +90,25 @@ LOCAL_CPPFLAGS := $(common_cflags)
 
 LOCAL_SRC_FILES := \
     $(common_src_files) \
+		src/systemtime_impl.cpp \
+		src/androidsystem_impl.cpp \
+		src/filesystem_impl.cpp \
+		src/kernelsystem_impl.cpp \
+    src/trace_impl.cpp \
+		src/startaction.cpp \
+		src/stopaction.cpp \
+		src/dumpaction.cpp \
+		src/streamaction.cpp \
+		src/sleepaction.cpp \
+		src/cleanupaction.cpp \
+		src/signal.cpp \
+		src/actionrunner_impl.cpp \
+    src/extraceapp.cpp \
     $(common_test_files) \
+    src/extraceapp_test.cpp \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock \
-
 
 LOCAL_SHARED_LIBRARIES := \
     libbinder \
@@ -106,21 +121,39 @@ include $(BUILD_NATIVE_TEST)
 # extrace_test host
 # =================
 
-include $(CLEAR_VARS)
+# include $(CLEAR_VARS)
 
-LOCAL_MODULE := extrace_test_host
-LOCAL_MODULE_TAGS := tests
-LOCAL_MODULE_HOST := linux
+# LOCAL_MODULE := extrace_test_host
+# LOCAL_MODULE_TAGS := tests
+# LOCAL_MODULE_HOST := linux
 
-LOCAL_CPPFLAGS := $(common_cflags)
+# LOCAL_CPPFLAGS := $(common_cflags)
+# LOCAL_C_INCLUDES := $(TOP)/system/core/cutils
+# LOCAL_SRC_FILES := \
+#     $(common_src_files) \
+# 		src/systemtime_impl.cpp \
+# 		src/filesystem_impl.cpp \
+# 		src/kernelsystem_impl.cpp \
+#     src/trace_impl.cpp \
+# 		src/startaction.cpp \
+# 		src/stopaction.cpp \
+# 		src/dumpaction.cpp \
+# 		src/streamaction.cpp \
+# 		src/sleepaction.cpp \
+# 		src/cleanupaction.cpp \
+# 		src/signal.cpp \
+# 		src/actionrunner_impl.cpp \
+#     src/extraceapp.cpp \
+#     $(common_test_files) \
+#     src/extraceapp_test.cpp \
 
-LOCAL_SRC_FILES := \
-    $(common_src_files) \
-    $(common_test_files) \
+# LOCAL_STATIC_LIBRARIES := \
+#     libgmock_host \
+#     libcutils \
+#     libz \
 
-LOCAL_STATIC_LIBRARIES := \
-    libgmock_host \
-    libutils \
-    liblog \
+# LOCAL_SHARED_LIBRARIES := \
+#     libutils \
+#     libbacktrace \
 
-include $(BUILD_HOST_NATIVE_TEST)
+# include $(BUILD_HOST_NATIVE_TEST)

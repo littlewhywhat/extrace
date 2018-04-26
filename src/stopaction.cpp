@@ -15,6 +15,8 @@
  */
 #include "stopaction.h"
 
+#include <cstdio>
+
 void StopAction::setTrace(shared_ptr<Trace> & trace) {
   m_Trace = trace;
 }
