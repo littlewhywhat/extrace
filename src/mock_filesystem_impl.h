@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_STOPACTION_H
-#define LTTLWHWHT_STOPACTION_H
+#ifndef LTTLWHWHT_MOCK_FILESYSTEM_IMPL_H
+#define LTTLWHWHT_MOCK_FILESYSTEM_IMPL_H
 
-#include "action.h"
+#include "gmock/gmock.h"
 
-#include <cstdio>
-#include <memory>
+#include "filesystem_impl.h"
 
-#include "trace.h"
-
-using namespace std;
-
-class StopAction : public Action {
+class MockFileSystemImpl : public FileSystemImpl {
   public:
-    bool tryRun() override;
-    void setTrace(shared_ptr<Trace> & trace);
-    void setErrorStream(FILE * errorStream);
-  private:
-    shared_ptr<Trace> m_Trace;
-    FILE * m_ErrorStream;
+    MOCK_METHOD1(set_errstream, void(FILE*));
+    MOCK_METHOD1(fileExists, bool(const char*));
+    MOCK_METHOD1(fileIsWritable, bool(const char*));
+    MOCK_METHOD1(truncateFile, bool(const char*));
+    MOCK_METHOD2(writeStr, bool(const char *, const char*));
+    MOCK_METHOD2(appendStr, bool(const char *, const char*));
+    MOCK_METHOD3(readStr, bool(const char *, char*, int));
 };
 
-#endif // LTTLWHWHT_STOPACTION_H
+#endif // LTTLWHWHT_MOCK_FILESYSTEM_IMPL_H

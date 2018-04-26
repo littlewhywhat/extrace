@@ -3,16 +3,6 @@
 class AtraceMain {
  - handleSignal(int /*signo*/): void
  - registerSigHandler(): void
- - listSupportedCategories() : void
- - showHelp(const char *cmd): void
- - setupDependencies(): void
- - setupAndroidSystemImpl(): void
- - setupKernelSystemImpl(): void
- - addAppsToTrace(const char * commaSepApps): void
- - addFunctionsToTrace(const char * commaSepFuncs): void
- - addAndroidCategoriesToTrace(const char * commaSepCats): void
- - addCoreServicesToTrace(): bool
- - addKernelCategoriesFromFileToTrace(const char * filename): bool
  + main(int argc, char ** argv): int
 }
 hide AtraceMain fields
@@ -31,6 +21,19 @@ AtraceMain "-stopAction"     -- "1" StopAction
 AtraceMain "-dumpAction"     -- "1" DumpAction
 AtraceMain "-cleanUpAction"  -- "1" CleanUpAction
 AtraceMain "-signal_impl"    -- "1" Signal
+
+class ExtraceApp {
+  - listSupportedCategories() : void
+  - showHelp(const char *cmd): void
+  - setupDependencies(): void
+  - setupAndroidSystemImpl(): void
+  - setupKernelSystemImpl(): void
+  - addAppsToTrace(const char * commaSepApps): void
+  - addFunctionsToTrace(const char * commaSepFuncs): void
+  - addAndroidCategoriesToTrace(const char * commaSepCats): void
+  - addCoreServicesToTrace(): bool
+  - addKernelCategoriesFromFileToTrace(const char * filename): bool
+}
 
 interface Action {
   + {abstract} bool tryRun()

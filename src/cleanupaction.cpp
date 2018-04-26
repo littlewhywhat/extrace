@@ -15,6 +15,8 @@
  */
 #include "cleanupaction.h"
 
+#include <cstdio>
+
 void CleanUpAction::setTrace(shared_ptr<Trace> & trace) {
   m_Trace = trace;
 }
