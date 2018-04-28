@@ -79,6 +79,5 @@ class ExtraceApp {
     void setupAndroidSystemImpl();
     void setupKernelSystemImpl();
     bool addCoreServicesToTrace();
-    bool addKernelCategoriesFromFileToTrace(const char * filename);
     
 };

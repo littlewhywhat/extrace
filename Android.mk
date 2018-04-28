@@ -54,6 +54,8 @@ LOCAL_SRC_FILES:= \
 		src/streamaction.cpp \
 		src/sleepaction.cpp \
 		src/cleanupaction.cpp \
+		src/addandroidcoretotrace.cpp \
+		src/addkernelcategoriesfromfiletotrace.cpp \
 		src/signal.cpp \
 		src/actionrunner_impl.cpp \
 		src/argsparser.cpp \
@@ -101,6 +103,8 @@ LOCAL_SRC_FILES := \
 		src/streamaction.cpp \
 		src/sleepaction.cpp \
 		src/cleanupaction.cpp \
+		src/addandroidcoretotrace.cpp \
+		src/addkernelcategoriesfromfiletotrace.cpp \
 		src/signal.cpp \
 		src/actionrunner_impl.cpp \
     src/extraceapp.cpp \

@@ -26,6 +26,8 @@
 
 #include "argsparser.h"
 #include "arguments.h"
+#include "addandroidcoretotrace.h"
+#include "addkernelcategoriesfromfiletotrace.h"
 
 using namespace std;
 
@@ -293,33 +295,6 @@ void ExtraceApp::setupKernelSystemImpl() {
   }); 
 }
 
-bool ExtraceApp::addCoreServicesToTrace() {
-  set<string> tokens;
-  if (m_AndroidSystemImpl->has_core_services()) {
-    string value;
-    m_AndroidSystemImpl->property_get_core_service_names(value);
-    m_AndroidToolBox->parseToTokens(value.c_str(), ",", tokens);
-    for (const auto & token : tokens) {
-      m_TraceImpl->addApp(token.c_str());
-    }
-    return true;
-  }
-  fprintf(m_ErrorStream, "Can't enable core services - not supported\n");
-  return false;
-}
-
-bool ExtraceApp::addKernelCategoriesFromFileToTrace(const char * filename) {
-  set<string> tokens;
-  if (!m_AndroidToolBox->parseFileToTokens(filename, " ", tokens)) {
-    fprintf(m_ErrorStream, "error parsing category file \"%s\"\n", filename);
-    return false;
-  }
-  for (const auto & token : tokens) {
-     m_TraceImpl->addKernelCategory(token.c_str());
-  }
-  return true;
-}
-
 bool ExtraceApp::run(int argc, const char ** argv) {
   Arguments args;
   ArgsParser argsparser;
@@ -362,12 +337,6 @@ bool ExtraceApp::run(int argc, const char ** argv) {
     listSupportedCategories();
     return true;
   }
-
-  if (args.is_enabled("CoreServices")) {
-    if (!addCoreServicesToTrace()) {
-      return false;
-    }
-  }
   if (args.is_enabled("CircleBuffer")) {
     m_TraceImpl->enableTraceOverwrite();
   }
@@ -376,12 +345,6 @@ bool ExtraceApp::run(int argc, const char ** argv) {
   }
   if (args.is_enabled("Compressed")) {
     m_DumpAction->enableCompression();
-  }
-  if (args.has_string("KernelCategoriesFilename")) {
-     if (!addKernelCategoriesFromFileToTrace(
-             args.get_string("KernelCategoriesFilename").c_str())) {
-        return false;
-     }
   }
   if (args.has_string("OutputFile")) {
     m_DumpAction->setOutputFile(args.get_string("OutputFile").c_str());
@@ -417,6 +380,27 @@ bool ExtraceApp::run(int argc, const char ** argv) {
   }
 
   ActionRunnerImpl actionRunnerImpl;
+  if (args.is_enabled("CoreServices")) {
+    shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
+    shared_ptr<AndroidSystem> sp_AndroidSystem = shared_ptr<AndroidSystem>(m_AndroidSystemImpl);
+    shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
+    actionRunnerImpl.addAction(AddAndroidCoreToTrace::Builder(
+                                  m_ErrorStream, 
+                                  sp_TraceImpl,
+                                  sp_AndroidSystem, 
+                                  sp_ToolBox
+                              ).build());
+  }
+  if (args.has_string("KernelCategoriesFilename")) {
+    shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
+    shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
+    actionRunnerImpl.addAction(AddKernelCategoriesFromFileToTrace::Builder(
+                                  m_ErrorStream,
+                                  sp_TraceImpl,
+                                  sp_ToolBox,
+                                  args.get_string("KernelCategoriesFilename")
+                              ).build());
+  }
   if (args.has_integer("InitSleep")) {
     actionRunnerImpl.addAction(m_InitSleep);
   }
