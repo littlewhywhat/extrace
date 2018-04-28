@@ -36,9 +36,7 @@ void AbstractConsoleApp::setup(int argc, const char ** argv) {
   else
   {
     this->isReady = false;
-    // TODO
-    // print error
-    // print help 
+    this->printHelp(argv[0]); 
   }
 }
 
