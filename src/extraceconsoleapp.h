@@ -20,7 +20,10 @@
 #include "argsparser.h"
 #include "arguments.h"
 
+#include <cstdio>
 #include <string>
+
+using namespace std;
 
 //! I am a wrapper for extrace app to run from console
 class ExtraceConsoleApp : public AbstractConsoleApp
@@ -28,8 +31,11 @@ class ExtraceConsoleApp : public AbstractConsoleApp
   public:
     ExtraceConsoleApp(): AbstractConsoleApp() {}
     ~ExtraceConsoleApp() {}
+    void setErrorStream(FILE * errorStream);
    private:
+    FILE * m_ErrorStream = NULL;
     std::string category;
+    void printHelp(const string & appName) const override;
     void do_run(void) override;
     bool do_succeeded(void) const override;
     void register_args_to(ArgsParser & argsParser) const override;

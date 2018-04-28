@@ -31,6 +31,7 @@ class AbstractConsoleApp : public ConsoleApp
     void run() override { do_run(); }
     bool succeeded(void) const override { return do_succeeded(); }
   private:
+    virtual void printHelp(const string & appName) const = 0;
     //! Stub for limiting inheritors 
     virtual void do_run() = 0;
     //! Stub for limiting inheritors
