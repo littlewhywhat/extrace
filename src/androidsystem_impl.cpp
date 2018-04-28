@@ -60,12 +60,13 @@ bool AndroidSystemImpl::setAppCmdlineProperty(const vector<string> & appNames) {
     for (size_t i = 0; i < appNames.size(); i++) {
         snprintf(buf, sizeof(buf), k_traceAppsPropertyTemplate, i);
         if (property_set(buf, appNames[i].c_str()) < 0) {
-            fprintf(errstream, "error setting trace app %d property to %s\n", i, buf);
+            fprintf(errstream, "error setting trace app %zu property to %s\n", i, buf);
             clearAppProperties();
             return false;
         }
     }
-    snprintf(buf, sizeof(buf), "%d", appNames.size());
+    unsigned int appNumber = appNames.size();
+    snprintf(buf, sizeof(buf), "%u", appNumber);
     if (property_set(k_traceAppsNumberProperty, buf) < 0) {
         fprintf(errstream, "error setting trace app number property to %s\n", buf);
         clearAppProperties();
