@@ -56,6 +56,7 @@ LOCAL_SRC_FILES:= \
 		src/cleanupaction.cpp \
 		src/addandroidcoretotrace.cpp \
 		src/addkernelcategoriesfromfiletotrace.cpp \
+		src/listsupportedcategories.cpp \
 		src/signal.cpp \
 		src/actionrunner_impl.cpp \
 		src/argsparser.cpp \
@@ -105,6 +106,7 @@ LOCAL_SRC_FILES := \
 		src/cleanupaction.cpp \
 		src/addandroidcoretotrace.cpp \
 		src/addkernelcategoriesfromfiletotrace.cpp \
+		src/listsupportedcategories.cpp \
 		src/signal.cpp \
 		src/actionrunner_impl.cpp \
     src/extraceapp.cpp \

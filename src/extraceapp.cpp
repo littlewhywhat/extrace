@@ -28,6 +28,7 @@
 #include "arguments.h"
 #include "addandroidcoretotrace.h"
 #include "addkernelcategoriesfromfiletotrace.h"
+#include "listsupportedcategories.h"
 
 using namespace std;
 
@@ -95,20 +96,6 @@ void ExtraceApp::setSignal(Signal * signal) {
 void ExtraceApp::handleSignal() {
   if (m_HandleSignals)
     m_Signal->fire();
-}
-
-void ExtraceApp::listSupportedCategories() const {
-  const auto & kernelCategories = m_KernelSystemImpl->getCategories();
-  for (const auto & category : kernelCategories) {
-      if (m_KernelSystemImpl->isCategorySupported(category)) {
-          fprintf(m_OutputStream, "  %10s - %s\n", category.name, category.longname);
-      }
-  }
-  const auto & androidCategories = m_AndroidSystemImpl->getCategories();
-  for (const auto & category : androidCategories) {
-      // is there a way to check?
-      fprintf(m_OutputStream, "  %10s - %s\n", category.name, category.longname);
-  }
 }
 
 void ExtraceApp::showHelp(const char *cmd) const {
@@ -333,10 +320,6 @@ bool ExtraceApp::run(int argc, const char ** argv) {
   setupKernelSystemImpl();
   setupDependencies();
 
-  if (args.is_enabled("ListCategories")) {
-    listSupportedCategories();
-    return true;
-  }
   if (args.is_enabled("CircleBuffer")) {
     m_TraceImpl->enableTraceOverwrite();
   }
@@ -380,55 +363,65 @@ bool ExtraceApp::run(int argc, const char ** argv) {
   }
 
   ActionRunnerImpl actionRunnerImpl;
-  if (args.is_enabled("CoreServices")) {
-    shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
+  if (args.is_enabled("ListCategories")) {
     shared_ptr<AndroidSystem> sp_AndroidSystem = shared_ptr<AndroidSystem>(m_AndroidSystemImpl);
-    shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
-    actionRunnerImpl.addAction(AddAndroidCoreToTrace::Builder(
-                                  m_ErrorStream, 
-                                  sp_TraceImpl,
-                                  sp_AndroidSystem, 
-                                  sp_ToolBox
+    shared_ptr<KernelSystem> sp_KernelSystem = shared_ptr<KernelSystem>(m_KernelSystemImpl);
+    actionRunnerImpl.addAction(ListSupportedCategories::Builder(
+                                  m_OutputStream,
+                                  sp_AndroidSystem,
+                                  sp_KernelSystem
                               ).build());
-  }
-  if (args.has_string("KernelCategoriesFilename")) {
-    shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
-    shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
-    actionRunnerImpl.addAction(AddKernelCategoriesFromFileToTrace::Builder(
-                                  m_ErrorStream,
-                                  sp_TraceImpl,
-                                  sp_ToolBox,
-                                  args.get_string("KernelCategoriesFilename")
-                              ).build());
-  }
-  if (args.has_integer("InitSleep")) {
-    actionRunnerImpl.addAction(m_InitSleep);
-  }
-  if (args.is_enabled("AsyncStart")) {
-    actionRunnerImpl.addAction(m_StartAction);
-    if (args.is_enabled("Stream")) {
-      actionRunnerImpl.addAction(m_StreamAction);
-      m_HandleSignals = true;
+  } else {
+    if (args.is_enabled("CoreServices")) {
+      shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
+      shared_ptr<AndroidSystem> sp_AndroidSystem = shared_ptr<AndroidSystem>(m_AndroidSystemImpl);
+      shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
+      actionRunnerImpl.addAction(AddAndroidCoreToTrace::Builder(
+                                    m_ErrorStream, 
+                                    sp_TraceImpl,
+                                    sp_AndroidSystem, 
+                                    sp_ToolBox
+                                ).build());
     }
-  }
-  else if (args.is_enabled("AsyncStop")) {
-    actionRunnerImpl.addAction(m_StopAction);
-    actionRunnerImpl.addAction(m_DumpAction);
-    actionRunnerImpl.addAction(m_CleanUpAction);
-  }
-  else if (args.is_enabled("AsyncDump")) {
-    actionRunnerImpl.addAction(m_DumpAction);
-  }
-  else {
-    actionRunnerImpl.addAction(m_StartAction);
-    actionRunnerImpl.addAction(m_MidSleep);
-    if (args.is_enabled("Stream")) {
-      actionRunnerImpl.addAction(m_StreamAction);
-      m_HandleSignals = true;
+    if (args.has_string("KernelCategoriesFilename")) {
+      shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
+      shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
+      actionRunnerImpl.addAction(AddKernelCategoriesFromFileToTrace::Builder(
+                                    m_ErrorStream,
+                                    sp_TraceImpl,
+                                    sp_ToolBox,
+                                    args.get_string("KernelCategoriesFilename")
+                                ).build());
     }
-    actionRunnerImpl.addAction(m_StopAction);
-    actionRunnerImpl.addAction(m_DumpAction);
-    actionRunnerImpl.addAction(m_CleanUpAction);
+    if (args.has_integer("InitSleep")) {
+      actionRunnerImpl.addAction(m_InitSleep);
+    }
+    if (args.is_enabled("AsyncStart")) {
+      actionRunnerImpl.addAction(m_StartAction);
+      if (args.is_enabled("Stream")) {
+        actionRunnerImpl.addAction(m_StreamAction);
+        m_HandleSignals = true;
+      }
+    }
+    else if (args.is_enabled("AsyncStop")) {
+      actionRunnerImpl.addAction(m_StopAction);
+      actionRunnerImpl.addAction(m_DumpAction);
+      actionRunnerImpl.addAction(m_CleanUpAction);
+    }
+    else if (args.is_enabled("AsyncDump")) {
+      actionRunnerImpl.addAction(m_DumpAction);
+    }
+    else {
+      actionRunnerImpl.addAction(m_StartAction);
+      actionRunnerImpl.addAction(m_MidSleep);
+      if (args.is_enabled("Stream")) {
+        actionRunnerImpl.addAction(m_StreamAction);
+        m_HandleSignals = true;
+      }
+      actionRunnerImpl.addAction(m_StopAction);
+      actionRunnerImpl.addAction(m_DumpAction);
+      actionRunnerImpl.addAction(m_CleanUpAction);
+    }
   }
 
   return actionRunnerImpl.tryRunActions();
