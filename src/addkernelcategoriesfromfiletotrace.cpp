@@ -37,9 +37,7 @@ bool AddKernelCategoriesFromFileToTrace::tryRun() {
     fprintf(m_ErrorStream, "error parsing category file \"%s\"\n", m_Filename.c_str());
     return false;
   }
-  printf("size %u\n", (uint32_t)tokens.size());
   for (const auto & token : tokens) {
-     fprintf(m_ErrorStream, "%s\n", token.c_str());
      m_TraceImpl->addKernelCategory(token.c_str());
   }
   return true;
