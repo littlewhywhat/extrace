@@ -5,6 +5,7 @@ common_src_files := \
     src/consoleappmain.cpp \
     src/extraceconsoleapp.cpp \
     src/extraceconsoleappbuilder.cpp \
+    src/extracearguments.cpp \
     src/androidtoolbox.cpp \
 
 common_test_files := \
@@ -32,6 +33,60 @@ LOCAL_SRC_FILES:= \
 LOCAL_MODULE:= extrace
 
 LOCAL_CPPFLAGS := $(common_cflags)
+
+LOCAL_C_INCLUDES += external/zlib
+
+LOCAL_MODULE_TAGS:= optional
+
+LOCAL_SHARED_LIBRARIES := \
+    libbinder \
+    libcutils \
+    libutils \
+    libz \
+
+include $(BUILD_EXECUTABLE)
+
+# extrace
+# ==========
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= \
+    src/systemtime_impl.cpp \
+		src/androidsystem_impl.cpp \
+		src/filesystem_impl.cpp \
+		src/kernelsystem_impl.cpp \
+		src/androidtoolbox.cpp \
+    src/trace_impl.cpp \
+		src/startaction.cpp \
+		src/stopaction.cpp \
+		src/dumpaction.cpp \
+		src/streamaction.cpp \
+		src/sleepaction.cpp \
+		src/cleanupaction.cpp \
+		src/addandroidcoretotrace.cpp \
+		src/addkernelcategoriesfromfiletotrace.cpp \
+		src/listsupportedcategories.cpp \
+		src/signal.cpp \
+		src/actionrunner_impl.cpp \
+		src/argsparser.cpp \
+    src/arguments.cpp \
+    src/extraceapp.cpp \
+    src/experiment.cpp \
+
+LOCAL_MODULE:= experiment
+
+LOCAL_CPPFLAGS := $(common_cflags)
+
+LOCAL_C_INCLUDES += external/zlib
+
+LOCAL_MODULE_TAGS:= optional
+
+LOCAL_SHARED_LIBRARIES := \
+    libbinder \
+    libcutils \
+    libutils \
+    libz \
 
 include $(BUILD_EXECUTABLE)
 

@@ -17,20 +17,21 @@
 
 #include "arguments.h"
 #include "argsparser.h"
+#include "androidtoolbox.h"
 
 void AbstractConsoleApp::setup(int argc, const char ** argv) {
   // TODO refactor
   // ArgsParser consoleArgsParser(argc, argv);
   ArgsParser consoleArgsParser;
+  consoleArgsParser.setToolbox(make_shared<AndroidToolbox>());
   this->register_args_to(consoleArgsParser);
   Arguments arguments;
   // TODO refactor
   // consoleArgsParser.parse_to(arguments);
   // if (consoleArgsParser.succeeded()
   if (consoleArgsParser.parse(arguments, argc, argv) == argc
-      && this->admits(arguments))
+      && this->trySetup(arguments))
   {
-    this->setup_with(arguments);
     this->isReady = true;
   }
   else

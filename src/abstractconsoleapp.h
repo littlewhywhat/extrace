@@ -41,9 +41,8 @@ class AbstractConsoleApp : public ConsoleApp
     // they want to try to get from argv
     virtual void register_args_to(ArgsParser & argsParser) const = 0;
     //! Validates parsed arguments
-    virtual bool admits(const Arguments & arguments) const = 0;
     //! Setups itself to run using parsed arguments
-    virtual void setup_with(const Arguments & arguments) = 0;
+    virtual bool trySetup(const Arguments & arguments) = 0;
     //! Boolean flag to indicate if app is ready to run
     bool isReady;
 };
