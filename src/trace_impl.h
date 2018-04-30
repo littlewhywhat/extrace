@@ -42,8 +42,8 @@ class TraceImpl : public Trace {
     // Disable tracing in the kernel.
     void stop() override;
     void setErrorStream(FILE * errorStream);
-    void setAndroidSystem(shared_ptr<AndroidSystem> & androidSystem);
-    void setKernelSystem(shared_ptr<KernelSystem> & kernelSystem);
+    void setAndroidSystem(AndroidSystem * androidSystem);
+    void setKernelSystem(KernelSystem * kernelSystem);
     void enableTraceOverwrite();
     void setTraceBufferSizeKB(uint32_t size);
     void addKernelCategory(const char* categoryName);
@@ -52,8 +52,8 @@ class TraceImpl : public Trace {
     void addFunction(const char * funcName);
   private:
     FILE * m_ErrorStream = NULL;
-    shared_ptr<AndroidSystem> m_AndroidSystem;
-    shared_ptr<KernelSystem> m_KernelSystem;
+    AndroidSystem *_AndroidSystem;
+    KernelSystem *_KernelSystem;
     bool m_TraceOverwriteSwitch = false;
     uint32_t m_TraceBufferSizeKB = 2048;
     vector<string> m_KernelCategories;
