@@ -15,7 +15,7 @@
  */
 #include "startaction.h"
 
-void StartAction::setTrace(shared_ptr<Trace> & trace) {
+void StartAction::setTrace(Trace * trace) {
   m_Trace = trace;
 }
 
@@ -27,7 +27,7 @@ void StartAction::setOutputStream(FILE * outStream) {
   m_OutStream = outStream;
 }
 
-void StartAction::setKernelSystem(shared_ptr<KernelSystem> & kernelSystem) {
+void StartAction::setKernelSystem(KernelSystem * kernelSystem) {
   m_KernelSystem = kernelSystem;
 }
 
@@ -51,4 +51,14 @@ bool StartAction::tryRun() {
     fprintf(m_ErrorStream, "error StartAction::tryRun\n");
   }
   return ok;
+}
+
+Action * StartAction::Builder::buildFrom(const SystemCore & systemCore) const
+{
+  auto * startAction = new StartAction();
+  startAction->setTrace(systemCore.getTrace());
+  startAction->setErrorStream(systemCore.getErrorStream());
+  startAction->setOutputStream(systemCore.getOutputStream());
+  startAction->setKernelSystem(systemCore.getKernelSystem());
+  return startAction;
 }

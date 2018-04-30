@@ -19,36 +19,31 @@
 
 #include "action.h"
 
-#include <memory>
 #include <cstdio>
 #include <string>
 
-#include "trace_impl.h"
+#include "trace.h"
 #include "androidsystem.h"
 #include "toolbox.h"
+#include "systemcore.h"
+#include "extracearguments.h"
 
 using namespace std;
 
 class AddKernelCategoriesFromFileToTrace : public Action {
   public:
     bool tryRun() override;
-    void setTraceImpl(shared_ptr<TraceImpl> & traceImpl);
+    void setTrace(Trace * trace);
     void setErrorStream(FILE * errorStream);
-    void setToolBox(shared_ptr<ToolBox> & toolBox);
+    void setToolBox(ToolBox * toolBox);
     void setFilename(const string & filename);
     class Builder {
       public:
-        Builder(FILE * errorStream,
-                shared_ptr<TraceImpl> & traceImpl, 
-                shared_ptr<ToolBox> & toolBox,
-                const string & filename); 
-        AddKernelCategoriesFromFileToTrace * build() const;
-      private:
-        AddKernelCategoriesFromFileToTrace * m_AddKernelCategoriesFromFileToTrace;
+        Action * buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const;
     };
   private:
-    shared_ptr<TraceImpl> m_TraceImpl;
-    shared_ptr<ToolBox> m_ToolBox;
+    Trace * m_Trace;
+    ToolBox * m_ToolBox;
     FILE * m_ErrorStream;
     string m_Filename;
 };

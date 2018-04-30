@@ -15,11 +15,11 @@
  */
 #include "listsupportedcategories.h"
 
-void ListSupportedCategories::setAndroidSystem(shared_ptr<AndroidSystem> & androidSystem) {
+void ListSupportedCategories::setAndroidSystem(AndroidSystem * androidSystem) {
   m_AndroidSystem = androidSystem;
 }
 
-void ListSupportedCategories::setKernelSystem(shared_ptr<KernelSystem> & kernelSystem) {
+void ListSupportedCategories::setKernelSystem(KernelSystem * kernelSystem) {
   m_KernelSystem = kernelSystem;
 }
 
@@ -42,15 +42,10 @@ bool ListSupportedCategories::tryRun() {
   return true;
 }
 
-ListSupportedCategories::Builder::Builder(FILE * outputStream,
-                                        shared_ptr<AndroidSystem> & androidSystem, 
-                                        shared_ptr<KernelSystem> & kernelSystem) {
-  m_ListSupportedCategories = new ListSupportedCategories();
-  m_ListSupportedCategories->setOutputStream(outputStream);
-  m_ListSupportedCategories->setAndroidSystem(androidSystem);
-  m_ListSupportedCategories->setKernelSystem(kernelSystem);
-}
-
-ListSupportedCategories * ListSupportedCategories::Builder::build() const {
-  return m_ListSupportedCategories;
+Action * ListSupportedCategories::Builder::buildFrom(const SystemCore & systemCore) const {
+  auto * listSupportedCategories = new ListSupportedCategories();
+  listSupportedCategories->setOutputStream(systemCore.getOutputStream());
+  listSupportedCategories->setAndroidSystem(systemCore.getAndroidSystem());
+  listSupportedCategories->setKernelSystem(systemCore.getKernelSystem());
+  return listSupportedCategories;
 }

@@ -19,36 +19,31 @@
 
 #include "action.h"
 
-#include <memory>
 #include <cstdio>
 
-#include "trace_impl.h"
+#include "trace.h"
 #include "androidsystem.h"
 #include "toolbox.h"
+#include "systemcore.h"
+#include "extracearguments.h"
 
 using namespace std;
 
 class AddAndroidCoreToTrace : public Action {
   public:
     bool tryRun() override;
-    void setTraceImpl(shared_ptr<TraceImpl> & traceImpl);
+    void setTrace(Trace * traceImpl);
     void setErrorStream(FILE * errorStream);
-    void setToolBox(shared_ptr<ToolBox> & toolBox);
-    void setAndroidSystem(shared_ptr<AndroidSystem> & androidSystem);
+    void setToolBox(ToolBox * toolBox);
+    void setAndroidSystem(AndroidSystem * androidSystem);
     class Builder {
       public:
-        Builder(FILE * errorStream,
-                shared_ptr<TraceImpl> & traceImpl, 
-                shared_ptr<AndroidSystem> & androidSystem,
-                shared_ptr<ToolBox> & toolBox); 
-        AddAndroidCoreToTrace * build() const;
-      private:
-        AddAndroidCoreToTrace * m_AddAndroidCoreToTrace;
+        Action * buildFrom(const SystemCore & systemCore) const;
     };
   private:
-    shared_ptr<TraceImpl> m_TraceImpl;
-    shared_ptr<AndroidSystem> m_AndroidSystem;
-    shared_ptr<ToolBox> m_ToolBox;
+    Trace * m_Trace;
+    AndroidSystem * m_AndroidSystem;
+    ToolBox * m_ToolBox;
     FILE * m_ErrorStream;
 };
 

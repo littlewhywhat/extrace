@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 #include "extraceconsoleapp.h"
+#include "actionrunnerbuilder.h"
 
 #include <stdio.h>
+
+ExtraceConsoleApp::~ExtraceConsoleApp() {
+  delete m_ActionRunner;
+  delete m_ActionRunnerBuilder;
+}
+
+void ExtraceConsoleApp::setActionRunnerBuilder(ActionRunnerBuilder * builder)
+{
+  m_ActionRunnerBuilder = builder;
+}
 
 void ExtraceConsoleApp::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
@@ -33,19 +44,24 @@ bool ExtraceConsoleApp::trySetup(const Arguments & arguments)
     fprintf(m_ErrorStream, "None of necessary options specified\n");
     return false;
   }
+  if (m_ExtraceArguments.haveHelpOption()) {
+    return false;
+  }
+  m_ActionRunner = m_ActionRunnerBuilder->buildFrom(m_ExtraceArguments);
   return true;
 }
 
 void ExtraceConsoleApp::do_run()
 {
   printf("Started application\n");
+  m_Success = m_ActionRunner->tryRunActions();
 }
 
 bool ExtraceConsoleApp::do_succeeded(void) const 
 { 
-  return true;
+  return m_Success;
 }
 
-void ExtraceConsoleApp::printHelp(const string & appName) const {
-  m_ExtraceArguments.printHelp(m_ErrorStream, appName);
+void ExtraceConsoleApp::printHelp() const {
+  m_ExtraceArguments.printHelp(m_ErrorStream, m_Name);
 }

@@ -17,7 +17,7 @@
 
 #include <cstdio>
 
-void StopAction::setTrace(shared_ptr<Trace> & trace) {
+void StopAction::setTrace(Trace * trace) {
   m_Trace = trace;
 }
 
@@ -32,4 +32,12 @@ bool StopAction::tryRun() {
     fprintf(m_ErrorStream, "error StopAction::tryRun\n");
   }
   return ok;
+}
+
+Action * StopAction::Builder::buildFrom(const SystemCore & systemCore) const
+{
+  auto * stopAction = new StopAction();
+  stopAction->setTrace(systemCore.getTrace());
+  stopAction->setErrorStream(systemCore.getErrorStream());
+  return stopAction;
 }

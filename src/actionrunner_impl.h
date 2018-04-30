@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "action.h"
+#include "systemcore.h"
 
 using namespace std;
 
@@ -30,7 +31,9 @@ class ActionRunnerImpl : public ActionRunner {
     ~ActionRunnerImpl();
     bool tryRunActions() override;
     void addAction(Action * action);
+    void setSystemCore(SystemCore * systemCore);
   private:
+    SystemCore * m_SystemCore = NULL;
     vector<Action*> m_Actions;
 };
 

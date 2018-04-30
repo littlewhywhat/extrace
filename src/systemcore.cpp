@@ -35,6 +35,18 @@ SystemCore::~SystemCore() {
   delete m_ToolBox;    
 }
 
+FILE * SystemCore::getErrorStream() const {
+  return m_ErrorStream;
+}
+
+FILE * SystemCore::getOutputStream() const {
+  return m_OutputStream;
+}
+
+ToolBox * SystemCore::getToolBox() const {
+  return m_ToolBox;
+}
+
 FileSystem * SystemCore::getFileSystem() const {
   return m_FileSystem;
 }
@@ -57,6 +69,18 @@ SystemTime * SystemCore::getSystemTime() const {
 
 Signal * SystemCore::getSignal() const {
   return m_Signal;
+}
+
+void SystemCore::setErrorStream(FILE * errorStream) {
+  m_ErrorStream = errorStream;
+}
+
+void SystemCore::setOutputStream(FILE * outputStream) {
+  m_OutputStream = outputStream;
+}
+
+void SystemCore::setToolBox(ToolBox * toolBox) {
+  m_ToolBox = toolBox;
 }
 
 void SystemCore::setFileSystem(FileSystem * fileSystem) {
@@ -83,7 +107,7 @@ void SystemCore::setSignal(Signal * signal) {
   m_Signal = signal;
 }
 
-SystemCore * SystemCore::ExtraceBuilder::build() const {
+SystemCore * SystemCore::Builder::build() const {
   FILE * errorStream       = stderr;
   FILE * outputStream      = stdout;
   auto * fileSystemImpl    = new FileSystemImpl();

@@ -22,7 +22,7 @@ void SleepAction::setDurationSeconds(uint32_t durationSeconds) {
   m_DurationSeconds = durationSeconds;
 }
 
-void SleepAction::setSignal(shared_ptr<Signal> & signal) {
+void SleepAction::setSignal(Signal * signal) {
   m_Signal = signal;
 }
 
@@ -45,4 +45,18 @@ bool SleepAction::tryRun() {
     fprintf(m_ErrorStream, "error SleepAction::tryRun - sleep aborted\n");
   }
   return ok;
+}
+
+Action * SleepAction::InitSleepBuilder::buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const {
+  auto * sleepAction = new SleepAction();
+  sleepAction->setSignal(systemCore.getSignal());
+  sleepAction->setDurationSeconds(arguments.getInitSleepDuration());
+  return sleepAction;
+}
+
+Action * SleepAction::MidSleepBuilder::buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const {
+  auto * sleepAction = new SleepAction();
+  sleepAction->setSignal(systemCore.getSignal());
+  sleepAction->setDurationSeconds(arguments.getMidSleepDuration());
+  return sleepAction;
 }

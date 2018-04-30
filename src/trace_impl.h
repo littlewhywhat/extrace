@@ -41,19 +41,19 @@ class TraceImpl : public Trace {
     bool start() override;
     // Disable tracing in the kernel.
     void stop() override;
+    void addKernelCategory(const char* categoryName) override;
+    void addAndroidCategory(const char * categoryName) override;
+    void addApp(const char * appName) override;
+    void addFunction(const char * funcName) override;
     void setErrorStream(FILE * errorStream);
     void setAndroidSystem(AndroidSystem * androidSystem);
     void setKernelSystem(KernelSystem * kernelSystem);
     void enableTraceOverwrite();
     void setTraceBufferSizeKB(uint32_t size);
-    void addKernelCategory(const char* categoryName);
-    void addAndroidCategory(const char * categoryName);
-    void addApp(const char * appName);
-    void addFunction(const char * funcName);
   private:
     FILE * m_ErrorStream = NULL;
-    AndroidSystem *_AndroidSystem;
-    KernelSystem *_KernelSystem;
+    AndroidSystem * m_AndroidSystem;
+    KernelSystem * m_KernelSystem;
     bool m_TraceOverwriteSwitch = false;
     uint32_t m_TraceBufferSizeKB = 2048;
     vector<string> m_KernelCategories;

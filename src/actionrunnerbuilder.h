@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-#include "actionrunner_impl.h"
+#ifndef LTTLWHWHT_ACTIONRUNNERBUILDER_H
+#define LTTLWHWHT_ACTIONRUNNERBUILDER_H
 
-ActionRunnerImpl::~ActionRunnerImpl() 
+#include "actionrunner.h"
+#include "systemcore.h"
+#include "extracearguments.h"
+
+class ActionRunnerBuilder 
 {
-  delete m_SystemCore;
-  for (auto * action : m_Actions)
-  {
-    delete action;
-  }
-}
+  public:
+    void setSystemCoreBuilder(SystemCore::Builder * systemCoreBuilder);
+    ActionRunner * buildFrom(const ExtraceArguments & arguments) const;
+  private:
+    SystemCore::Builder * m_SystemCoreBuilder = NULL;
+};
 
-void ActionRunnerImpl::setSystemCore(SystemCore * systemCore)
-{
-  m_SystemCore = systemCore;
-}
-
-bool ActionRunnerImpl::tryRunActions() {
-  for (Action * action: m_Actions) {
-    if (!action->tryRun()) {
-      return false;
-    }
-  }
-  return true;
-}
-
-void ActionRunnerImpl::addAction(Action * action) {
-  m_Actions.push_back(action);
-}
+#endif // LTTLWHWHT_ACTIONRUNNERBUILDER_H

@@ -17,11 +17,16 @@
 #ifndef LTTLWHWHT_CONSOLEAPP_H
 #define LTTLWHWHT_CONSOLEAPP_H
 
+#include <string>
+
+using namespace std;
+
 //! I am a console application to run using console arguments
 class ConsoleApp
 {
   public:
     virtual ~ConsoleApp() {}
+    virtual void setName(const string & name) = 0;
     //! Setups ConsoleApp by console args to run
     virtual void setup(int argc, const char ** argv) = 0;
     //! Indicates if app is setup and is ready to run

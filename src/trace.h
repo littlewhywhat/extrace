@@ -20,6 +20,10 @@
 class Trace {
   public:
     virtual ~Trace() {}
+    virtual void addKernelCategory(const char* categoryName) = 0;
+    virtual void addAndroidCategory(const char * categoryName) = 0;
+    virtual void addApp(const char * appName) = 0;
+    virtual void addFunction(const char * funcName) = 0;
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     virtual bool setUp() = 0;

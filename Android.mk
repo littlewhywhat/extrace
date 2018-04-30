@@ -7,6 +7,7 @@ common_src_files := \
     src/extraceconsoleappbuilder.cpp \
     src/extracearguments.cpp \
     src/androidtoolbox.cpp \
+    src/systemcore.cpp \
 
 common_test_files := \
     src/argsparser_test.cpp \
@@ -28,7 +29,24 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
     $(common_src_files) \
-    src/main.cpp \
+    src/systemtime_impl.cpp \
+		src/androidsystem_impl.cpp \
+		src/filesystem_impl.cpp \
+		src/kernelsystem_impl.cpp \
+    src/trace_impl.cpp \
+    src/listsupportedcategories.cpp \
+		src/addkernelcategoriesfromfiletotrace.cpp \
+		src/addandroidcoretotrace.cpp \
+		src/signal.cpp \
+		src/actionrunner_impl.cpp \
+		src/main.cpp \
+		src/sleepaction.cpp \
+		src/startaction.cpp \
+		src/streamaction.cpp \
+		src/stopaction.cpp \
+		src/cleanupaction.cpp \
+		src/dumpaction.cpp \
+		src/actionrunnerbuilder.cpp \
 
 LOCAL_MODULE:= extrace
 
@@ -72,7 +90,6 @@ LOCAL_SRC_FILES:= \
 		src/argsparser.cpp \
     src/arguments.cpp \
     src/extraceapp.cpp \
-    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment
 
@@ -88,7 +105,7 @@ LOCAL_SHARED_LIBRARIES := \
     libutils \
     libz \
 
-include $(BUILD_EXECUTABLE)
+# include $(BUILD_EXECUTABLE)
 
 # atrace refactored
 # =================

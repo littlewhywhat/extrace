@@ -19,11 +19,11 @@
 
 #include "action.h"
 
-#include <memory>
 #include <cstdio>
 
 #include "androidsystem.h"
 #include "kernelsystem.h"
+#include "systemcore.h"
 
 using namespace std;
 
@@ -31,20 +31,15 @@ class ListSupportedCategories : public Action {
   public:
     bool tryRun() override;
     void setOutputStream(FILE * outputStream);
-    void setAndroidSystem(shared_ptr<AndroidSystem> & AndroidSystem);
-    void setKernelSystem(shared_ptr<KernelSystem> & kernelSystem);
+    void setAndroidSystem(AndroidSystem * AndroidSystem);
+    void setKernelSystem(KernelSystem * kernelSystem);
     class Builder {
       public:
-        Builder(FILE * outputStream,
-                shared_ptr<AndroidSystem> & androidSystem, 
-                shared_ptr<KernelSystem> & kernelSystem);
-        ListSupportedCategories * build() const;
-      private:
-        ListSupportedCategories * m_ListSupportedCategories;
+        Action * buildFrom(const SystemCore & systemCore) const;
     };
   private:
-    shared_ptr<AndroidSystem> m_AndroidSystem;
-    shared_ptr<KernelSystem> m_KernelSystem;
+    AndroidSystem * m_AndroidSystem;
+    KernelSystem * m_KernelSystem;
     FILE * m_OutputStream;
 };
 

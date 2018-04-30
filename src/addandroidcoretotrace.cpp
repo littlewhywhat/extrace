@@ -15,19 +15,19 @@
  */
 #include "addandroidcoretotrace.h"
 
-void AddAndroidCoreToTrace::setTraceImpl(shared_ptr<TraceImpl> & traceImpl) {
-  m_TraceImpl = traceImpl;
+void AddAndroidCoreToTrace::setTrace(Trace * trace) {
+  m_Trace = trace;
 }
 
 void AddAndroidCoreToTrace::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
 }
 
-void AddAndroidCoreToTrace::setAndroidSystem(shared_ptr<AndroidSystem> & androidSystem) {
+void AddAndroidCoreToTrace::setAndroidSystem(AndroidSystem * androidSystem) {
   m_AndroidSystem = androidSystem;
 }
 
-void AddAndroidCoreToTrace::setToolBox(shared_ptr<ToolBox> & toolBox) {
+void AddAndroidCoreToTrace::setToolBox(ToolBox * toolBox) {
   m_ToolBox = toolBox;
 }
 
@@ -38,7 +38,7 @@ bool AddAndroidCoreToTrace::tryRun() {
     m_AndroidSystem->property_get_core_service_names(value);
     m_ToolBox->parseToTokens(value.c_str(), ",", tokens);
     for (const auto & token : tokens) {
-      m_TraceImpl->addApp(token.c_str());
+      m_Trace->addApp(token.c_str());
     }
     return true;
   }
@@ -46,17 +46,11 @@ bool AddAndroidCoreToTrace::tryRun() {
   return false;
 }
 
-AddAndroidCoreToTrace::Builder::Builder(FILE * errorStream,
-                                        shared_ptr<TraceImpl> & traceImpl, 
-                                        shared_ptr<AndroidSystem> & androidSystem,
-                                        shared_ptr<ToolBox> & toolBox) {
-  m_AddAndroidCoreToTrace = new AddAndroidCoreToTrace();
-  m_AddAndroidCoreToTrace->setErrorStream(errorStream);
-  m_AddAndroidCoreToTrace->setTraceImpl(traceImpl);
-  m_AddAndroidCoreToTrace->setAndroidSystem(androidSystem);
-  m_AddAndroidCoreToTrace->setToolBox(toolBox);
-}
-
-AddAndroidCoreToTrace * AddAndroidCoreToTrace::Builder::build() const {
-  return m_AddAndroidCoreToTrace;
+Action * AddAndroidCoreToTrace::Builder::buildFrom(const SystemCore & systemCore) const {
+  auto * addAndroidCoreToTrace = new AddAndroidCoreToTrace();
+  addAndroidCoreToTrace->setErrorStream(systemCore.getErrorStream());
+  addAndroidCoreToTrace->setTrace(systemCore.getTrace());
+  addAndroidCoreToTrace->setAndroidSystem(systemCore.getAndroidSystem());
+  addAndroidCoreToTrace->setToolBox(systemCore.getToolBox());
+  return addAndroidCoreToTrace;
 }
