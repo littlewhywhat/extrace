@@ -19,6 +19,7 @@
 #include "abstractconsoleapp.h"
 #include "argsparser.h"
 #include "arguments.h"
+#include "extracearguments.h"
 
 #include <cstdio>
 #include <string>
@@ -33,14 +34,13 @@ class ExtraceConsoleApp : public AbstractConsoleApp
     ~ExtraceConsoleApp() {}
     void setErrorStream(FILE * errorStream);
    private:
+    ExtraceArguments m_ExtraceArguments;
     FILE * m_ErrorStream = NULL;
-    std::string category;
     void printHelp(const string & appName) const override;
     void do_run(void) override;
     bool do_succeeded(void) const override;
     void register_args_to(ArgsParser & argsParser) const override;
-    bool admits(const Arguments & arguments) const override;
-    void setup_with(const Arguments & arguments) override;
+    bool trySetup(const Arguments & arguments) override;
 };
 
 #endif // LTTLWHWHT_EXTRACECONSAPP_H

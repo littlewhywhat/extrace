@@ -23,5 +23,6 @@ ExtraceConsoleApp * ExtraceConsoleAppBuilder::build(void) const
   // MachineTraceSession * machineTraceSession = new FMachineTraceSession(fMachineTrace);
   // ExtraceApp * extraceApp = new ExtraceAppImpl(machineTraceSession);
   ExtraceConsoleApp * consoleApp = new ExtraceConsoleApp();
+  consoleApp->setErrorStream(stderr);
   return consoleApp;
 }
