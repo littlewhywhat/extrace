@@ -25,17 +25,15 @@
 
 #include <stdio.h>
 #include <map>
-#include <memory>
-
 using namespace std;
 
 class KernelSystemImpl : public KernelSystem {
   public:
     ~KernelSystemImpl();
     void set_errstream(FILE * errstream);
-    void set_file_system(shared_ptr<FileSystem> & file_system);
-    void set_toolbox(shared_ptr<ToolBox> & toolbox);
-    void set_systime(shared_ptr<SystemTime> & systime);
+    void set_file_system(FileSystem * file_system);
+    void set_toolbox(ToolBox * toolbox);
+    void set_systime(SystemTime * systime);
     int tryOpenToWriteOrCreate(const char* filename);
     bool try_sendfile(int fd_from, int fd_to);
     bool compress_trace_to(int traceFD, int outFd) override;
@@ -61,11 +59,15 @@ class KernelSystemImpl : public KernelSystem {
     bool disableKernelTraceEvents();
     void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files);
     bool isCategorySupported(const TracingCategory& category) const;
+    class Creator {
+      public:
+        KernelSystemImpl * createWithDefaultCategories() const;
+    };
   private:
     FILE * errstream = NULL;
-    shared_ptr<FileSystem> file_system = NULL;
-    shared_ptr<ToolBox> toolbox = NULL;
-    shared_ptr<SystemTime> systime = NULL;
+    FileSystem * file_system = NULL;
+    ToolBox * toolbox = NULL;
+    SystemTime * systime = NULL;
 
     map<string, TracingCategory> m_Categories;
     vector<TracingCategory> m_CategoriesList;

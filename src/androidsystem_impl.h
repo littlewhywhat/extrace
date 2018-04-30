@@ -36,6 +36,10 @@ class AndroidSystemImpl : public AndroidSystem {
     void log_dumping_trace() override;
     void set_errstream(FILE * errstream);
     void add_category(const char * id, const char * name, uint64_t atrace_tag);
+    class Creator {
+      public:
+        AndroidSystemImpl * createWithDefaultCategories() const;
+    };
   private:
     FILE * errstream = NULL;
     const char* k_traceTagsProperty = "debug.atrace.tags.enableflags";

@@ -22,11 +22,11 @@ void TraceImpl::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
 }
 
-void TraceImpl::setAndroidSystem(shared_ptr<AndroidSystem> & androidSystem) {
+void TraceImpl::setAndroidSystem(AndroidSystem * androidSystem) {
   m_AndroidSystem = androidSystem;
 }
 
-void TraceImpl::setKernelSystem(shared_ptr<KernelSystem> & kernelSystem) {
+void TraceImpl::setKernelSystem(KernelSystem * kernelSystem) {
   m_KernelSystem = kernelSystem;
 }
 
