@@ -25,7 +25,7 @@
 
 using namespace std;
 
-class ActionRunnerImpl : ActionRunner {
+class ActionRunnerImpl : public ActionRunner {
   public:
     ~ActionRunnerImpl();
     bool tryRunActions() override;

@@ -26,11 +26,13 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
                  EXCLUDE_FROM_ALL)
 
 set (CMAKE_CXX_STANDARD 11)
-set (CMAKE_CXX_FLAGS "-Wall -Werror -fno-exceptions -pedantic -Wunused-parameter -fpermissive")
+set (CMAKE_CXX_FLAGS "-Wall -fno-exceptions -pedantic ")
 # create and separate lists of necessary sources:
 # - OBJ_SOURCES, MAIN, TEST_SOURCES
 include_directories("src")
+set(EXPERIMENT "${CMAKE_SOURCE_DIR}/src/experiment.cpp")
 set(MAIN "${CMAKE_SOURCE_DIR}/src/main.cpp")
+set(EXTRACEAPP "${CMAKE_SOURCE_DIR}/src/extraceapp.cpp")
 set(ATRACE "${CMAKE_SOURCE_DIR}/src/atrace.cpp")
 set(SYSTEMTIME_IMPL "${CMAKE_SOURCE_DIR}/src/systemtime_impl.cpp")
 set(ANDROIDSYSTEM_IMPL "${CMAKE_SOURCE_DIR}/src/androidsystem_impl.cpp")
@@ -51,6 +53,7 @@ list(REMOVE_ITEM OBJ_SOURCES
      ${KERNELSYSTEM_IMPL}
      ${ANDROIDTOOLBOX}
      ${TEST_SOURCES}
+     ${EXTRACEAPP}
 )
 
 list(REMOVE_ITEM TEST_SOURCES
@@ -59,11 +62,16 @@ list(REMOVE_ITEM TEST_SOURCES
 
 # create main executable 
 set (SOURCES ${OBJ_SOURCES} ${MAIN})
-add_executable(main ${SOURCES})
+# add_executable(main ${SOURCES})
+
+add_executable(experiment ${EXPERIMENT} ${OBJ_SOURCES})
+
+# create experimental
+set (SOURCES ${OBJ_SOURCES} ${EXPERIMENT})
 
 # create test executable
 set (SOURCES ${OBJ_SOURCES} ${TEST_SOURCES})
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(main_test ${SOURCES})
-target_link_libraries(main_test gtest_main)
-target_link_libraries(main_test gmock_main)
+# add_executable(main_test ${SOURCES})
+# target_link_libraries(main_test gtest_main)
+# target_link_libraries(main_test gmock_main)
