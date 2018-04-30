@@ -1,0 +1,59 @@
+@startuml
+class Core {
+}
+
+Core "-m_AndroidSystem" -- "1" AndroidSystem
+
+class CoreCmdLineCreator {
+  + registerTo(argsParser: ArgsParser): void
+  + createFrom(args: Arguments): Core
+}
+
+CoreCmdLineCreator "m_AndroidSystemCmdLineCreator" -- "1" AndroidSystemCmdLineCreator
+
+class AndroidSystemCmdLineCreator {
+  - CATEGORIES_OPTION_CMDLINE: string
+  - CATEGORIES_OPTION_ID: string
+  --
+  + registerTo(argsParser: ArgsParser): void
+  + createFrom(args: Arguments): AndroidSystem
+}
+
+class AndroidSystem {
+  + isCategorySupported() const: bool
+}
+
+class ActionBuilder {
+  + registerTo(argsParser: ArgsParser): void
+  + buildListSupportedCategories(args: Arguments): ListSupportedCategories
+}
+
+ActionBuilder "m_Core" -- "1" Core
+ActionBuilder "m_ListSupportedCategoriesBuilder" -- "1" ListSupportedCategoriesBuilder
+
+class ActionRunnerBuilder {
+  + registerTo(argsParser: ArgsParser): void
+  + build(actionBuilder: ActionBuilder, args: Arguments): ActionRunner
+}
+
+class Action {
+  + tryRun(): bool
+}
+
+class ListSupportedCategories {
+}
+
+ListSupportedCategories --|> Action
+ListSupportedCategories "m_AndroidSystem" -- "1" AndroidSystem
+
+class ListSupportedCategoriesBuilder {
+  + registerTo(argsParser: ArgsParser): void
+  + build(core: Core, args: Arguments): ListSupportedCategories
+}
+
+class ListSupportedCategoriesCreator {
+  + registerTo(argsParser: argsParser): void
+  + createFrom(arguments: Arguments): ListSupportedCategoriesCreator
+}
+
+@enduml
