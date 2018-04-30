@@ -40,7 +40,7 @@ class ExtraceApp {
 
     void setErrorStream(FILE * errorStream);
     void setOutputStream(FILE * outputStream);
-    void setAndroidToolbox(AndroidToolbox * androidToolBox);
+    void setAndroidToolBox(AndroidToolBox * androidToolBox);
     void setSystemTimeImpl(SystemTimeImpl * systemTimeImpl);
     void setFileSystemImpl(FileSystemImpl * fileSystemImpl);
     void setKernelSystemImpl(KernelSystemImpl * kernelSystemImpl);
@@ -58,7 +58,7 @@ class ExtraceApp {
     bool m_HandleSignals = true;
     FILE * m_ErrorStream;
     FILE * m_OutputStream;
-    AndroidToolbox * m_AndroidToolBox;
+    AndroidToolBox * m_AndroidToolBox;
     SystemTimeImpl * m_SystemTimeImpl;
     FileSystemImpl * m_FileSystemImpl;
     KernelSystemImpl * m_KernelSystemImpl;

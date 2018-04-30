@@ -33,14 +33,14 @@ class AddAndroidCoreToTrace : public Action {
     bool tryRun() override;
     void setTraceImpl(shared_ptr<TraceImpl> & traceImpl);
     void setErrorStream(FILE * errorStream);
-    void setToolbox(shared_ptr<Toolbox> & toolBox);
+    void setToolBox(shared_ptr<ToolBox> & toolBox);
     void setAndroidSystem(shared_ptr<AndroidSystem> & androidSystem);
     class Builder {
       public:
         Builder(FILE * errorStream,
                 shared_ptr<TraceImpl> & traceImpl, 
                 shared_ptr<AndroidSystem> & androidSystem,
-                shared_ptr<Toolbox> & toolBox); 
+                shared_ptr<ToolBox> & toolBox); 
         AddAndroidCoreToTrace * build() const;
       private:
         AddAndroidCoreToTrace * m_AddAndroidCoreToTrace;
@@ -48,7 +48,7 @@ class AddAndroidCoreToTrace : public Action {
   private:
     shared_ptr<TraceImpl> m_TraceImpl;
     shared_ptr<AndroidSystem> m_AndroidSystem;
-    shared_ptr<Toolbox> m_ToolBox;
+    shared_ptr<ToolBox> m_ToolBox;
     FILE * m_ErrorStream;
 };
 

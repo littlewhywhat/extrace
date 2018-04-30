@@ -24,7 +24,7 @@
 
 using namespace android;
 
-bool AndroidToolbox::parseFileToTokens(const char * filename, const char * delims,
+bool AndroidToolBox::parseFileToTokens(const char * filename, const char * delims,
                                        std::set<std::string> & tokens) const
 {
   Tokenizer* tokenizer = NULL;
@@ -43,7 +43,7 @@ bool AndroidToolbox::parseFileToTokens(const char * filename, const char * delim
   return true;
 }
 
-void AndroidToolbox::parseToTokens(const char * delimseplist, const char * delims,
+void AndroidToolBox::parseToTokens(const char * delimseplist, const char * delims,
                                    std::set<std::string> & tokens) const
 {
   char* delimseplist_dup = strdup(delimseplist);

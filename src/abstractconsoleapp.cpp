@@ -23,7 +23,7 @@ void AbstractConsoleApp::setup(int argc, const char ** argv) {
   // TODO refactor
   // ArgsParser consoleArgsParser(argc, argv);
   ArgsParser consoleArgsParser;
-  consoleArgsParser.setToolbox(make_shared<AndroidToolbox>());
+  consoleArgsParser.setToolBox(make_shared<AndroidToolBox>());
   this->register_args_to(consoleArgsParser);
   Arguments arguments;
   // TODO refactor

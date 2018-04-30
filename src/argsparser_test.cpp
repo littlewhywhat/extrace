@@ -23,7 +23,7 @@
 class ArgsParserTest : public ::testing::Test {
   public:
     void SetUp() {
-      parser.setToolbox(make_shared<AndroidToolbox>());
+      parser.setToolBox(make_shared<AndroidToolBox>());
     }
     //! Tests parsing of boolean
     void test_parse_boolean() {

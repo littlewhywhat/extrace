@@ -46,7 +46,7 @@ void handleSignal(int /*signo*/)
 void setupExtraceApp() {
   extraceApp.setErrorStream(stderr);
   extraceApp.setOutputStream(stdout);
-  extraceApp.setAndroidToolbox(new AndroidToolbox());
+  extraceApp.setAndroidToolBox(new AndroidToolBox());
   extraceApp.setSystemTimeImpl(new SystemTimeImpl());
   extraceApp.setFileSystemImpl(new FileSystemImpl());
   extraceApp.setKernelSystemImpl(new KernelSystemImpl());

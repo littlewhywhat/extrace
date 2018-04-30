@@ -23,7 +23,7 @@ void AddKernelCategoriesFromFileToTrace::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
 }
 
-void AddKernelCategoriesFromFileToTrace::setToolbox(shared_ptr<Toolbox> & toolBox) {
+void AddKernelCategoriesFromFileToTrace::setToolBox(shared_ptr<ToolBox> & toolBox) {
   m_ToolBox = toolBox;
 }
 
@@ -45,12 +45,12 @@ bool AddKernelCategoriesFromFileToTrace::tryRun() {
 
 AddKernelCategoriesFromFileToTrace::Builder::Builder(FILE * errorStream,
                                         shared_ptr<TraceImpl> & traceImpl, 
-                                        shared_ptr<Toolbox> & toolBox,
+                                        shared_ptr<ToolBox> & toolBox,
                                         const string & filename) {
   m_AddKernelCategoriesFromFileToTrace = new AddKernelCategoriesFromFileToTrace();
   m_AddKernelCategoriesFromFileToTrace->setErrorStream(errorStream);
   m_AddKernelCategoriesFromFileToTrace->setTraceImpl(traceImpl);
-  m_AddKernelCategoriesFromFileToTrace->setToolbox(toolBox);
+  m_AddKernelCategoriesFromFileToTrace->setToolBox(toolBox);
   m_AddKernelCategoriesFromFileToTrace->setFilename(filename);
 }
 

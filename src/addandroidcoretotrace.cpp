@@ -27,7 +27,7 @@ void AddAndroidCoreToTrace::setAndroidSystem(shared_ptr<AndroidSystem> & android
   m_AndroidSystem = androidSystem;
 }
 
-void AddAndroidCoreToTrace::setToolbox(shared_ptr<Toolbox> & toolBox) {
+void AddAndroidCoreToTrace::setToolBox(shared_ptr<ToolBox> & toolBox) {
   m_ToolBox = toolBox;
 }
 
@@ -49,12 +49,12 @@ bool AddAndroidCoreToTrace::tryRun() {
 AddAndroidCoreToTrace::Builder::Builder(FILE * errorStream,
                                         shared_ptr<TraceImpl> & traceImpl, 
                                         shared_ptr<AndroidSystem> & androidSystem,
-                                        shared_ptr<Toolbox> & toolBox) {
+                                        shared_ptr<ToolBox> & toolBox) {
   m_AddAndroidCoreToTrace = new AddAndroidCoreToTrace();
   m_AddAndroidCoreToTrace->setErrorStream(errorStream);
   m_AddAndroidCoreToTrace->setTraceImpl(traceImpl);
   m_AddAndroidCoreToTrace->setAndroidSystem(androidSystem);
-  m_AddAndroidCoreToTrace->setToolbox(toolBox);
+  m_AddAndroidCoreToTrace->setToolBox(toolBox);
 }
 
 AddAndroidCoreToTrace * AddAndroidCoreToTrace::Builder::build() const {

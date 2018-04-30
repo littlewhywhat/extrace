@@ -44,7 +44,7 @@ void KernelSystemImpl::set_file_system(shared_ptr<FileSystem> & file_system)
     this->file_system = file_system;
 }
 
-void KernelSystemImpl::set_toolbox(shared_ptr<Toolbox> & toolbox)
+void KernelSystemImpl::set_toolbox(shared_ptr<ToolBox> & toolbox)
 {
     this->toolbox = toolbox;
 }

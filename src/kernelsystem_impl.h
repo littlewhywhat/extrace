@@ -34,7 +34,7 @@ class KernelSystemImpl : public KernelSystem {
     ~KernelSystemImpl();
     void set_errstream(FILE * errstream);
     void set_file_system(shared_ptr<FileSystem> & file_system);
-    void set_toolbox(shared_ptr<Toolbox> & toolbox);
+    void set_toolbox(shared_ptr<ToolBox> & toolbox);
     void set_systime(shared_ptr<SystemTime> & systime);
     int tryOpenToWriteOrCreate(const char* filename);
     bool try_sendfile(int fd_from, int fd_to);
@@ -64,7 +64,7 @@ class KernelSystemImpl : public KernelSystem {
   private:
     FILE * errstream = NULL;
     shared_ptr<FileSystem> file_system = NULL;
-    shared_ptr<Toolbox> toolbox = NULL;
+    shared_ptr<ToolBox> toolbox = NULL;
     shared_ptr<SystemTime> systime = NULL;
 
     map<string, TracingCategory> m_Categories;

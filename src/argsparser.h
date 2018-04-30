@@ -36,13 +36,13 @@ class ArgsParser {
     void register_string(const char * specifier, const char * option_name);
     //! Registers comma separated values list under provided optionName
     void registerCommaSepList(const char * specifier, const char * optionName);
-    void setToolbox(const shared_ptr<Toolbox> & toolBox);
+    void setToolBox(const shared_ptr<ToolBox> & toolBox);
     //! Parses argv using list of registered options to arguments
     // Returns index of last processed arg from argv or argc value if processed
     // all without error
     int parse(Arguments & arguments, int argc, const char ** argv);
   private:
-    shared_ptr<Toolbox> m_ToolBox;
+    shared_ptr<ToolBox> m_ToolBox;
     //! Stores registered boolean options
     std::map<std::string, std::string> boolean_opt_names;
     //! Stores registered integer options
