@@ -42,3 +42,8 @@ void ConsoleAppMain::set_consoleapp(ConsoleApp * consoleapp)
 {
   this->consoleapp = consoleapp;
 }
+
+void ConsoleAppMain::handleSignal()
+{
+  this->consoleapp->handleSignal();
+}

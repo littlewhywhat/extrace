@@ -17,30 +17,27 @@
 #ifndef LTTLWHWHT_STREAMACTION_H
 #define LTTLWHWHT_STREAMACTION_H
 
-#include "action.h"
+#include "interruptableaction.h"
 
 #include <stdio.h>  // FILE
 
 #include "kernelsystem.h"
-#include "signal.h"
 #include "systemcore.h"
 
 using namespace std;
 
-class StreamAction : public Action {
+class StreamAction : public InterruptableAction {
   public:
     bool tryRun() override;
-    void setSignal(Signal * signal);
     void setErrorStream(FILE * errorStream);
     void setOutputStream(FILE * outStream);
     void setKernelSystem(KernelSystem * kernelSystem);
     class Builder {
       public:
-        Action * buildFrom(const SystemCore & systemCore) const;  
+        InterruptableAction * buildFrom(const SystemCore & systemCore) const;  
     };
   private:
     KernelSystem * m_KernelSystem;
-    Signal * m_Signal;
     FILE * m_ErrorStream;
     FILE * m_OutStream;
 };

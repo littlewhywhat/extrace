@@ -65,6 +65,7 @@ bool TraceImpl::setUp() {
   ok &= m_KernelSystem->setKernelTraceFuncs(m_Functions);
 
   // Set up the tags property.
+  printf("hello\n");
   ok &= m_AndroidSystem->tryEnableCategories(m_AndroidCategories);
   ok &= m_AndroidSystem->setAppCmdlineProperty(m_Apps);
   ok &= m_AndroidSystem->pokeBinderServices();
@@ -117,4 +118,36 @@ void TraceImpl::stop() {
   if (!ok) {
     fprintf(m_ErrorStream, "error TraceImpl::stop\n");
   }
+}
+
+TraceImpl * TraceImpl::Creator::createFrom(const ExtraceArguments & arguments) const
+{
+  auto * traceImpl = new TraceImpl();
+  if (arguments.enableCircleBuffer()) {
+    traceImpl->enableTraceOverwrite();
+  }
+  if (arguments.specifyBufferSize()) {
+    traceImpl->setTraceBufferSizeKB(arguments.getBufferSize());
+  }
+  if (arguments.haveKernelCategories()) {
+    for (auto & category : arguments.getKernelCategories()) {
+      traceImpl->addKernelCategory(category.c_str());
+    }
+  }
+  if (arguments.haveAndroidCategories()) {
+    for (auto & category: arguments.getAndroidCategories()) {
+      traceImpl->addAndroidCategory(category.c_str());
+    }
+  }
+  if (arguments.haveApps()) {
+    for (auto & app: arguments.getApps()) {
+      traceImpl->addApp(app.c_str());
+    }
+  }
+  if (arguments.haveKernelFunctions()) {
+    for (auto & function: arguments.getKernelFunctions()) {
+      traceImpl->addFunction(function.c_str());
+    }
+  }
+  return traceImpl;
 }

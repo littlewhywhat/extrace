@@ -27,8 +27,6 @@ using namespace std;
 //! This class contains arguments' values
 class Arguments {
   public:
-    void setApplicationName(const string & applicationName);
-    const string & getApplicationName() const;
     //! Enables boolean option specified by option_name
     void put_boolean(const char * option_name);
     //! Says if boolean option specified by option_name is enabled
@@ -52,7 +50,6 @@ class Arguments {
     //! Says if list of string option specified by option name exists
     bool hasStringList(const char * optionName) const;
   private:
-    string m_ApplicationName;
     //! set of enabled boolean options
     std::set<std::string> booleans;
     //! map of single integer options

@@ -35,6 +35,7 @@ class ConsoleApp
     virtual void run() = 0;
     //! Indicates if run was successful
     virtual bool succeeded(void) const = 0;
+    virtual void handleSignal(void) = 0;
 };
 
 #endif // LTTLWHWHT_CONSOLEAPP_H

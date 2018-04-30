@@ -131,6 +131,7 @@ const std::vector<TracingCategory> & AndroidSystemImpl::getCategories() const {
 
 bool AndroidSystemImpl::tryEnableCategories(const vector<string> & categories) {
     uint64_t tags = 0;
+    printf("hello\n");
     for (const auto & id : categories) {
         if (m_Categories.find(id) == m_Categories.end()) {
             fprintf(errstream, "category is not supported - %s", id.c_str());

@@ -46,9 +46,12 @@ bool AddKernelCategoriesFromFileToTrace::tryRun() {
 Action * AddKernelCategoriesFromFileToTrace::Builder::buildFrom(const SystemCore & systemCore,
                                                             const ExtraceArguments & arguments) const {
   auto * addKernelCategoriesFromFileToTrace = new AddKernelCategoriesFromFileToTrace();
+  if (arguments.haveKernelCategoryFilename())
+  {
+    addKernelCategoriesFromFileToTrace->setFilename(arguments.getKernelCategoryFilename());
+  }
   addKernelCategoriesFromFileToTrace->setErrorStream(systemCore.getErrorStream());
   addKernelCategoriesFromFileToTrace->setTrace(systemCore.getTrace());
   addKernelCategoriesFromFileToTrace->setToolBox(systemCore.getToolBox());
-  addKernelCategoriesFromFileToTrace->setFilename(arguments.getKernelCategoryFilename());
   return addKernelCategoriesFromFileToTrace;
 }

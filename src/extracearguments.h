@@ -39,7 +39,7 @@ class ExtraceArguments
     bool enableListCategories() const;
     bool enableCoreServices() const;
     bool enableCircleBuffer() const;
-    bool enableSignalsIgnore() const;
+    bool enableInterrupts() const;
     bool haveKernelCategoryFilename() const;
     const string & getKernelCategoryFilename() const;
     bool specifyBufferSize() const;

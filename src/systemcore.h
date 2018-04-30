@@ -26,6 +26,7 @@
 #include "trace.h"
 #include "systemtime.h"
 #include "signal.h"
+#include "extracearguments.h"
 
 class SystemCore
 {
@@ -39,10 +40,9 @@ class SystemCore
     AndroidSystem * getAndroidSystem() const;
     Trace * getTrace() const;
     SystemTime * getSystemTime() const;
-    Signal * getSignal() const;
     class Builder {
       public:
-        SystemCore * build() const;
+        SystemCore * build(const ExtraceArguments & arguments) const;
     };
   private:
     SystemCore();
@@ -54,7 +54,6 @@ class SystemCore
     KernelSystem  * m_KernelSystem  = NULL;
     Trace         * m_Trace         = NULL;
     SystemTime    * m_SystemTime    = NULL;
-    Signal        * m_Signal        = NULL;
 
     void setErrorStream(FILE * errorStream);
     void setOutputStream(FILE * outputStream);
@@ -64,7 +63,6 @@ class SystemCore
     void setAndroidSystem(AndroidSystem * androidSystem);
     void setTrace(Trace * trace);
     void setSystemTime(SystemTime * systemTime);
-    void setSignal(Signal * signal);
 };
 
 #endif // LTTLWHWHT_SYSTEMCORE_H

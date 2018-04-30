@@ -65,3 +65,10 @@ bool ExtraceConsoleApp::do_succeeded(void) const
 void ExtraceConsoleApp::printHelp() const {
   m_ExtraceArguments.printHelp(m_ErrorStream, m_Name);
 }
+
+void ExtraceConsoleApp::handleSignal() {
+  if (m_ActionRunner)
+  {
+    m_ActionRunner->handleSignal();
+  }
+}

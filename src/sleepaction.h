@@ -17,34 +17,31 @@
 #ifndef LTTLWHWHT_SLEEPACTION_H
 #define LTTLWHWHT_SLEEPACTION_H
 
-#include "action.h"
+#include "interruptableaction.h"
 
 #include <inttypes.h> // uint32_t
 #include <stdio.h>    // FILE
 
-#include "signal.h"
 #include "systemcore.h"
 #include "extracearguments.h"
 
 using namespace std;
 
-class SleepAction : public Action {
+class SleepAction : public InterruptableAction {
   public:
     bool tryRun() override;
     void setDurationSeconds(uint32_t durationSeconds);
-    void setSignal(Signal * signal);
     void setErrorStream(FILE * errorStream);
     class InitSleepBuilder {
       public:
-        Action * buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const;
+        InterruptableAction * buildFrom(const ExtraceArguments & arguments) const;
     };
     class MidSleepBuilder {
       public:
-        Action * buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const;
+        InterruptableAction * buildFrom(const ExtraceArguments & arguments) const;
     };
   private:
     uint32_t m_DurationSeconds = 5;
-    Signal * m_Signal;
     FILE * m_ErrorStream;
 };
 

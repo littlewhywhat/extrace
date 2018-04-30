@@ -76,6 +76,10 @@ Action * DumpAction::Builder::buildFrom(const SystemCore & systemCore,
   {
     dumpAction->enableCompression();
   }
+  if (arguments.haveDumpFilename())
+  {
+    dumpAction->setOutputFile(arguments.getDumpFilename().c_str());
+  }
   dumpAction->setErrorStream(systemCore.getErrorStream());
   dumpAction->setOutputStream(systemCore.getOutputStream());
   dumpAction->setKernelSystem(systemCore.getKernelSystem());

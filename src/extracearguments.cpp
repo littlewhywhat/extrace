@@ -151,7 +151,7 @@ bool ExtraceArguments::enableCircleBuffer() const {
   return m_Arguments->is_enabled(CIRCLE_BUFFER_OPTION_NAME);
 }
 
-bool ExtraceArguments::enableSignalsIgnore() const {
+bool ExtraceArguments::enableInterrupts() const {
   return m_Arguments->is_enabled(IGNORE_SIGNALS_OPTION_NAME);
 }
 

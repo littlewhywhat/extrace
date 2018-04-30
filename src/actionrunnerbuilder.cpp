@@ -33,9 +33,12 @@ void ActionRunnerBuilder::setSystemCoreBuilder(SystemCore::Builder * systemCoreB
 }
 
 ActionRunner * ActionRunnerBuilder::buildFrom(const ExtraceArguments & arguments) const {
-  auto * systemCore       = m_SystemCoreBuilder->build();
+  auto * systemCore       = m_SystemCoreBuilder->build(arguments);
   auto * actionRunnerImpl = new ActionRunnerImpl();
   actionRunnerImpl->setSystemCore(systemCore);
+  if (arguments.enableInterrupts()) {
+    actionRunnerImpl->enableInterrupts();
+  }
   if (arguments.haveListCategoriesOption()) {
     actionRunnerImpl->addAction(ListSupportedCategories::Builder()
                                     .buildFrom(*systemCore));
@@ -48,15 +51,16 @@ ActionRunner * ActionRunnerBuilder::buildFrom(const ExtraceArguments & arguments
       actionRunnerImpl->addAction(AddKernelCategoriesFromFileToTrace::Builder().buildFrom(*systemCore, arguments));
     }
     if (arguments.specifyInitSleepDuration()) {
-      actionRunnerImpl->addAction(SleepAction::InitSleepBuilder()
-                                    .buildFrom(*systemCore, arguments));
+      actionRunnerImpl->addInterruptableAction(SleepAction::InitSleepBuilder()
+                                               .buildFrom(arguments));
     }
     if (arguments.enableAsyncStart()) {
       actionRunnerImpl->addAction(StartAction::Builder()
                                     .buildFrom(*systemCore));
       if (arguments.enableStream()) {
-        actionRunnerImpl->addAction(StreamAction::Builder()
-                                    .buildFrom(*systemCore));
+        actionRunnerImpl->addInterruptableAction(StreamAction::Builder()
+                                                 .buildFrom(*systemCore));
+        actionRunnerImpl->enableInterrupts();
       }
     }
     else if (arguments.enableAsyncStop()) {
@@ -74,11 +78,12 @@ ActionRunner * ActionRunnerBuilder::buildFrom(const ExtraceArguments & arguments
     else {
       actionRunnerImpl->addAction(StartAction::Builder()
                                     .buildFrom(*systemCore));
-      actionRunnerImpl->addAction(SleepAction::MidSleepBuilder()
-                                    .buildFrom(*systemCore, arguments));
+      actionRunnerImpl->addInterruptableAction(SleepAction::MidSleepBuilder()
+                                    .buildFrom(arguments));
       if (arguments.enableStream()) {
-        actionRunnerImpl->addAction(StreamAction::Builder()
+        actionRunnerImpl->addInterruptableAction(StreamAction::Builder()
                                     .buildFrom(*systemCore));
+        actionRunnerImpl->enableInterrupts();
       }
       actionRunnerImpl->addAction(StopAction::Builder()
                                     .buildFrom(*systemCore));
