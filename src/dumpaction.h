@@ -19,24 +19,31 @@
 
 #include "action.h"
 
-#include <memory>
 #include <string>
 #include <cstdio>
 
 #include "kernelsystem.h"
+#include "systemcore.h"
+#include "extracearguments.h"
 
 using namespace std;
 
 class DumpAction : public Action {
   public:
     bool tryRun() override;
-    void setKernelSystem(shared_ptr<KernelSystem> & kernelSystem);
+    void setKernelSystem(KernelSystem * kernelSystem);
     void setErrorStream(FILE * errorStream);
     void setOutputFile(const char * outputFile);
     void setOutputStream(FILE * outStream);
     void enableCompression();
+    class Builder 
+    {
+      public:
+        Action * buildFrom(const SystemCore & systemCore,
+                           const ExtraceArguments & arguments) const;
+    };
   private:
-    shared_ptr<KernelSystem> m_KernelSystem;
+    KernelSystem * m_KernelSystem;
     FILE * m_ErrorStream;
     FILE * m_OutStream;
     string m_OutputFile;

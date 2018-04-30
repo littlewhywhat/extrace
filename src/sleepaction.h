@@ -21,9 +21,10 @@
 
 #include <inttypes.h> // uint32_t
 #include <stdio.h>    // FILE
-#include <memory>
 
 #include "signal.h"
+#include "systemcore.h"
+#include "extracearguments.h"
 
 using namespace std;
 
@@ -31,11 +32,19 @@ class SleepAction : public Action {
   public:
     bool tryRun() override;
     void setDurationSeconds(uint32_t durationSeconds);
-    void setSignal(shared_ptr<Signal> & signal);
+    void setSignal(Signal * signal);
     void setErrorStream(FILE * errorStream);
+    class InitSleepBuilder {
+      public:
+        Action * buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const;
+    };
+    class MidSleepBuilder {
+      public:
+        Action * buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const;
+    };
   private:
     uint32_t m_DurationSeconds = 5;
-    shared_ptr<Signal> m_Signal;
+    Signal * m_Signal;
     FILE * m_ErrorStream;
 };
 

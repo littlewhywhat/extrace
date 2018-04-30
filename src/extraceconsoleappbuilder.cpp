@@ -16,13 +16,19 @@
 #include "extraceconsoleapp.h"
 #include "extraceconsoleappbuilder.h"
 
+
 ExtraceConsoleApp * ExtraceConsoleAppBuilder::build(void) const
 {
   // TODO
   // FMachineTrace * fMachineTrace = new FMachineTrace();
   // MachineTraceSession * machineTraceSession = new FMachineTraceSession(fMachineTrace);
   // ExtraceApp * extraceApp = new ExtraceAppImpl(machineTraceSession);
+
+  ActionRunnerBuilder * actionRunnerBuilder = new ActionRunnerBuilder();
+  actionRunnerBuilder->setSystemCoreBuilder(new SystemCore::Builder());
+
   ExtraceConsoleApp * consoleApp = new ExtraceConsoleApp();
   consoleApp->setErrorStream(stderr);
+  consoleApp->setActionRunnerBuilder(actionRunnerBuilder);
   return consoleApp;
 }

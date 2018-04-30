@@ -26,12 +26,15 @@ class AbstractConsoleApp : public ConsoleApp
   public:
     AbstractConsoleApp(): isReady(false) {}
     virtual ~AbstractConsoleApp() {}
+    void setName(const string & name) override;
     void setup(int argc, const char ** argv) override;
     bool is_ready(void) const override;
     void run() override { do_run(); }
     bool succeeded(void) const override { return do_succeeded(); }
+  protected:
+    string m_Name;
   private:
-    virtual void printHelp(const string & appName) const = 0;
+    virtual void printHelp() const = 0;
     //! Stub for limiting inheritors 
     virtual void do_run() = 0;
     //! Stub for limiting inheritors

@@ -19,24 +19,28 @@
 
 #include "action.h"
 
-#include <memory>   // shared_ptr
 #include <stdio.h>  // FILE
 
 #include "kernelsystem.h"
 #include "signal.h"
+#include "systemcore.h"
 
 using namespace std;
 
 class StreamAction : public Action {
   public:
     bool tryRun() override;
-    void setSignal(shared_ptr<Signal> & signal);
+    void setSignal(Signal * signal);
     void setErrorStream(FILE * errorStream);
     void setOutputStream(FILE * outStream);
-    void setKernelSystem(shared_ptr<KernelSystem> & kernelSystem);
+    void setKernelSystem(KernelSystem * kernelSystem);
+    class Builder {
+      public:
+        Action * buildFrom(const SystemCore & systemCore) const;  
+    };
   private:
-    shared_ptr<KernelSystem> m_KernelSystem;
-    shared_ptr<Signal> m_Signal;
+    KernelSystem * m_KernelSystem;
+    Signal * m_Signal;
     FILE * m_ErrorStream;
     FILE * m_OutStream;
 };

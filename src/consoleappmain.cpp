@@ -20,6 +20,7 @@
 int ConsoleAppMain::run(int argc, const char ** argv)
 {
   ConsoleApp & consoleapp = *(this->consoleapp);
+  consoleapp.setName(argv[0]);
   consoleapp.setup(argc, argv);
   if (consoleapp.is_ready())
   {

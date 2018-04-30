@@ -22,6 +22,7 @@
 #include <binder/Parcel.h>
 #include <cutils/properties.h>
 #include <utils/String8.h>
+#include <utils/Trace.h> // ATRACE_TAGs
 
 #include <zlib.h>
 

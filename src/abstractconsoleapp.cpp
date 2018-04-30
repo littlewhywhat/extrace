@@ -19,6 +19,11 @@
 #include "argsparser.h"
 #include "androidtoolbox.h"
 
+void AbstractConsoleApp::setName(const string & name)
+{
+  m_Name = name;
+}
+
 void AbstractConsoleApp::setup(int argc, const char ** argv) {
   // TODO refactor
   // ArgsParser consoleArgsParser(argc, argv);
@@ -37,7 +42,7 @@ void AbstractConsoleApp::setup(int argc, const char ** argv) {
   else
   {
     this->isReady = false;
-    this->printHelp(argv[0]); 
+    this->printHelp(); 
   }
 }
 

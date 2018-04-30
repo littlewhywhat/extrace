@@ -40,8 +40,9 @@ class SystemCore
     Trace * getTrace() const;
     SystemTime * getSystemTime() const;
     Signal * getSignal() const;
-    class ExtraceBuilder {
-      SystemCore * build() const;
+    class Builder {
+      public:
+        SystemCore * build() const;
     };
   private:
     SystemCore();

@@ -15,15 +15,15 @@
  */
 #include "addkernelcategoriesfromfiletotrace.h"
 
-void AddKernelCategoriesFromFileToTrace::setTraceImpl(shared_ptr<TraceImpl> & traceImpl) {
-  m_TraceImpl = traceImpl;
+void AddKernelCategoriesFromFileToTrace::setTrace(Trace * trace) {
+  m_Trace = trace;
 }
 
 void AddKernelCategoriesFromFileToTrace::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
 }
 
-void AddKernelCategoriesFromFileToTrace::setToolBox(shared_ptr<ToolBox> & toolBox) {
+void AddKernelCategoriesFromFileToTrace::setToolBox(ToolBox * toolBox) {
   m_ToolBox = toolBox;
 }
 
@@ -38,22 +38,17 @@ bool AddKernelCategoriesFromFileToTrace::tryRun() {
     return false;
   }
   for (const auto & token : tokens) {
-     m_TraceImpl->addKernelCategory(token.c_str());
+     m_Trace->addKernelCategory(token.c_str());
   }
   return true;
 }
 
-AddKernelCategoriesFromFileToTrace::Builder::Builder(FILE * errorStream,
-                                        shared_ptr<TraceImpl> & traceImpl, 
-                                        shared_ptr<ToolBox> & toolBox,
-                                        const string & filename) {
-  m_AddKernelCategoriesFromFileToTrace = new AddKernelCategoriesFromFileToTrace();
-  m_AddKernelCategoriesFromFileToTrace->setErrorStream(errorStream);
-  m_AddKernelCategoriesFromFileToTrace->setTraceImpl(traceImpl);
-  m_AddKernelCategoriesFromFileToTrace->setToolBox(toolBox);
-  m_AddKernelCategoriesFromFileToTrace->setFilename(filename);
-}
-
-AddKernelCategoriesFromFileToTrace * AddKernelCategoriesFromFileToTrace::Builder::build() const {
-  return m_AddKernelCategoriesFromFileToTrace;
+Action * AddKernelCategoriesFromFileToTrace::Builder::buildFrom(const SystemCore & systemCore,
+                                                            const ExtraceArguments & arguments) const {
+  auto * addKernelCategoriesFromFileToTrace = new AddKernelCategoriesFromFileToTrace();
+  addKernelCategoriesFromFileToTrace->setErrorStream(systemCore.getErrorStream());
+  addKernelCategoriesFromFileToTrace->setTrace(systemCore.getTrace());
+  addKernelCategoriesFromFileToTrace->setToolBox(systemCore.getToolBox());
+  addKernelCategoriesFromFileToTrace->setFilename(arguments.getKernelCategoryFilename());
+  return addKernelCategoriesFromFileToTrace;
 }

@@ -17,7 +17,7 @@
 
 #include <unistd.h> // close
 
-void DumpAction::setKernelSystem(shared_ptr<KernelSystem> & kernelSystem) {
+void DumpAction::setKernelSystem(KernelSystem * kernelSystem) {
   m_KernelSystem = kernelSystem;
 }
 
@@ -67,4 +67,17 @@ bool DumpAction::tryRun() {
     close(outFd);
   }
   return m_KernelSystem->clearTrace();
+}
+
+Action * DumpAction::Builder::buildFrom(const SystemCore & systemCore,
+                                        const ExtraceArguments & arguments) const {
+  auto * dumpAction = new DumpAction();
+  if (arguments.enableCompression())
+  {
+    dumpAction->enableCompression();
+  }
+  dumpAction->setErrorStream(systemCore.getErrorStream());
+  dumpAction->setOutputStream(systemCore.getOutputStream());
+  dumpAction->setKernelSystem(systemCore.getKernelSystem());
+  return dumpAction;
 }

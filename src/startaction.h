@@ -19,23 +19,26 @@
 
 #include "action.h"
 
-#include <memory>
-
 #include "trace.h"
 #include "kernelsystem.h"
+#include "systemcore.h"
 
 using namespace std;
 
 class StartAction : public Action {
   public:
     bool tryRun() override;
-    void setTrace(shared_ptr<Trace> & trace);
+    void setTrace(Trace * trace);
     void setErrorStream(FILE * errorStream);
     void setOutputStream(FILE * outStream);
-    void setKernelSystem(shared_ptr<KernelSystem> & kernelSystem);
+    void setKernelSystem(KernelSystem * kernelSystem);
+    class Builder {
+      public:
+        Action * buildFrom(const SystemCore & systemCore) const;
+    };
   private:
-    shared_ptr<Trace> m_Trace;
-    shared_ptr<KernelSystem> m_KernelSystem;
+    Trace * m_Trace;
+    KernelSystem * m_KernelSystem;
     FILE * m_ErrorStream;
     FILE * m_OutStream;
 };

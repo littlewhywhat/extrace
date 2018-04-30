@@ -20,19 +20,23 @@
 #include "action.h"
 
 #include <cstdio>
-#include <memory>
 
 #include "trace.h"
+#include "systemcore.h"
 
 using namespace std;
 
 class StopAction : public Action {
   public:
     bool tryRun() override;
-    void setTrace(shared_ptr<Trace> & trace);
+    void setTrace(Trace * trace);
     void setErrorStream(FILE * errorStream);
+    class Builder {
+      public:
+        Action * buildFrom(const SystemCore & systemCore) const;
+    };
   private:
-    shared_ptr<Trace> m_Trace;
+    Trace * m_Trace;
     FILE * m_ErrorStream;
 };
 

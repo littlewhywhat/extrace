@@ -17,7 +17,7 @@
 
 #include <cstdio>
 
-void CleanUpAction::setTrace(shared_ptr<Trace> & trace) {
+void CleanUpAction::setTrace(Trace * trace) {
   m_Trace = trace;
 }
 
@@ -32,4 +32,12 @@ bool CleanUpAction::tryRun() {
     fprintf(m_ErrorStream, "error CleanUpAction::tryRun\n");
   }
   return ok;
+}
+
+Action * CleanUpAction::Builder::buildFrom(const SystemCore & systemCore)
+{
+  auto * cleanUpAction = new CleanUpAction();
+  cleanUpAction->setTrace(systemCore.getTrace());
+  cleanUpAction->setErrorStream(systemCore.getErrorStream());
+  return cleanUpAction;
 }

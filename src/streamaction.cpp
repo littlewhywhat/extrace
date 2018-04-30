@@ -23,11 +23,11 @@ void StreamAction::setOutputStream(FILE * outStream) {
   m_OutStream = outStream;
 }
 
-void StreamAction::setSignal(shared_ptr<Signal> & signal) {
+void StreamAction::setSignal(Signal * signal) {
   m_Signal = signal;
 }
 
-void StreamAction::setKernelSystem(shared_ptr<KernelSystem> & kernelSystem) {
+void StreamAction::setKernelSystem(KernelSystem * kernelSystem) {
   m_KernelSystem = kernelSystem;
 }
 
@@ -49,4 +49,13 @@ bool StreamAction::tryRun() {
       fflush(m_OutStream);
   }
   return ok;
+}
+
+Action * StreamAction::Builder::buildFrom(const SystemCore & systemCore) const {
+  StreamAction * streamAction = new StreamAction();
+  streamAction->setErrorStream(systemCore.getErrorStream());
+  streamAction->setOutputStream(systemCore.getOutputStream());
+  streamAction->setSignal(systemCore.getSignal());
+  streamAction->setKernelSystem(systemCore.getKernelSystem());
+  return streamAction;
 }

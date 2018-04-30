@@ -20,6 +20,8 @@
 #include "argsparser.h"
 #include "arguments.h"
 #include "extracearguments.h"
+#include "actionrunner.h"
+#include "actionrunnerbuilder.h"
 
 #include <cstdio>
 #include <string>
@@ -31,12 +33,16 @@ class ExtraceConsoleApp : public AbstractConsoleApp
 {
   public:
     ExtraceConsoleApp(): AbstractConsoleApp() {}
-    ~ExtraceConsoleApp() {}
+    ~ExtraceConsoleApp();
+    void setActionRunnerBuilder(ActionRunnerBuilder * actionRunnerBuilder);
     void setErrorStream(FILE * errorStream);
    private:
     ExtraceArguments m_ExtraceArguments;
+    ActionRunner * m_ActionRunner = NULL;
+    ActionRunnerBuilder * m_ActionRunnerBuilder = NULL;
+    bool m_Success = false;
     FILE * m_ErrorStream = NULL;
-    void printHelp(const string & appName) const override;
+    void printHelp() const override;
     void do_run(void) override;
     bool do_succeeded(void) const override;
     void register_args_to(ArgsParser & argsParser) const override;
