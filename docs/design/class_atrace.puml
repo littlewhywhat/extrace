@@ -7,7 +7,7 @@ class AtraceMain {
 }
 hide AtraceMain fields
 
-AtraceMain "-toolBox"        -- "1" AndroidToolbox
+AtraceMain "-toolBox"        -- "1" AndroidToolBox
 AtraceMain "-systemTimeImpl" -- "1" SystemTimeImpl
 AtraceMain "-fileSystem"     -- "1" FileSystemImpl
 AtraceMain "-kernelSystem"   -- "1" KernelSystemImpl
@@ -232,7 +232,7 @@ class KernelSystemImpl {
 
 KernelSystemImpl ..> KernelSystem
 KernelSystemImpl "-file_system" --> "1" FileSystem
-KernelSystemImpl "-toolbox" --> "1" Toolbox
+KernelSystemImpl "-toolbox" --> "1" ToolBox
 KernelSystemImpl "-systime" *-->"1" SystemTime
 KernelSystemImpl "-m_Categories " -->"0..*" TracingCategory
 
@@ -274,17 +274,17 @@ hide SystemTimeImpl fields
 
 SystemTimeImpl ..> SystemTime
 
-interface Toolbox {
+interface ToolBox {
   + {abstract} parseFileToTokens(const char* filename, const char* delims, set<string> & tokens)
   + {abstract} parseToTokens(const char* delimsepstr, const char* delims, set<string> & tokens)
 }
-hide Toolbox fields
+hide ToolBox fields
 
-class AndroidToolbox {
+class AndroidToolBox {
 }
-hide AndroidToolbox fields
-hide AndroidToolbox methods
+hide AndroidToolBox fields
+hide AndroidToolBox methods
 
-AndroidToolbox ..> Toolbox
+AndroidToolBox ..> ToolBox
 
 @enduml

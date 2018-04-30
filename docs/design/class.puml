@@ -46,7 +46,7 @@ class ArgsParser {
 }
 
 ArgsParser --> Arguments: parses
-ArgsParser "-m_ToolBox" -- "1" Toolbox
+ArgsParser "-m_ToolBox" -- "1" ToolBox
 
 class Arguments {
   - booleans: std::set<std::string>

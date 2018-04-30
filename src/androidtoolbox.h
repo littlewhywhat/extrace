@@ -20,7 +20,7 @@
 
 #include "toolbox.h"
 
-class AndroidToolbox : public Toolbox {
+class AndroidToolBox : public ToolBox {
   public:
     bool parseFileToTokens(const char * filename, const char * delims,
                            std::set<std::string> & tokens) const override;

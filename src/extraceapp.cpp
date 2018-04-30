@@ -50,7 +50,7 @@ void ExtraceApp::setOutputStream(FILE * outputStream) {
   m_OutputStream = outputStream;
 }
 
-void ExtraceApp::setAndroidToolbox(AndroidToolbox * androidToolBox) {
+void ExtraceApp::setAndroidToolBox(AndroidToolBox * androidToolBox) {
   m_AndroidToolBox = androidToolBox;
 }
 void ExtraceApp::setSystemTimeImpl(SystemTimeImpl * systemTimeImpl) {
@@ -131,7 +131,7 @@ void ExtraceApp::showHelp(const char *cmd) const {
 }
 
 void ExtraceApp::setupDependencies() {
-  auto sp_ToolBox       = shared_ptr<Toolbox>(m_AndroidToolBox);
+  auto sp_ToolBox       = shared_ptr<ToolBox>(m_AndroidToolBox);
   auto sp_SystemTime    = shared_ptr<SystemTime>(m_SystemTimeImpl);
   auto sp_FileSystem    = shared_ptr<FileSystem>(m_FileSystemImpl);
   auto sp_KernelSystem  = shared_ptr<KernelSystem>(m_KernelSystemImpl);
@@ -285,7 +285,7 @@ void ExtraceApp::setupKernelSystemImpl() {
 bool ExtraceApp::run(int argc, const char ** argv) {
   Arguments args;
   ArgsParser argsparser;
-  argsparser.setToolbox(make_shared<AndroidToolbox>());
+  argsparser.setToolBox(make_shared<AndroidToolBox>());
 
   argsparser.register_boolean("--help", "Help");
   argsparser.register_boolean("-c", "CircleBuffer");
@@ -375,7 +375,7 @@ bool ExtraceApp::run(int argc, const char ** argv) {
     if (args.is_enabled("CoreServices")) {
       shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
       shared_ptr<AndroidSystem> sp_AndroidSystem = shared_ptr<AndroidSystem>(m_AndroidSystemImpl);
-      shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
+      shared_ptr<ToolBox> sp_ToolBox = shared_ptr<ToolBox>(m_AndroidToolBox);
       actionRunnerImpl.addAction(AddAndroidCoreToTrace::Builder(
                                     m_ErrorStream, 
                                     sp_TraceImpl,
@@ -385,7 +385,7 @@ bool ExtraceApp::run(int argc, const char ** argv) {
     }
     if (args.has_string("KernelCategoriesFilename")) {
       shared_ptr<TraceImpl> sp_TraceImpl = shared_ptr<TraceImpl>(m_TraceImpl);
-      shared_ptr<Toolbox> sp_ToolBox = shared_ptr<Toolbox>(m_AndroidToolBox);
+      shared_ptr<ToolBox> sp_ToolBox = shared_ptr<ToolBox>(m_AndroidToolBox);
       actionRunnerImpl.addAction(AddKernelCategoriesFromFileToTrace::Builder(
                                     m_ErrorStream,
                                     sp_TraceImpl,

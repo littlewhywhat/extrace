@@ -34,13 +34,13 @@ class AddKernelCategoriesFromFileToTrace : public Action {
     bool tryRun() override;
     void setTraceImpl(shared_ptr<TraceImpl> & traceImpl);
     void setErrorStream(FILE * errorStream);
-    void setToolbox(shared_ptr<Toolbox> & toolBox);
+    void setToolBox(shared_ptr<ToolBox> & toolBox);
     void setFilename(const string & filename);
     class Builder {
       public:
         Builder(FILE * errorStream,
                 shared_ptr<TraceImpl> & traceImpl, 
-                shared_ptr<Toolbox> & toolBox,
+                shared_ptr<ToolBox> & toolBox,
                 const string & filename); 
         AddKernelCategoriesFromFileToTrace * build() const;
       private:
@@ -48,7 +48,7 @@ class AddKernelCategoriesFromFileToTrace : public Action {
     };
   private:
     shared_ptr<TraceImpl> m_TraceImpl;
-    shared_ptr<Toolbox> m_ToolBox;
+    shared_ptr<ToolBox> m_ToolBox;
     FILE * m_ErrorStream;
     string m_Filename;
 };

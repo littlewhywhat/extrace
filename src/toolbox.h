@@ -21,9 +21,9 @@
 #include <string>
 #include <set>
 
-class Toolbox {
+class ToolBox {
   public:
-    virtual ~Toolbox() {}
+    virtual ~ToolBox() {}
     virtual bool parseFileToTokens(const char * filename, const char * delims,
                                    std::set<std::string> & tokens) const = 0;
     virtual void parseToTokens(const char * delimseplist, const char * delims,

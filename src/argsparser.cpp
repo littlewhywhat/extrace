@@ -18,7 +18,7 @@
 
 #include "stdio.h"
 
-void ArgsParser::setToolbox(const shared_ptr<Toolbox> & toolBox) {
+void ArgsParser::setToolBox(const shared_ptr<ToolBox> & toolBox) {
   m_ToolBox = toolBox;
 }
 
