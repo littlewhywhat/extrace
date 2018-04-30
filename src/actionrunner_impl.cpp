@@ -42,3 +42,20 @@ bool ActionRunnerImpl::tryRunActions() {
 void ActionRunnerImpl::addAction(Action * action) {
   m_Actions.push_back(action);
 }
+
+void ActionRunnerImpl::addInterruptableAction(InterruptableAction * action) {
+  m_InterruptableActions.push_back(action);
+  m_Actions.push_back(action);
+}
+
+void ActionRunnerImpl::handleSignal() {
+  if (m_InterruptsEnabled) {
+    for (auto * action : m_InterruptableActions) {
+      action->handleSignal();
+    }
+  }
+}
+
+void ActionRunnerImpl::enableInterrupts() {
+  m_InterruptsEnabled = true;  
+}

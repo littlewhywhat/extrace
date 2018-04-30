@@ -23,10 +23,6 @@ void StreamAction::setOutputStream(FILE * outStream) {
   m_OutStream = outStream;
 }
 
-void StreamAction::setSignal(Signal * signal) {
-  m_Signal = signal;
-}
-
 void StreamAction::setKernelSystem(KernelSystem * kernelSystem) {
   m_KernelSystem = kernelSystem;
 }
@@ -38,9 +34,9 @@ bool StreamAction::tryRun() {
       fprintf(m_ErrorStream, "error StreamAction::tryRun\n");
       return false;
   }
-  while (!m_Signal->fired()) {
+  while (!m_Interrupted) {
       if (!m_KernelSystem->try_send(traceStream, fileno(m_OutStream))) {
-          if (!m_Signal->fired()) {
+          if (!m_Interrupted) {
             fprintf(m_ErrorStream, "error StreamAction::tryRun - stream aborted\n");
             ok = false;
           }
@@ -51,11 +47,10 @@ bool StreamAction::tryRun() {
   return ok;
 }
 
-Action * StreamAction::Builder::buildFrom(const SystemCore & systemCore) const {
+InterruptableAction * StreamAction::Builder::buildFrom(const SystemCore & systemCore) const {
   StreamAction * streamAction = new StreamAction();
   streamAction->setErrorStream(systemCore.getErrorStream());
   streamAction->setOutputStream(systemCore.getOutputStream());
-  streamAction->setSignal(systemCore.getSignal());
   streamAction->setKernelSystem(systemCore.getKernelSystem());
   return streamAction;
 }

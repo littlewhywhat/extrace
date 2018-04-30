@@ -23,18 +23,24 @@
 
 #include "action.h"
 #include "systemcore.h"
+#include "interruptableaction.h"
 
 using namespace std;
 
 class ActionRunnerImpl : public ActionRunner {
   public:
     ~ActionRunnerImpl();
+    void handleSignal() override;
+    void enableInterrupts();
     bool tryRunActions() override;
+    void addInterruptableAction(InterruptableAction * action);
     void addAction(Action * action);
     void setSystemCore(SystemCore * systemCore);
   private:
     SystemCore * m_SystemCore = NULL;
+    bool m_InterruptsEnabled = false;
     vector<Action*> m_Actions;
+    vector<InterruptableAction*> m_InterruptableActions;
 };
 
 #endif // LTTLWHWHT_ACTION_RUNNER_IMPL_H

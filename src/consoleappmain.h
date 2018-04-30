@@ -31,6 +31,7 @@ class ConsoleAppMain
     // Instance of ConsoleApp that is supplied here will exist
     // until ConsoleAppMain exists.
     void set_consoleapp(ConsoleApp * consoleapp);
+    void handleSignal();
   private:
     //! Pointer to console application to run
     ConsoleApp * consoleapp;

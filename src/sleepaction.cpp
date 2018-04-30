@@ -22,10 +22,6 @@ void SleepAction::setDurationSeconds(uint32_t durationSeconds) {
   m_DurationSeconds = durationSeconds;
 }
 
-void SleepAction::setSignal(Signal * signal) {
-  m_Signal = signal;
-}
-
 void SleepAction::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
 }
@@ -36,7 +32,7 @@ bool SleepAction::tryRun() {
   timeLeft.tv_sec = m_DurationSeconds;
   timeLeft.tv_nsec = 0;
   do {
-    if (m_Signal->fired()) {
+    if (m_Interrupted) {
       ok = false;
       break;
     }
@@ -47,16 +43,18 @@ bool SleepAction::tryRun() {
   return ok;
 }
 
-Action * SleepAction::InitSleepBuilder::buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const {
+InterruptableAction * SleepAction::InitSleepBuilder::buildFrom(const ExtraceArguments & arguments) const {
   auto * sleepAction = new SleepAction();
-  sleepAction->setSignal(systemCore.getSignal());
-  sleepAction->setDurationSeconds(arguments.getInitSleepDuration());
+  if (arguments.specifyInitSleepDuration()) {
+    sleepAction->setDurationSeconds(arguments.getInitSleepDuration());
+  }
   return sleepAction;
 }
 
-Action * SleepAction::MidSleepBuilder::buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const {
+InterruptableAction * SleepAction::MidSleepBuilder::buildFrom(const ExtraceArguments & arguments) const {
   auto * sleepAction = new SleepAction();
-  sleepAction->setSignal(systemCore.getSignal());
-  sleepAction->setDurationSeconds(arguments.getMidSleepDuration());
+  if (arguments.specifyMidSleepDuration()) {
+    sleepAction->setDurationSeconds(arguments.getMidSleepDuration());
+  }
   return sleepAction;
 }

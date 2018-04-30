@@ -21,6 +21,7 @@ class ActionRunner {
   public:
     virtual ~ActionRunner() {}
     virtual bool tryRunActions() = 0;
+    virtual void handleSignal() = 0;
 };
 
 #endif // LTTLWHWHT_ACTION_RUNNER_H

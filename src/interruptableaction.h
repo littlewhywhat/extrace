@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-#include "signal.h"
+#ifndef LTTLWHWHT_INTERRUPTABLEACTION_H
+#define LTTLWHWHT_INTERRUPTABLEACTION_H
 
-void Signal::fire() {
-  m_Fired = true;
-}
+#include "action.h"
 
-bool Signal::fired() {
-  return m_Fired;
-}
+class InterruptableAction: public Action
+{
+  public:
+    virtual ~InterruptableAction() {}
+    void handleSignal() { m_Interrupted = true; };
+  protected:
+    bool m_Interrupted = false;
+};
+
+#endif // LTTLWHWHT_INTERRUPTABLEACTION_H

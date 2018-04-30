@@ -31,7 +31,6 @@ SystemCore::~SystemCore() {
   delete m_KernelSystem;
   delete m_Trace;
   delete m_SystemTime;
-  delete m_Signal;
   delete m_ToolBox;    
 }
 
@@ -67,10 +66,6 @@ SystemTime * SystemCore::getSystemTime() const {
   return m_SystemTime;
 }
 
-Signal * SystemCore::getSignal() const {
-  return m_Signal;
-}
-
 void SystemCore::setErrorStream(FILE * errorStream) {
   m_ErrorStream = errorStream;
 }
@@ -103,22 +98,19 @@ void SystemCore::setSystemTime(SystemTime * systemTime) {
   m_SystemTime = systemTime;
 }
 
-void SystemCore::setSignal(Signal * signal) {
-  m_Signal = signal;
-}
-
-SystemCore * SystemCore::Builder::build() const {
+SystemCore * SystemCore::Builder::build(const ExtraceArguments & arguments) const {
   FILE * errorStream       = stderr;
   FILE * outputStream      = stdout;
   auto * fileSystemImpl    = new FileSystemImpl();
   auto * kernelSystemImpl  = KernelSystemImpl::Creator().createWithDefaultCategories();
   auto * androidSystemImpl = AndroidSystemImpl::Creator().createWithDefaultCategories();
-  auto * traceImpl         = new TraceImpl();
+  auto * traceImpl         = TraceImpl::Creator().createFrom(arguments);
   auto * systemTimeImpl    = new SystemTimeImpl();
-  auto * signal            = new Signal();
   auto * androidToolBox    = new AndroidToolBox();
 
   fileSystemImpl->set_errstream(errorStream);
+
+  androidSystemImpl->set_errstream(errorStream);
 
   kernelSystemImpl->set_errstream(errorStream);
   kernelSystemImpl->set_file_system(fileSystemImpl);
@@ -137,7 +129,6 @@ SystemCore * SystemCore::Builder::build() const {
   systemCore->setAndroidSystem(androidSystemImpl);
   systemCore->setTrace(traceImpl);
   systemCore->setSystemTime(systemTimeImpl);
-  systemCore->setSignal(signal);
 
   return systemCore;
 }

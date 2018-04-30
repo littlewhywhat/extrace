@@ -37,7 +37,6 @@ LOCAL_SRC_FILES:= \
     src/listsupportedcategories.cpp \
 		src/addkernelcategoriesfromfiletotrace.cpp \
 		src/addandroidcoretotrace.cpp \
-		src/signal.cpp \
 		src/actionrunner_impl.cpp \
 		src/main.cpp \
 		src/sleepaction.cpp \

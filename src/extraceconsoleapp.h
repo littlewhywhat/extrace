@@ -34,6 +34,7 @@ class ExtraceConsoleApp : public AbstractConsoleApp
   public:
     ExtraceConsoleApp(): AbstractConsoleApp() {}
     ~ExtraceConsoleApp();
+    void handleSignal() override;
     void setActionRunnerBuilder(ActionRunnerBuilder * actionRunnerBuilder);
     void setErrorStream(FILE * errorStream);
    private:

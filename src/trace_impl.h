@@ -21,6 +21,7 @@
 
 #include "kernelsystem.h"
 #include "androidsystem.h"
+#include "extracearguments.h"
 
 #include <vector>
 #include <string>
@@ -50,6 +51,10 @@ class TraceImpl : public Trace {
     void setKernelSystem(KernelSystem * kernelSystem);
     void enableTraceOverwrite();
     void setTraceBufferSizeKB(uint32_t size);
+    class Creator {
+      public:
+        TraceImpl * createFrom(const ExtraceArguments & arguments) const;
+    };
   private:
     FILE * m_ErrorStream = NULL;
     AndroidSystem * m_AndroidSystem;
