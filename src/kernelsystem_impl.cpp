@@ -30,25 +30,6 @@
 KernelSystemImpl::~KernelSystemImpl()
 {}
 
-void KernelSystemImpl::set_errstream(FILE * errstream)
-{
-    this->errstream = errstream;
-}
-
-void KernelSystemImpl::set_systime(SystemTime * systime) {
-    this->systime = systime;
-}
-
-void KernelSystemImpl::set_file_system(FileSystem * file_system)
-{
-    this->file_system = file_system;
-}
-
-void KernelSystemImpl::set_toolbox(ToolBox * toolbox)
-{
-    this->toolbox = toolbox;
-}
-
 int KernelSystemImpl::tryOpenToWriteOrCreate(const char* filename)
 {
     int outFd = open(filename, O_WRONLY | O_CREAT);
@@ -63,7 +44,7 @@ bool KernelSystemImpl::try_sendfile(int fd_from, int fd_to)
     ssize_t sent = 0;
     while ((sent = sendfile(fd_to, fd_from, NULL, 64*1024*1024)) > 0);
     if (sent == -1) {
-        fprintf(errstream, "error sendfile: %s (%d)\n", strerror(errno),
+        fprintf(m_Wire.getErrorStream(), "error sendfile: %s (%d)\n", strerror(errno),
                 errno);
         return false;
     }
@@ -82,12 +63,12 @@ bool KernelSystemImpl::try_send(int fd_from, int fd_to) {
 
 bool KernelSystemImpl::setKernelOptionEnable(const char* filename, bool enable)
 {
-    return file_system->writeStr(filename, enable ? "1" : "0");
+    return m_FileSystem->writeStr(filename, enable ? "1" : "0");
 }
 
 bool KernelSystemImpl::isPossibleSetKernelOption(const char* filename)
 {
-    return filename != NULL && file_system->fileIsWritable(filename);
+    return filename != NULL && m_FileSystem->fileIsWritable(filename);
 }
 
 bool KernelSystemImpl::isCategorySupported(const TracingCategory& category) const
@@ -96,10 +77,10 @@ bool KernelSystemImpl::isCategorySupported(const TracingCategory& category) cons
         return true;
     } else {
         if (isCategorySupportedForRoot(category)) {
-            fprintf(errstream, "error: category \"%s\" requires root "
+            fprintf(m_Wire.getErrorStream(), "error: category \"%s\" requires root "
                     "privileges.\n", category.name);
         } else {
-            fprintf(errstream, "error: category \"%s\" is not supported "
+            fprintf(m_Wire.getErrorStream(), "error: category \"%s\" is not supported "
                     "on this device.\n", category.name);
         }
         return false;
@@ -114,14 +95,14 @@ bool KernelSystemImpl::_isCategorySupported(const TracingCategory& category) con
         bool req = file.required == EnableFile::REQ;
         if (path != NULL) {
             if (req) {
-                if (!file_system->fileIsWritable(path)) {
-                    fprintf(errstream, "File %s is not writable\n", path);
+                if (!m_FileSystem->fileIsWritable(path)) {
+                    fprintf(m_Wire.getErrorStream(), "File %s is not writable\n", path);
                     return false;
                 } else {
                     ok = true;
                 }
             } else {
-                ok |= file_system->fileIsWritable(path);
+                ok |= m_FileSystem->fileIsWritable(path);
             }
         }
     }
@@ -136,13 +117,13 @@ bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& categor
         bool req = file.required == EnableFile::REQ;
         if (path != NULL) {
             if (req) {
-                if (!file_system->fileExists(path)) {
+                if (!m_FileSystem->fileExists(path)) {
                     return false;
                 } else {
                     ok = true;
                 }
             } else {
-                ok |= file_system->fileExists(path);
+                ok |= m_FileSystem->fileExists(path);
             }
         }
     }
@@ -153,11 +134,11 @@ bool KernelSystemImpl::writeClockSyncMarker()
 {
   printf("writeClockSyncMarker\n");
   char buffer[128];
-  float now_in_seconds = systime->get_monotonic();
+  float now_in_seconds = m_SystemTime->get_monotonic();
   snprintf(buffer, 128, "trace_event_clock_sync: parent_ts=%f\n", now_in_seconds);
   bool ok = true;
   ok &= writeMarker(buffer);
-  int64_t realtime_in_ms = systime->get_realtime();
+  int64_t realtime_in_ms = m_SystemTime->get_realtime();
   snprintf(buffer, 128, "trace_event_clock_sync: realtime_ts=%" PRId64 "\n", realtime_in_ms);
   ok &= writeMarker(buffer);
   return ok;
@@ -165,7 +146,7 @@ bool KernelSystemImpl::writeClockSyncMarker()
 
 bool KernelSystemImpl::writeMarker(const char * buffer)
 {
-  return file_system->writeStr(k_traceMarkerPath, buffer);
+  return m_FileSystem->writeStr(k_traceMarkerPath, buffer);
 }
 
 bool KernelSystemImpl::setTraceOverwriteEnable(bool enable)
@@ -180,14 +161,14 @@ bool KernelSystemImpl::setTracingEnabled(bool enable)
 
 bool KernelSystemImpl::clearTrace()
 {
-    return file_system->truncateFile(k_tracePath);
+    return m_FileSystem->truncateFile(k_tracePath);
 }
 
 int KernelSystemImpl::getTracePipeFd()
 {
     int traceFD = open(k_traceStreamPath, O_RDWR);
     if (traceFD == -1) {
-       fprintf(errstream, "error opening %s: %s (%d)\n", k_traceStreamPath,
+       fprintf(m_Wire.getErrorStream(), "error opening %s: %s (%d)\n", k_traceStreamPath,
                 strerror(errno), errno);
     }
     return traceFD;
@@ -197,7 +178,7 @@ int KernelSystemImpl::getTraceFd()
 {
     int traceFD = open(k_tracePath, O_RDWR);
     if (traceFD == -1) {
-       fprintf(errstream, "error opening %s: %s (%d)\n", k_tracePath,
+       fprintf(m_Wire.getErrorStream(), "error opening %s: %s (%d)\n", k_tracePath,
                 strerror(errno), errno);
     }
     return traceFD;
@@ -210,7 +191,7 @@ bool KernelSystemImpl::setTraceBufferSizeKB(int size)
         size = 1;
     }
     snprintf(str, 32, "%d", size);
-    return file_system->writeStr(k_traceBufferSizePath, str);
+    return m_FileSystem->writeStr(k_traceBufferSizePath, str);
 }
 
 bool KernelSystemImpl::setGlobalClockEnable(bool enable)
@@ -221,12 +202,12 @@ bool KernelSystemImpl::setGlobalClockEnable(bool enable)
         return true;
     }
 
-    return file_system->writeStr(k_traceClockPath, clock);
+    return m_FileSystem->writeStr(k_traceClockPath, clock);
 }
 
 bool KernelSystemImpl::setPrintTgidEnableIfPresent(bool enable)
 {
-    if (file_system->fileExists(k_printTgidPath)) {
+    if (m_FileSystem->fileExists(k_printTgidPath)) {
         return setKernelOptionEnable(k_printTgidPath, enable);
     }
     return true;
@@ -238,24 +219,24 @@ bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
 
     if (funcs.empty()) {
         // Disable kernel function tracing.
-        if (file_system->fileIsWritable(k_currentTracerPath)) {
-            ok &= file_system->writeStr(k_currentTracerPath, "nop");
+        if (m_FileSystem->fileIsWritable(k_currentTracerPath)) {
+            ok &= m_FileSystem->writeStr(k_currentTracerPath, "nop");
         }
-        if (file_system->fileIsWritable(k_ftraceFilterPath)) {
-            ok &= file_system->truncateFile(k_ftraceFilterPath);
+        if (m_FileSystem->fileIsWritable(k_ftraceFilterPath)) {
+            ok &= m_FileSystem->truncateFile(k_ftraceFilterPath);
         }
     } else {
         // Enable kernel function tracing.
-        ok &= file_system->writeStr(k_currentTracerPath, "function_graph");
+        ok &= m_FileSystem->writeStr(k_currentTracerPath, "function_graph");
         ok &= setKernelOptionEnable(k_funcgraphAbsTimePath, true);
         ok &= setKernelOptionEnable(k_funcgraphCpuPath, true);
         ok &= setKernelOptionEnable(k_funcgraphProcPath, true);
         // ok &= setKernelOptionEnable(k_funcgraphFlatPath, true);
 
         // Set the requested filter functions.
-        ok &= file_system->truncateFile(k_ftraceFilterPath);
+        ok &= m_FileSystem->truncateFile(k_ftraceFilterPath);
         for (const auto & func: funcs) {
-            ok &= file_system->appendStr(k_ftraceFilterPath, func.c_str());
+            ok &= m_FileSystem->appendStr(k_ftraceFilterPath, func.c_str());
         }
 
         // Verify that the set functions are being traced.
@@ -270,7 +251,7 @@ bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
 bool KernelSystemImpl::isTraceClock(const char *mode)
 {
     char buf[4097];    
-    if (!file_system->readStr(k_traceClockPath, buf, 4097)) {
+    if (!m_FileSystem->readStr(k_traceClockPath, buf, 4097)) {
         return false;
     }
 
@@ -292,19 +273,19 @@ bool KernelSystemImpl::isTraceClock(const char *mode)
 bool KernelSystemImpl::verifyKernelTraceFuncs(const vector<string> & funcs) const
 {
     char buf[4097];    
-    if (!file_system->readStr(k_ftraceFilterPath, buf, 4097)) {
+    if (!m_FileSystem->readStr(k_ftraceFilterPath, buf, 4097)) {
         return false;
     }
 
     std::set<std::string> funcs_traced;
-    toolbox->parseToTokens(buf, "\n", funcs_traced);
+    m_ToolBox->parseToTokens(buf, "\n", funcs_traced);
 
     bool ok = true;
     for (const auto & func : funcs) {
         // except wildcards
         if (strchr(func.c_str(), '*') == NULL 
             && funcs_traced.find(func) == funcs_traced.end()) {
-            fprintf(errstream, "error: \"%s\" is not a valid kernel function to trace.\n",
+            fprintf(m_Wire.getErrorStream(), "error: \"%s\" is not a valid kernel function to trace.\n",
                     func.c_str());
             ok = false;
         }
@@ -336,7 +317,7 @@ bool KernelSystemImpl::enableKernelTraceEvents(const std::vector<string> & ids) 
     bool ok = true;
     for (const auto & id : ids) {
         if (m_Categories.find(id) == m_Categories.end()) {
-            fprintf(errstream, "wrong kernel category id '%s'\n", id.c_str());
+            fprintf(m_Wire.getErrorStream(), "wrong kernel category id '%s'\n", id.c_str());
             return false;
         } else {
             const auto & category = m_Categories[id];
@@ -347,7 +328,7 @@ bool KernelSystemImpl::enableKernelTraceEvents(const std::vector<string> & ids) 
                     if (isPossibleSetKernelOption(path)) {
                         ok &= setKernelOptionEnable(path, true);
                     } else if (required) {
-                        fprintf(errstream, "error writing file %s\n", path);
+                        fprintf(m_Wire.getErrorStream(), "error writing file %s\n", path);
                         ok = false;
                     }
                 }
@@ -369,7 +350,7 @@ bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
     memset(&zs, 0, sizeof(zs));
     result = deflateInit(&zs, Z_DEFAULT_COMPRESSION);
     if (result != Z_OK) {
-        fprintf(errstream, "error initializing zlib: %d\n", result);
+        fprintf(m_Wire.getErrorStream(), "error initializing zlib: %d\n", result);
         close(traceFD);
         return false;
     }
@@ -389,7 +370,7 @@ bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
             // More input is needed.
             result = read(traceFD, in, bufSize);
             if (result < 0) {
-                fprintf(errstream, "error reading trace: %s (%d)\n",
+                fprintf(m_Wire.getErrorStream(), "error reading trace: %s (%d)\n",
                         strerror(errno), errno);
                 result = Z_STREAM_END;
                 ok = false;
@@ -406,7 +387,7 @@ bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
             // Need to write the output.
             result = write(outFd, out, bufSize);
             if ((size_t)result < bufSize) {
-                fprintf(errstream, "error writing deflated trace: %s (%d)\n",
+                fprintf(m_Wire.getErrorStream(), "error writing deflated trace: %s (%d)\n",
                         strerror(errno), errno);
                 result = Z_STREAM_END; // skip deflate error message
                 zs.avail_out = bufSize; // skip the final write
@@ -420,7 +401,7 @@ bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
     } while ((result = deflate(&zs, flush)) == Z_OK);
 
     if (result != Z_STREAM_END) {
-        fprintf(errstream, "error deflating trace: %s\n", zs.msg);
+        fprintf(m_Wire.getErrorStream(), "error deflating trace: %s\n", zs.msg);
         ok = false;
     }
 
@@ -428,7 +409,7 @@ bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
         size_t bytes = bufSize - zs.avail_out;
         result = write(outFd, out, bytes);
         if ((size_t)result < bytes) {
-            fprintf(errstream, "error writing deflated trace: %s (%d)\n",
+            fprintf(m_Wire.getErrorStream(), "error writing deflated trace: %s (%d)\n",
                     strerror(errno), errno);
             ok = false;
         }
@@ -436,97 +417,11 @@ bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
 
     result = deflateEnd(&zs);
     if (result != Z_OK) {
-        fprintf(errstream, "error cleaning up zlib: %d\n", result);
+        fprintf(m_Wire.getErrorStream(), "error cleaning up zlib: %d\n", result);
         ok = false;
     }
 
     free(in);
     free(out);
     return ok;
-}
-
-KernelSystemImpl * KernelSystemImpl::Creator::createWithDefaultCategories() const {
-  auto * kernelSystemImpl = new KernelSystemImpl();
-  kernelSystemImpl->add_kernel_category("sched",         "CPU Scheduling",
-  {
-     { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_switch/enable" },
-     { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_wakeup/enable" },
-     { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_blocked_reason/enable" },
-     { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_cpu_hotplug/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("irq",           "IRQ Events",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/irq/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ipi/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("freq",          "CPU Frequency",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_frequency/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/clock_set_rate/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/cpu_frequency_limits/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("membus",        "Memory Bus Utilization",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/memory_bus/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("idle",          "CPU Idle",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_idle/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("disk",          "Disk I/O",
-  {
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_enter/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_exit/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_write_begin/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_write_end/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_da_write_begin/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_da_write_end/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_sync_file_enter/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_sync_file_exit/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_issue/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_complete/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("mmc",           "eMMC commands",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/mmc/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("load",          "CPU Load",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/cpufreq_interactive/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("sync",          "Synchronization",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/sync/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("workq",         "Kernel Workqueues",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/workqueue/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("memreclaim",    "Kernel Memory Reclaim",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_begin/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_end/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_wake/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_sleep/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("regulators",    "Voltage and Current Regulators",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/regulator/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("binder_driver", "Binder Kernel driver",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction_received/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("binder_lock",   "Binder global lock trace",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_lock/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_locked/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_unlock/enable" },
-  });
-  kernelSystemImpl->add_kernel_category("pagecache",     "Page cache",
-  {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/filemap/enable" },
-  }); 
-  return kernelSystemImpl;
 }

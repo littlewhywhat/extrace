@@ -20,6 +20,7 @@ TraceSystem * TraceSystemBuilder::build(const Wire & wire, const TraceArguments 
   FileSystem * fileSystem = NULL;
   auto * kernelSystem  = m_KernelSystemBuilder->build(wire, fileSystem);
   auto * androidSystem = m_AndroidSystemBuilder->build(wire);
-  auto * trace         = m_TraceBuilder->build(wire, kernelSystem, androidSystem);
+  auto * trace         = m_TraceBuilder->build(wire, kernelSystem, androidSystem,
+                                               traceArguments);
   return new TraceSystem(fileSystem, kernelSystem, androidSystem, trace);
 };

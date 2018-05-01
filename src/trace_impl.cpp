@@ -18,18 +18,6 @@
 
 TraceImpl::~TraceImpl() {}
 
-void TraceImpl::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-void TraceImpl::setAndroidSystem(AndroidSystem * androidSystem) {
-  m_AndroidSystem = androidSystem;
-}
-
-void TraceImpl::setKernelSystem(KernelSystem * kernelSystem) {
-  m_KernelSystem = kernelSystem;
-}
-
 void TraceImpl::enableTraceOverwrite() {
   m_TraceOverwriteSwitch = true;
 }
@@ -77,7 +65,7 @@ bool TraceImpl::setUp() {
   // Enable all the sysfs enables that are in an enabled category.
   ok &= m_KernelSystem->enableKernelTraceEvents(m_KernelCategories);
   if (!ok) {
-    fprintf(m_ErrorStream, "error TraceImpl::setUp\n");
+    fprintf(m_Wire.getErrorStream(), "error TraceImpl::setUp\n");
   }
   return ok;
 }
@@ -99,7 +87,7 @@ void TraceImpl::cleanUp() {
   ok &= m_KernelSystem->setPrintTgidEnableIfPresent(false);
   ok &= m_KernelSystem->setKernelTraceFuncs(vector<string>());
   if (!ok) {
-    fprintf(m_ErrorStream, "error TraceImpl::cleanUp\n");
+    fprintf(m_Wire.getErrorStream(), "error TraceImpl::cleanUp\n");
   }
 }
 
@@ -107,7 +95,7 @@ bool TraceImpl::start() {
   bool ok = true;
   ok &= m_KernelSystem->setTracingEnabled(true);
   if (!ok) {
-    fprintf(m_ErrorStream, "error TraceImpl::start\n");
+    fprintf(m_Wire.getErrorStream(), "error TraceImpl::start\n");
   }
   return ok;
 }
@@ -116,38 +104,6 @@ void TraceImpl::stop() {
   bool ok = true;
   ok &= m_KernelSystem->setTracingEnabled(false);
   if (!ok) {
-    fprintf(m_ErrorStream, "error TraceImpl::stop\n");
+    fprintf(m_Wire.getErrorStream(), "error TraceImpl::stop\n");
   }
-}
-
-TraceImpl * TraceImpl::Creator::createFrom(const ExtraceArguments & arguments) const
-{
-  auto * traceImpl = new TraceImpl();
-  if (arguments.enableCircleBuffer()) {
-    traceImpl->enableTraceOverwrite();
-  }
-  if (arguments.specifyBufferSize()) {
-    traceImpl->setTraceBufferSizeKB(arguments.getBufferSize());
-  }
-  if (arguments.haveKernelCategories()) {
-    for (auto & category : arguments.getKernelCategories()) {
-      traceImpl->addKernelCategory(category.c_str());
-    }
-  }
-  if (arguments.haveAndroidCategories()) {
-    for (auto & category: arguments.getAndroidCategories()) {
-      traceImpl->addAndroidCategory(category.c_str());
-    }
-  }
-  if (arguments.haveApps()) {
-    for (auto & app: arguments.getApps()) {
-      traceImpl->addApp(app.c_str());
-    }
-  }
-  if (arguments.haveKernelFunctions()) {
-    for (auto & function: arguments.getKernelFunctions()) {
-      traceImpl->addFunction(function.c_str());
-    }
-  }
-  return traceImpl;
 }
