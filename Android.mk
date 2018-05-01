@@ -110,6 +110,10 @@ LOCAL_SRC_FILES:= \
 			src/cmdlineargsparser.cpp \
 			src/cmdlineargs.cpp \
 			src/wire.cpp \
+			src/systemtime_impl.cpp \
+			src/kernelsystem_impl.cpp \
+			src/androidsystem_impl.cpp \
+			src/trace_impl.cpp \
 	    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment

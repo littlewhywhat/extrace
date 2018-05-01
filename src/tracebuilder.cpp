@@ -16,7 +16,35 @@
 
 #include "tracebuilder.h"
 
+#include "trace_impl.h"
+
 Trace * TraceBuilder::build(const Wire & wire, KernelSystem * kernelSystem,
-                                               AndroidSystem * androidSystem) const {
-  return NULL;
+                            AndroidSystem * androidSystem,
+                            const TraceArguments & traceArguments) const {
+  auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem);
+  if (traceArguments.circleBufferEnabled()) {
+    traceImpl->enableTraceOverwrite();
+  }
+  traceImpl->setTraceBufferSizeKB(traceArguments.getBufferSize());
+  if (traceArguments.hasKernelCategories()) {
+    for (auto & category : traceArguments.getKernelCategories()) {
+      traceImpl->addKernelCategory(category.c_str());
+    }
+  }
+  if (traceArguments.hasAndroidCategories()) {
+    for (auto & category: traceArguments.getAndroidCategories()) {
+      traceImpl->addAndroidCategory(category.c_str());
+    }
+  }
+  if (traceArguments.hasApps()) {
+    for (auto & app: traceArguments.getApps()) {
+      traceImpl->addApp(app.c_str());
+    }
+  }
+  if (traceArguments.hasKernelFunctions()) {
+    for (auto & function: traceArguments.getKernelFunctions()) {
+      traceImpl->addFunction(function.c_str());
+    }
+  }
+  return traceImpl;
 }

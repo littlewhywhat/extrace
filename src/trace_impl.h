@@ -21,7 +21,7 @@
 
 #include "kernelsystem.h"
 #include "androidsystem.h"
-#include "extracearguments.h"
+#include "wire.h"
 
 #include <vector>
 #include <string>
@@ -32,6 +32,9 @@ using namespace std;
 
 class TraceImpl : public Trace {
   public:
+    TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
+               KernelSystem * kernelSystem): m_Wire(wire),
+               m_AndroidSystem(androidSystem), m_KernelSystem(kernelSystem) {}
     ~TraceImpl();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
@@ -46,17 +49,10 @@ class TraceImpl : public Trace {
     void addAndroidCategory(const char * categoryName) override;
     void addApp(const char * appName) override;
     void addFunction(const char * funcName) override;
-    void setErrorStream(FILE * errorStream);
-    void setAndroidSystem(AndroidSystem * androidSystem);
-    void setKernelSystem(KernelSystem * kernelSystem);
     void enableTraceOverwrite();
     void setTraceBufferSizeKB(uint32_t size);
-    class Creator {
-      public:
-        TraceImpl * createFrom(const ExtraceArguments & arguments) const;
-    };
   private:
-    FILE * m_ErrorStream = NULL;
+    const Wire & m_Wire;
     AndroidSystem * m_AndroidSystem;
     KernelSystem * m_KernelSystem;
     bool m_TraceOverwriteSwitch = false;

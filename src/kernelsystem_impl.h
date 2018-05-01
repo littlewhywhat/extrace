@@ -22,18 +22,19 @@
 #include "filesystem.h"
 #include "toolbox.h"
 #include "systemtime.h"
+#include "wire.h"
 
-#include <stdio.h>
 #include <map>
+
 using namespace std;
 
 class KernelSystemImpl : public KernelSystem {
   public:
+    KernelSystemImpl(const Wire & wire, FileSystem * fileSystem,
+                     ToolBox * toolBox, SystemTime * systemTime):
+                     m_Wire(wire), m_FileSystem(fileSystem),
+                     m_ToolBox(toolBox), m_SystemTime(systemTime) {}
     ~KernelSystemImpl();
-    void set_errstream(FILE * errstream);
-    void set_file_system(FileSystem * file_system);
-    void set_toolbox(ToolBox * toolbox);
-    void set_systime(SystemTime * systime);
     int tryOpenToWriteOrCreate(const char* filename);
     bool try_sendfile(int fd_from, int fd_to);
     bool compress_trace_to(int traceFD, int outFd) override;
@@ -64,10 +65,10 @@ class KernelSystemImpl : public KernelSystem {
         KernelSystemImpl * createWithDefaultCategories() const;
     };
   private:
-    FILE * errstream = NULL;
-    FileSystem * file_system = NULL;
-    ToolBox * toolbox = NULL;
-    SystemTime * systime = NULL;
+    const Wire & m_Wire;
+    FileSystem * m_FileSystem = NULL;
+    ToolBox * m_ToolBox = NULL;
+    SystemTime * m_SystemTime = NULL;
 
     map<string, TracingCategory> m_Categories;
     vector<TracingCategory> m_CategoriesList;

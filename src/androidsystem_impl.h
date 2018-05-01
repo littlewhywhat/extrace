@@ -20,11 +20,13 @@
 
 #include "androidsystem.h"
 #include "tracingcategory.h"
+#include "wire.h"
 
 #include <map>
 
 class AndroidSystemImpl : public AndroidSystem {
   public:
+    AndroidSystemImpl(const Wire & wire): m_Wire(wire) {}
     bool has_core_services() const override;
     const std::vector<TracingCategory> & getCategories() const;
     bool tryEnableCategories(const vector<string> & categories);
@@ -34,14 +36,13 @@ class AndroidSystemImpl : public AndroidSystem {
     bool pokeBinderServices() override;
     void clearAppProperties() override;
     void log_dumping_trace() override;
-    void set_errstream(FILE * errstream);
     void add_category(const char * id, const char * name, uint64_t atrace_tag);
     class Creator {
       public:
         AndroidSystemImpl * createWithDefaultCategories() const;
     };
   private:
-    FILE * errstream = NULL;
+    const Wire & m_Wire;
     const char* k_traceTagsProperty = "debug.atrace.tags.enableflags";
     const char* k_coreServicesProp = "ro.atrace.core.services";
     const char* k_traceAppsNumberProperty = "debug.atrace.app_number";

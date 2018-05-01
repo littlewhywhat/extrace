@@ -20,10 +20,13 @@
 #include "wire.h"
 #include "filesystem.h"
 #include "kernelsystem.h"
+#include "kernelsystem_impl.h"
 
 class KernelSystemBuilder {
   public:
     KernelSystem * build(const Wire & wire, FileSystem * fileSystem) const;
+  private:
+    void initDefaultCategories(KernelSystemImpl * kernelSystemImpl) const;
 };
 
 #endif // LTTLWHWHT_KERNELSYSTEMBUILDER_H
