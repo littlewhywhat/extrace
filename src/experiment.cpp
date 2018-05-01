@@ -1,6 +1,10 @@
 #include "arguments.h"
 #include "toolbox.h"
 #include "androidtoolbox.h"
+#include "kernelsystem.h"
+#include "androidsystem.h"
+#include "trace.h"
+#include "filesystem.h"
 
 #include <memory>
 #include <cstdio>
@@ -402,8 +406,8 @@ bool TraceArguments::asyncStopEnabled() const {
 
 bool TraceArguments::asyncDumpEnabled() const {
   return m_AsyncDump;
-}
 
+}
 bool TraceArguments::streamEnabled() const {
   return m_Stream;
 }
@@ -463,10 +467,47 @@ TraceArguments::TraceArguments() {
 
 class TraceSystem {
   public:
-    TraceSystem(const Wire & wire, const TraceArguments & traceArguments): m_Wire(wire) {}
+    TraceSystem(FileSystem * fileSystem,
+                KernelSystem * kernelSystem,
+                AndroidSystem * androidSystem,
+                Trace * trace): m_FileSystem(fileSystem),
+                                m_KernelSystem(kernelSystem),
+                                m_AndroidSystem(androidSystem),
+                                m_Trace(trace) {}
+    ~TraceSystem();
+    FileSystem & getFileSystem() const; 
+    KernelSystem & getKernelSystem() const;
+    AndroidSystem & getAndroidSystem() const;
+    Trace & getTrace() const;
   private:
-    const Wire & m_Wire;
+    FileSystem * m_FileSystem = NULL;
+    KernelSystem * m_KernelSystem = NULL;
+    AndroidSystem * m_AndroidSystem = NULL;
+    Trace * m_Trace = NULL;
 };
+
+TraceSystem::~TraceSystem() {
+  delete m_FileSystem;
+  delete m_KernelSystem;
+  delete m_AndroidSystem;
+  delete m_Trace;
+}
+
+FileSystem & TraceSystem::getFileSystem() const {
+  return *m_FileSystem;
+}
+
+KernelSystem & TraceSystem::getKernelSystem() const {
+  return *m_KernelSystem;
+}
+
+AndroidSystem & TraceSystem::getAndroidSystem() const {
+  return *m_AndroidSystem;
+}
+
+Trace & TraceSystem::getTrace() const {
+  return *m_Trace;
+}
 
 /************/
 
@@ -751,14 +792,61 @@ const string & TraceArgumentsBuilder::getHelpMessage() const {
 
 /************/
 
+class KernelSystemBuilder {
+  public:
+    KernelSystem * build(const Wire & wire, FileSystem * fileSystem) const;
+};
+
+KernelSystem * KernelSystemBuilder::build(const Wire & wire, FileSystem * fileSystem) const {
+  return NULL;
+}
+
+class AndroidSystemBuilder {
+  public:
+    AndroidSystem * build(const Wire & wire) const;
+};
+
+AndroidSystem * AndroidSystemBuilder::build(const Wire & wire) const {
+  return NULL;
+}
+
+class TraceBuilder {
+  public:
+    Trace * build(const Wire & wire,
+                  KernelSystem * kernelSystem,
+                  AndroidSystem * androidSystem) const;
+};
+
+Trace * TraceBuilder::build(const Wire & wire, KernelSystem * kernelSystem,
+                                               AndroidSystem * androidSystem) const {
+  return NULL;
+}
+
+
+/************/
+
 class TraceSystemBuilder {
   public:
+    TraceSystemBuilder(KernelSystemBuilder * kernelSystemBuilder,
+                       AndroidSystemBuilder * androidSystemBuilder,
+                       TraceBuilder * traceBuilder):
+                       m_KernelSystemBuilder(kernelSystemBuilder),
+                       m_AndroidSystemBuilder(androidSystemBuilder),
+                       m_TraceBuilder(traceBuilder) {}
     TraceSystem * build(const Wire & wire, const TraceArguments & traceArguments) const;
+  private:
+    KernelSystemBuilder * m_KernelSystemBuilder = NULL;
+    AndroidSystemBuilder * m_AndroidSystemBuilder = NULL;
+    TraceBuilder * m_TraceBuilder = NULL;
 };
 
 TraceSystem * TraceSystemBuilder::build(const Wire & wire, const TraceArguments & traceArguments) const {
-  return new TraceSystem(wire,traceArguments);
-}
+  FileSystem * fileSystem = NULL;
+  auto * kernelSystem  = m_KernelSystemBuilder->build(wire, fileSystem);
+  auto * androidSystem = m_AndroidSystemBuilder->build(wire);
+  auto * trace         = m_TraceBuilder->build(wire, kernelSystem, androidSystem);
+  return new TraceSystem(fileSystem, kernelSystem, androidSystem, trace);
+};
 
 /************/
 
@@ -882,8 +970,12 @@ int main(int argc, const char ** argv) {
   cmdLineApp.setAppName(argv[0]);
   cmdLineApp.setArgs(new CmdLineArgs(argc-1, argv+1));
   cmdLineApp.setActionCmdLineBuilder(new TraceActionsRunnerCmdLineBuilder(
-                                         new TraceArgumentsBuilder(),    // TODO
-                                         new TraceSystemBuilder(),       // TODO
+                                         new TraceArgumentsBuilder(),
+                                         new TraceSystemBuilder(
+                                             new KernelSystemBuilder(),  // TODO
+                                             new AndroidSystemBuilder(), // TODO
+                                             new TraceBuilder()          // TODO
+                                         ),
                                          new TraceActionsRunnerBuilder() // TODO
                                     ));
   registerSignalHandler();
