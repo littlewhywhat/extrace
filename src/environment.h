@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_ENVIRONMENT_H
+#define LTTLWHWHT_ENVIRONMENT_H
 
-#include "environment.h"
+#include "signal.h"
 
-class Action {
+#include <string>
+
+using namespace std;
+
+class Environment {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    Environment(const Signal & signal, const string & name):
+                m_Signal(signal), m_Name(name) {}
+    bool isInterrupted() const;
+    const string & getName() const;
+  private:
+    const Signal & m_Signal;
+    const string & m_Name;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_ENVIRONMENT_H

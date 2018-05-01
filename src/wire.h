@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_WIRE_H
+#define LTTLWHWHT_WIRE_H
 
-#include "environment.h"
+#include <cstdio>
 
-class Action {
+class Wire {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    Wire(FILE * outputStream, FILE * errorStream):
+         m_OutputStream(outputStream), m_ErrorStream(errorStream) {}
+    FILE * getOutputStream() const;
+    FILE * getErrorStream() const;
+  private:
+    FILE * m_OutputStream = NULL;
+    FILE * m_ErrorStream = NULL;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_WIRE_H

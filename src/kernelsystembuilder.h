@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_KERNELSYSTEMBUILDER_H
+#define LTTLWHWHT_KERNELSYSTEMBUILDER_H
 
-#include "environment.h"
+#include "wire.h"
+#include "filesystem.h"
+#include "kernelsystem.h"
 
-class Action {
+class KernelSystemBuilder {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    KernelSystem * build(const Wire & wire, FileSystem * fileSystem) const;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_KERNELSYSTEMBUILDER_H

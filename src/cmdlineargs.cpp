@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "cmdlineargs.h"
 
-#include "environment.h"
+CmdLineArgs::CmdLineArgs(int argc, const char** argv) {
+  for (int i = 0; i < argc; i++) {
+    m_Args.push_back(argv[i]);
+  }
+}
 
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
+uint32_t CmdLineArgs::getCount() const {
+  return m_Args.size();
+}
 
-#endif // LTTLWHWHT_ACTION_H
+const string & CmdLineArgs::get(uint32_t id) const {
+  return m_Args[id];
+}

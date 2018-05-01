@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "tracesystem.h"
 
-#include "environment.h"
+TraceSystem::~TraceSystem() {
+  delete m_FileSystem;
+  delete m_KernelSystem;
+  delete m_AndroidSystem;
+  delete m_Trace;
+}
 
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
+FileSystem & TraceSystem::getFileSystem() const {
+  return *m_FileSystem;
+}
 
-#endif // LTTLWHWHT_ACTION_H
+KernelSystem & TraceSystem::getKernelSystem() const {
+  return *m_KernelSystem;
+}
+
+AndroidSystem & TraceSystem::getAndroidSystem() const {
+  return *m_AndroidSystem;
+}
+
+Trace & TraceSystem::getTrace() const {
+  return *m_Trace;
+}

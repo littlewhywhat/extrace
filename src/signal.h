@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_SIGNAL_H
+#define LTTLWHWHT_SIGNAL_H
 
-#include "environment.h"
-
-class Action {
+class Signal {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    void fire();
+    bool isFired() const;
+  private:
+    bool m_Fired = false;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_SIGNAL_H

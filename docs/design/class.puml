@@ -3,21 +3,29 @@
 title Class Diagram
 
 interface ConsoleApp {
+  + {abstract} setName(name : string): void
   + {abstract} setup(int argc, const char ** argv) : void
   + {abstract} is_ready(void) const : bool
   + {abstract} run() : void
   + {abstract} succeeded(void) const : bool
+  + {abstract} handleSignal(void) = 0;
 }
 hide ConsoleApp fields
 
 abstract class AbstractConsoleApp {
   - isReady: bool
+  # m_Name: string
   --
+  + setName(name : string): void
+  + setup(int argc, const char ** argv) : void
+  + is_ready(void) const : bool
+  + run() : void
+  + succeeded(void) const : bool
+  - printHelp(): void
   - do_run(): void
   - do_succeeded(void) const: bool
   - register_args_to(ArgsParser & argsParser) const: void
-  - admits(const Arguments & arguments) const: bool
-  - setup_with(const Arguments & arguments): void
+  - trySetup(const Arguments & arguments): bool
 }
 
 AbstractConsoleApp ..> ConsoleApp
@@ -25,9 +33,9 @@ AbstractConsoleApp --> ArgsParser: uses
 AbstractConsoleApp --> Arguments: uses
 
 class ArgsParser {
-  - boolean_opt_names: std::map<std::string, std::string>
-  - integer_opt_names: std::map<std::string, std::string>
-  - string_opt_names: std::map<std::string, std::string>
+  - boolean_opt_names: map<string, string>
+  - integer_opt_names: map<string, string>
+  - string_opt_names: map<string, string>
   - m_CommaSepListOptNames: map<string, string>
   --
   + isCommaSepListSpec(const char * specifier) const: bool
@@ -49,33 +57,47 @@ ArgsParser --> Arguments: parses
 ArgsParser "-m_ToolBox" -- "1" ToolBox
 
 class Arguments {
-  - booleans: std::set<std::string>
-  - single_integers: std::map<std::string, int>
-  - single_strings: std::map<std::string, std::string>
+  - booleans: set<string>
+  - single_integers: map<string, int>
+  - single_strings: map<string, string>
   --
   + put_boolean(const char * option_name): void
   + is_enabled(const char * option_name) const: bool
   + put_integer(const char * option_name, int value): void
   + has_integer(const char * option_name) const: bool
   + get_integer(const char * option_name) const: int
-  + put_string(const char * option_name, const std::string & value): void
+  + put_string(const char * option_name, const string & value): void
   + has_string(const char * option_name) const: bool
-  + std::string & get_string(const char * option_name) const: const
+  + get_string(const char * option_name) const: const string & 
+  + putToStringList(optionName: const char *, const string & value): void
+  + getStringList(optionName: const char *): const vector<string>
+  + hasStringList(optionName: const char *): bool
 }
 
 class ConsoleAppMain {
   + run(int argc, const char ** argv): int
+  + handleSignal(): void
 }
 hide ConsoleAppMain fields
 
 ConsoleAppMain "-consoleApp" -- "1" ConsoleApp
 
 class ExtraceConsoleApp {
+  - m_ErrorStream: FILE *
+  - m_Success: bool
+  --
+  + handleSignal(): void
+  - printHelp() const: void
+  - do_run(): void
+  - do_succeeded(): bool
+  - register_args_to(argsParser: ArgsParser) const: void
+  - trySetup(arguments: const Arguments): bool
 }
-hide ExtraceConsoleApp methods
-hide ExtraceConsoleApp fields
 
 ExtraceConsoleApp --|> AbstractConsoleApp
+ExtraceConsoleApp "-m_ActionRunner" -- "1" ActionRunner
+ExtraceConsoleApp "-m_ActionRunnerBuilder" -- "1" ActionRunnerBuilder
+ExtraceConsoleApp "-m_ExtraceArguments" -- "1" ExtraceArguments
 
 class ExtraceConsoleAppBuilder {
   + build(void) const: ExtraceConsoleApp * 
@@ -83,5 +105,55 @@ class ExtraceConsoleAppBuilder {
 hide ExtraceConsoleAppBuilder fields
 
 ExtraceConsoleAppBuilder --> ExtraceConsoleApp: builds
+
+interface ActionRunner {
+  + tryRunActions(): bool
+  + handleSignal(): void
+}
+hide ActionRunner fields
+
+class ActionRunnerBuilder {
+  + buildFrom(arguments: ExtraceArguments): ActionRunner *
+}
+hide ActionRunnerBuilder fields
+
+class ExtraceArguments {
+  + setArguments(const Arguments * arguments): void
+  + registerTo(ArgsParser & argsParser) const: void
+  + areCorrect() const: bool
+  + printHelp(FILE * out, const string & appName) const: void
+  + haveHelpOption() const: bool
+  + haveListCategoriesOption() const: bool
+  + haveDumpFilename() const: bool
+  + getDumpFilename() const: const string &
+  + enableCompression() const: bool
+  + enableAsyncStart() const: bool
+  + enableAsyncStop() const: bool
+  + enableAsyncDump() const: bool
+  + enableStream() const: bool
+  + enableListCategories() const: bool
+  + enableCoreServices() const: bool
+  + enableCircleBuffer() const: bool
+  + enableInterrupts() const: bool
+  + haveKernelCategoryFilename() const: bool
+  + getKernelCategoryFilename() const: const string &
+  + specifyBufferSize() const: bool
+  + getBufferSize() const: int
+  + specifyInitSleepDuration() const: bool
+  + getInitSleepDuration() const: int
+  + specifyMidSleepDuration() const: bool
+  + getMidSleepDuration() const: int
+  + haveApps() const: bool
+  + getApps() const: const vector<string> &
+  + haveAndroidCategories() const: bool
+  + getAndroidCategories() const: const vector<string> &
+  + haveKernelCategories() const: bool
+  + getKernelCategories() const: const vector<string> &
+  + haveKernelFunctions() const: bool
+  + getKernelFunctions() const: const vector<string> &
+}
+hide ExtraceArguments fields
+
+ExtraceArguments "-m_Arguments" -- "1" Arguments
 
 @enduml

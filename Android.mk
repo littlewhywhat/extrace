@@ -16,7 +16,6 @@ common_test_files := \
     src/extrace_test.cpp \
 
 common_cflags := \
-    -Werror \
     -Wall \
     -std=c++11 \
 
@@ -68,27 +67,50 @@ include $(BUILD_EXECUTABLE)
 
 include $(CLEAR_VARS)
 
+# LOCAL_SRC_FILES:= \
+#     src/systemtime_impl.cpp \
+# 		src/androidsystem_impl.cpp \
+# 		src/filesystem_impl.cpp \
+# 		src/kernelsystem_impl.cpp \
+# 		src/androidtoolbox.cpp \
+#     src/trace_impl.cpp \
+# 		src/startaction.cpp \
+# 		src/stopaction.cpp \
+# 		src/dumpaction.cpp \
+# 		src/streamaction.cpp \
+# 		src/sleepaction.cpp \
+# 		src/cleanupaction.cpp \
+# 		src/addandroidcoretotrace.cpp \
+# 		src/addkernelcategoriesfromfiletotrace.cpp \
+# 		src/listsupportedcategories.cpp \
+# 		src/signal.cpp \
+# 		src/actionrunner_impl.cpp \
+# 		src/argsparser.cpp \
+#     src/arguments.cpp \
+#     src/extraceapp.cpp \
+
 LOCAL_SRC_FILES:= \
-    src/systemtime_impl.cpp \
-		src/androidsystem_impl.cpp \
-		src/filesystem_impl.cpp \
-		src/kernelsystem_impl.cpp \
-		src/androidtoolbox.cpp \
-    src/trace_impl.cpp \
-		src/startaction.cpp \
-		src/stopaction.cpp \
-		src/dumpaction.cpp \
-		src/streamaction.cpp \
-		src/sleepaction.cpp \
-		src/cleanupaction.cpp \
-		src/addandroidcoretotrace.cpp \
-		src/addkernelcategoriesfromfiletotrace.cpp \
-		src/listsupportedcategories.cpp \
-		src/signal.cpp \
-		src/actionrunner_impl.cpp \
-		src/argsparser.cpp \
-    src/arguments.cpp \
-    src/extraceapp.cpp \
+			src/signal.cpp \
+			src/cmdlineapp.cpp \
+			src/actionrunner.cpp \
+			src/environment.cpp \
+			src/kernelsystembuilder.cpp \
+			src/androidsystembuilder.cpp \
+			src/tracesystembuilder.cpp \
+			src/tracebuilder.cpp \
+			src/traceaction.cpp \
+			src/traceactionsrunner.cpp \
+			src/traceactionsrunnerbuilder.cpp \
+			src/traceactionsrunnercmdlinebuilder.cpp \
+			src/tracesystem.cpp \
+			src/tracearguments.cpp \
+			src/traceargumentsbuilder.cpp \
+	    src/androidtoolbox.cpp \
+			src/arguments.cpp \
+			src/cmdlineargsparser.cpp \
+			src/cmdlineargs.cpp \
+			src/wire.cpp \
+	    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment
 
@@ -104,7 +126,7 @@ LOCAL_SHARED_LIBRARIES := \
     libutils \
     libz \
 
-# include $(BUILD_EXECUTABLE)
+include $(BUILD_EXECUTABLE)
 
 # atrace refactored
 # =================

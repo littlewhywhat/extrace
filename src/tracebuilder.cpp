@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "tracebuilder.h"
 
-#include "environment.h"
-
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+Trace * TraceBuilder::build(const Wire & wire, KernelSystem * kernelSystem,
+                                               AndroidSystem * androidSystem) const {
+  return NULL;
+}

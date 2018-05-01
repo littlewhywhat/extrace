@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_CMDLINEARGS_H
+#define LTTLWHWHT_CMDLINEARGS_H
 
-#include "environment.h"
+#include <string>
+#include <vector>
+#include <stdint.h>
 
-class Action {
+using namespace std;
+
+class CmdLineArgs {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    CmdLineArgs(int argc, const char** argv);
+    uint32_t getCount() const;
+    const string & get(uint32_t id) const;
+  private:
+    vector<string> m_Args;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_CMDLINEARGS_H
