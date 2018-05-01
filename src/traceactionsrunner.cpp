@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "traceactionsrunner.h"
 
-#include "environment.h"
+TraceActionsRunner::~TraceActionsRunner() {
+  delete m_TraceSystem;
+  for (auto * traceAction : m_TraceActions) {
+    delete traceAction;
+  }
+}
 
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
+void TraceActionsRunner::addTraceAction(TraceAction * traceAction) {
+  m_TraceActions.push_back(traceAction);
+}
 
-#endif // LTTLWHWHT_ACTION_H
+bool TraceActionsRunner::tryRunIn(Environment & environment) {
+  for (auto * traceAction : m_TraceActions) {
+    if (!traceAction->tryRunIn(environment, *m_TraceSystem)) {
+      return false;
+    }
+  }
+  return true;
+}

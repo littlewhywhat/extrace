@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "traceaction.h"
 
-#include "environment.h"
-
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+bool TraceAction::tryRunIn(Environment & environment, TraceSystem & system) {
+  if (m_HelpMessage.empty())
+    fprintf(m_Wire.getErrorStream(), "Hello %s\n", environment.getName().c_str());
+  else
+    fprintf(m_Wire.getErrorStream(), m_HelpMessage.c_str(), environment.getName().c_str());
+  return true;
+}

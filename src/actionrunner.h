@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_RUNNER_H
-#define LTTLWHWHT_ACTION_RUNNER_H
+#ifndef LTTLWHWHT_ACTIONRUNNER_H
+#define LTTLWHWHT_ACTIONRUNNER_H
+
+#include "action.h"
+#include "environment.h"
 
 class ActionRunner {
   public:
-    virtual ~ActionRunner() {}
-    virtual bool tryRunActions() = 0;
-    virtual void handleSignal() = 0;
+    ActionRunner(Action * action): m_Action(action) {}
+    ~ActionRunner();
+    bool tryRunIn(Environment & environment);
+  private:
+    Action * m_Action = NULL;
 };
 
-#endif // LTTLWHWHT_ACTION_RUNNER_H
+#endif // LTTLWHWHT_ACTIONRUNNER_H

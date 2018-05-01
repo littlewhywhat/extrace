@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "actionrunner.h"
 
-#include "environment.h"
+ActionRunner::~ActionRunner() {
+  delete m_Action;
+}
 
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+bool ActionRunner::tryRunIn(Environment & environment) {
+  if (m_Action) {
+    return m_Action->tryRunIn(environment);
+  }
+  return false;
+}

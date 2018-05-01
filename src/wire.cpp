@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "wire.h"
 
-#include "environment.h"
+FILE * Wire::getOutputStream() const {
+  return m_OutputStream;
+}
 
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+FILE * Wire::getErrorStream() const {
+  return m_ErrorStream;
+}

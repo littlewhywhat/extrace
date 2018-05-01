@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
-
 #include "environment.h"
 
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
+bool Environment::isInterrupted() const {
+  return m_Signal.isFired();
+}
 
-#endif // LTTLWHWHT_ACTION_H
+const string & Environment::getName() const {
+  return m_Name;
+}

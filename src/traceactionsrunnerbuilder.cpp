@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "traceactionsrunnerbuilder.h"
 
-#include "environment.h"
-
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, TraceSystem * traceSystem,
+                                                      const TraceArguments & traceArguments) const {
+  auto * traceActionsRunner = new TraceActionsRunner(wire, traceSystem, traceArguments);
+  traceActionsRunner->addTraceAction(new TraceAction(wire, traceArguments));
+  return traceActionsRunner;
+}

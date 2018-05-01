@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "androidsystembuilder.h"
 
-#include "environment.h"
-
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+AndroidSystem * AndroidSystemBuilder::build(const Wire & wire) const {
+  return NULL;
+}

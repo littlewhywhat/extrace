@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_ACTIONCMDLINEBUILDER_H
+#define LTTLWHWHT_ACTIONCMDLINEBUILDER_H
 
-#include "environment.h"
+#include "action.h"
+#include "wire.h"
+#include "cmdlineargs.h"
 
-class Action {
+class ActionCmdLineBuilder {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    virtual ~ActionCmdLineBuilder() {}
+    virtual Action * build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const = 0;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_ACTIONCMDLINEBUILDER_H

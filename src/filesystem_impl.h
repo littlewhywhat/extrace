@@ -22,8 +22,7 @@
 
 class FileSystemImpl : public FileSystem {
   public:
-    void set_errstream(FILE * errstream);
-    // Check whether a file exists.
+    FileSystemImpl(const Wire & wire): m_Wire(wire) {}
     bool fileExists(const char* filename) override;
     // Check whether a file is writable.
     bool fileIsWritable(const char* filename) override;
@@ -36,7 +35,7 @@ class FileSystemImpl : public FileSystem {
     // Read a string from a file, returning true if the read is successful
     bool readStr(const char* filename, char* str, int max_size) override;
   private:
-    FILE * errstream;
+    const Wire & wire;
     bool _writeStr(const char* filename, const char* str, int flags);
 };
 

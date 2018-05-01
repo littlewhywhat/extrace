@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#include "traceactionsrunnercmdlinebuilder.h"
 
-#include "environment.h"
-
-class Action {
-  public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
-};
-
-#endif // LTTLWHWHT_ACTION_H
+Action * TraceActionsRunnerCmdLineBuilder::build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const {
+  auto   sp_traceArguments  = unique_ptr<const TraceArguments>(m_TraceArgumentsBuilder->build(wire, cmdLineArgs));
+  auto * traceSystem        = m_TraceSystemBuilder->build(wire, *sp_traceArguments);
+  auto * traceActionsRunner = m_TraceActionsRunnerBuilder->build(wire, traceSystem, *sp_traceArguments);
+  return traceActionsRunner;
+}

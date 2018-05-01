@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_H
-#define LTTLWHWHT_ACTION_H
+#ifndef LTTLWHWHT_TEMPLATECLASS_H
+#define LTTLWHWHT_TEMPLATECLASS_H
 
+#include "wire.h"
+#include "tracearguments.h"
+#include "tracesystem.h"
 #include "environment.h"
 
-class Action {
+#include <string>
+
+class TraceAction {
   public:
-    virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    TraceAction(const Wire & wire, const TraceArguments & traceArguments): m_Wire(wire) {
+      if (traceArguments.hasHelpMessage()) {
+        m_HelpMessage = traceArguments.getHelpMessage();
+      }
+    }
+    bool tryRunIn(Environment & environment, TraceSystem & system);
+  private:
+    const Wire & m_Wire;
+    string m_HelpMessage;
 };
 
-#endif // LTTLWHWHT_ACTION_H
+#endif // LTTLWHWHT_TEMPLATECLASS_H
