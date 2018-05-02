@@ -26,8 +26,10 @@
 #include "stopaction.h"
 #include "cleanupaction.h"
 
-TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, Environment * environment, TraceSystem * traceSystem,
-      const TraceArguments & traceArguments) const{
+TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire,
+                                                      Environment * environment,
+                                                      TraceSystem * traceSystem,
+                                                      const TraceArguments & traceArguments) const{
   auto * traceActionsRunner = new TraceActionsRunner(wire, environment, traceSystem);
 
   if (traceArguments.listCategoriesEnabled()) {
@@ -53,11 +55,13 @@ TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, Environ
     }
     else if (traceArguments.asyncStopEnabled()) {
       traceActionsRunner->addTraceAction(new StopAction(wire));
-      traceActionsRunner->addTraceAction(DumpAction::Builder().buildFrom(wire, traceArguments));
+      traceActionsRunner->addTraceAction(DumpAction::Builder()
+                                           .buildFrom(wire, traceArguments));
       traceActionsRunner->addTraceAction(new CleanUpAction(wire));
     }
     else if (traceArguments.asyncDumpEnabled()) {
-      traceActionsRunner->addTraceAction(DumpAction::Builder().buildFrom(wire, traceArguments));
+      traceActionsRunner->addTraceAction(DumpAction::Builder()
+                                           .buildFrom(wire, traceArguments));
     }
     else {
       traceActionsRunner->addTraceAction(new StartAction(wire));
@@ -67,7 +71,8 @@ TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, Environ
         traceActionsRunner->addTraceAction(new StreamAction(wire));
       }
       traceActionsRunner->addTraceAction(new StopAction(wire));
-      traceActionsRunner->addTraceAction(DumpAction::Builder().buildFrom(wire, traceArguments));
+      traceActionsRunner->addTraceAction(DumpAction::Builder()
+                                           .buildFrom(wire, traceArguments));
       traceActionsRunner->addTraceAction(new CleanUpAction(wire));
     }
   }

@@ -1,59 +1,43 @@
 @startuml
-class Core {
-}
 
-Core "-m_AndroidSystem" -- "1" AndroidSystem
-
-class CoreCmdLineCreator {
-  + registerTo(argsParser: ArgsParser): void
-  + createFrom(args: Arguments): Core
-}
-
-CoreCmdLineCreator "m_AndroidSystemCmdLineCreator" -- "1" AndroidSystemCmdLineCreator
-
-class AndroidSystemCmdLineCreator {
-  - CATEGORIES_OPTION_CMDLINE: string
-  - CATEGORIES_OPTION_ID: string
+class CmdLineApp {
+  - m_AppName: string
   --
-  + registerTo(argsParser: ArgsParser): void
-  + createFrom(args: Arguments): AndroidSystem
+  + run(): int
+  + handleSignal(): void
 }
 
-class AndroidSystem {
-  + isCategorySupported() const: bool
+CmdLineApp "m_Wire" -- "1" Wire
+CmdLineApp "m_CmdLineArgs" -- "1" CmdLineArgs
+CmdLineApp "m_ActionCmdLineBuilder" -- "1" ActionCmdLineBuilder
+CmdLineApp "m_Signal" -- "1" Signal
+
+class Wire {
+  - m_ErrorStream: FILE *
+  - m_OutputStream: FILE *
+  --
+  + getErrorStream(): FILE *
+  + getOutputStream(): FILE *
+}
+hide Wire methods
+
+class Signal {
+  - isFired: bool
+  --
+  + fire(): void
+  + isFired(): bool
 }
 
-class ActionBuilder {
-  + registerTo(argsParser: ArgsParser): void
-  + buildListSupportedCategories(args: Arguments): ListSupportedCategories
+class CmdLineArgs {
+  - m_Args: vector<string>
+  --
+  + getCount(): int
+  + get(id: int): string  
 }
 
-ActionBuilder "m_Core" -- "1" Core
-ActionBuilder "m_ListSupportedCategoriesBuilder" -- "1" ListSupportedCategoriesBuilder
-
-class ActionRunnerBuilder {
-  + registerTo(argsParser: ArgsParser): void
-  + build(actionBuilder: ActionBuilder, args: Arguments): ActionRunner
+interface ActionCmdLineBuilder {
+  + build(wire: Wire, signal: Signal, appName: string, cmdLineArgs: CmdLineArgs): Action
 }
-
-class Action {
-  + tryRun(): bool
-}
-
-class ListSupportedCategories {
-}
-
-ListSupportedCategories --|> Action
-ListSupportedCategories "m_AndroidSystem" -- "1" AndroidSystem
-
-class ListSupportedCategoriesBuilder {
-  + registerTo(argsParser: ArgsParser): void
-  + build(core: Core, args: Arguments): ListSupportedCategories
-}
-
-class ListSupportedCategoriesCreator {
-  + registerTo(argsParser: argsParser): void
-  + createFrom(arguments: Arguments): ListSupportedCategoriesCreator
-}
+hide ActionCmdLineBuilder fields
 
 @enduml
