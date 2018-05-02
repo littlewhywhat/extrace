@@ -26,6 +26,7 @@ using namespace std;
 class TraceArguments {
   public:
     TraceArguments();
+    void setAppName(const string & appName);
     void setHelpMessage(const string & message);
     void enableCircleBuffer();
     void enableIgnoreSignals();
@@ -63,6 +64,7 @@ class TraceArguments {
     bool streamEnabled() const;
     bool listCategoriesEnabled() const;
     bool coreServicesEnabled() const;
+    const string & getAppName() const;
     const string & getKernelCategoryFilename() const;
     const string & getOutputFilename() const;
     const string & getHelpMessage() const;
@@ -83,6 +85,7 @@ class TraceArguments {
     bool m_Stream = false;
     bool m_ListCategories = false;
     bool m_CoreServices = false;
+    string m_AppName;
     string m_HelpMessage;
     string m_OutputFilename;
     string m_KernelCategoryFilename;
