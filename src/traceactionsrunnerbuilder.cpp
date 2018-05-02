@@ -20,6 +20,11 @@
 #include "addandroidcoretotrace.h"
 #include "addkernelcategoriesfromfiletotrace.h"
 #include "sleepaction.h"
+#include "startaction.h"
+#include "streamaction.h"
+#include "dumpaction.h"
+#include "stopaction.h"
+#include "cleanupaction.h"
 
 TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, Environment * environment, TraceSystem * traceSystem,
       const TraceArguments & traceArguments) const{
@@ -40,32 +45,31 @@ TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, Environ
       traceActionsRunner->addTraceAction(new SleepAction(wire, 
                                              traceArguments.getInitSleepDuration()));
     }
-    // if (traceArguments.asyncStartEnabled()) {
-    //   traceActionsRunner->addTraceAction(new StartAction(wire));
-    //   if (traceArguments.streamEnabled()) {
-    //     traceActionsRunner->addTraceAction(new StreamAction(wire));
-    //   }
-    // }
+    if (traceArguments.asyncStartEnabled()) {
+      traceActionsRunner->addTraceAction(new StartAction(wire));
+      if (traceArguments.streamEnabled()) {
+        traceActionsRunner->addTraceAction(new StreamAction(wire));
+      }
+    }
+    else if (traceArguments.asyncStopEnabled()) {
+      traceActionsRunner->addTraceAction(new StopAction(wire));
+      traceActionsRunner->addTraceAction(DumpAction::Builder().buildFrom(wire, traceArguments));
+      traceActionsRunner->addTraceAction(new CleanUpAction(wire));
+    }
+    else if (traceArguments.asyncDumpEnabled()) {
+      traceActionsRunner->addTraceAction(DumpAction::Builder().buildFrom(wire, traceArguments));
+    }
+    else {
+      traceActionsRunner->addTraceAction(new StartAction(wire));
+      traceActionsRunner->addTraceAction(new SleepAction(wire, 
+                                             traceArguments.getInitSleepDuration()));
+      if (traceArguments.streamEnabled()) {
+        traceActionsRunner->addTraceAction(new StreamAction(wire));
+      }
+      traceActionsRunner->addTraceAction(new StopAction(wire));
+      traceActionsRunner->addTraceAction(DumpAction::Builder().buildFrom(wire, traceArguments));
+      traceActionsRunner->addTraceAction(new CleanUpAction(wire));
+    }
   }
-  //   else if (traceArguments.enableAsyncStop()) {
-  //     traceActionsRunner->addTraceAction(new StopAction(wire));
-  //     traceActionsRunner->addTraceAction(new DumpAction(wire, traceArguments));
-  //     traceActionsRunner->addTraceAction(new CleanUpAction(wire));
-  //   }
-  //   else if (traceArguments.enableAsyncDump()) {
-  //     traceActionsRunner->addTraceAction(new DumpAction(wire, traceArguments));
-  //   }
-  //   else {
-  //     traceActionsRunner->addTraceAction(new StartAction(wire));
-  //     traceActionsRunner->addTraceAction(SleepAction::createMid(traceArguments));
-  //     if (traceArguments.enableStream()) {
-  //       traceActionsRunner->addTraceAction(new StreamAction(wire));
-  //       traceActionsRunner->enableInterrupts();
-  //     }
-  //     traceActionsRunner->addTraceAction(new StopAction(wire));
-  //     traceActionsRunner->addTraceAction(new DumpAction(wire, traceArguments));
-  //     traceActionsRunner->addTraceAction(new CleanUpAction(wire));
-  //   }
-  // }
   return traceActionsRunner;
 }

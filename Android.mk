@@ -102,6 +102,11 @@ LOCAL_SRC_FILES:= \
 			src/addandroidcoretotrace.cpp \
 			src/addkernelcategoriesfromfiletotrace.cpp \
 			src/sleepaction.cpp \
+			src/startaction.cpp \
+			src/streamaction.cpp \
+			src/cleanupaction.cpp \
+			src/stopaction.cpp \
+			src/dumpaction.cpp \
 			src/traceactionsrunner.cpp \
 			src/traceactionsrunnerbuilder.cpp \
 			src/traceactionsrunnercmdlinebuilder.cpp \

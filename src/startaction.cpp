@@ -15,50 +15,24 @@
  */
 #include "startaction.h"
 
-void StartAction::setTrace(Trace * trace) {
-  m_Trace = trace;
-}
-
-void StartAction::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-void StartAction::setOutputStream(FILE * outStream) {
-  m_OutStream = outStream;
-}
-
-void StartAction::setKernelSystem(KernelSystem * kernelSystem) {
-  m_KernelSystem = kernelSystem;
-}
-
-bool StartAction::tryRun() {
+bool StartAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
   bool ok = true;
-  ok &= m_Trace->setUp();
-  ok &= m_Trace->start();
+  ok &= traceSystem.getTrace().setUp();
+  ok &= traceSystem.getTrace().start();
 
   if (ok) {
-    fprintf(m_OutStream, "started trace...\n");
-    fflush(m_OutStream);
+    fprintf(m_Wire.getOutputStream(), "started trace...\n");
+    fflush(m_Wire.getOutputStream());
 
     // We clear the trace after starting it because tracing gets enabled for
     // each CPU individually in the kernel. Having the beginning of the trace
     // contain entries from only one CPU can cause "begin" entries without a
     // matching "end" entry to show up if a task gets migrated from one CPU to
     // another.
-    ok &= m_KernelSystem->clearTrace();
-    ok &= m_KernelSystem->writeClockSyncMarker();
+    ok &= traceSystem.getKernelSystem().clearTrace();
+    ok &= traceSystem.getKernelSystem().writeClockSyncMarker();
   } else {
-    fprintf(m_ErrorStream, "error StartAction::tryRun\n");
+    fprintf(m_Wire.getErrorStream(), "error StartAction::tryRun\n");
   }
   return ok;
-}
-
-Action * StartAction::Builder::buildFrom(const SystemCore & systemCore) const
-{
-  auto * startAction = new StartAction();
-  startAction->setTrace(systemCore.getTrace());
-  startAction->setErrorStream(systemCore.getErrorStream());
-  startAction->setOutputStream(systemCore.getOutputStream());
-  startAction->setKernelSystem(systemCore.getKernelSystem());
-  return startAction;
 }
