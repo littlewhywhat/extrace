@@ -17,8 +17,7 @@
 #include "cmdlineapp.h"
 
 #include <cstdlib>
-
-#include "actionrunner.h"
+#include <memory>
 
 void CmdLineApp::handleSignal() {
   m_Signal.fire();
@@ -41,8 +40,8 @@ int CmdLineApp::run() {
   if (!m_CmdLineArgs || !m_ActionCmdLineBuilder) {
     return EXIT_FAILURE;
   }
-  ActionRunner actionRunner(m_ActionCmdLineBuilder->build(*m_Wire, m_Signal, *m_CmdLineArgs));
-  if (actionRunner.tryRun()) {
+  auto action = unique_ptr<Action>(m_ActionCmdLineBuilder->build(*m_Wire, m_Signal, *m_CmdLineArgs));
+  if (action->tryRun()) {
     return EXIT_SUCCESS;
   }
   return EXIT_FAILURE;

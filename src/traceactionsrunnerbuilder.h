@@ -18,15 +18,19 @@
 #define LTTLWHWHT_TRACEACTIONSRUNNERBUILDER_H
 
 #include "wire.h"
-#include "tracesystem.h"
 #include "tracearguments.h"
 #include "traceactionsrunner.h"
+#include "tracesystembuilder.h"
 
 class TraceActionsRunnerBuilder {
   public:
+    TraceActionsRunnerBuilder(TraceSystemBuilder * traceSystemBuilder):
+                              m_TraceSystemBuilder(traceSystemBuilder) {}
+    ~TraceActionsRunnerBuilder();
     TraceActionsRunner * build(const Wire & wire, const Signal & signal,
-                               TraceSystem * traceSystem,
                                const TraceArguments & traceArguments) const;
+  private:
+    TraceSystemBuilder * m_TraceSystemBuilder = NULL;
 };
 
 #endif // LTTLWHWHT_TRACEACTIONSRUNNERBUILDER_H

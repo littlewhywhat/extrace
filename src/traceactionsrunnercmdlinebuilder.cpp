@@ -21,7 +21,6 @@ Action * TraceActionsRunnerCmdLineBuilder::build(const Wire & wire,
                                                  const Signal & signal,
                                                  const CmdLineArgs & cmdLineArgs) const {
   auto   sp_traceArguments  = unique_ptr<const TraceArguments>(m_TraceArgumentsBuilder->build(wire, cmdLineArgs));
-  auto * traceSystem        = m_TraceSystemBuilder->build(wire, *sp_traceArguments);
-  auto * traceActionsRunner = m_TraceActionsRunnerBuilder->build(wire, signal, traceSystem, *sp_traceArguments);
+  auto * traceActionsRunner = m_TraceActionsRunnerBuilder->build(wire, signal, *sp_traceArguments);
   return traceActionsRunner;
 }

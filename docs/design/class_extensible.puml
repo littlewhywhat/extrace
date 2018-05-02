@@ -43,38 +43,38 @@ hide ActionCmdLineBuilder fields
 
 ActionCmdLineBuilder --> Action: builds
 
-class TraceActionsRunnerCmdLineBuilder {
+class ExtraceActionCmdLineBuilder {
   + build(wire: Wire, signal: Signal, cmdLineArgs: CmdLineArgs): Action 
 }
-hide TraceActionsRunnerCmdLineBuilder fields
+hide ExtraceActionCmdLineBuilder fields
 
-TraceActionsRunnerCmdLineBuilder .> ActionCmdLineBuilder
-TraceActionsRunnerCmdLineBuilder "-m_TraceArgumentsBuilder" -- "1" TraceArgumentsBuilder
-TraceActionsRunnerCmdLineBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
-TraceActionsRunnerCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" TraceActionsRunnerBuilder
+ExtraceActionCmdLineBuilder .> ActionCmdLineBuilder
+ExtraceActionCmdLineBuilder "-m_ExtraceArgumentsBuilder" -- "1" ExtraceArgumentsBuilder
+ExtraceActionCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" TraceActionsRunnerBuilder
 
-class TraceArgumentsBuilder {
-  + build(wire: Wire, cmdLineArgs: CmdLineArgs): TraceArguments
-  - createHelpTraceArguments(): TraceArguments
-  - createTraceArguments(arguments: Arguments): TraceArguments
+class ExtraceArgumentsBuilder {
+  + build(wire: Wire, cmdLineArgs: CmdLineArgs): ExtraceArguments
+  - createHelpTraceArguments(): ExtraceArguments
+  - createTraceArguments(arguments: Arguments): ExtraceArguments
   - getHelpMessage(): string
 }
-hide TraceArgumentsBuilder fields
+hide ExtraceArgumentsBuilder fields
 
-TraceArgumentsBuilder --> TraceArguments: builds
+ExtraceArgumentsBuilder --> ExtraceArguments: builds
 
 class TraceSystemBuilder {
-  + build(wire: Wire, traceArguments: TraceArguments): TraceSystem
+  + build(wire: Wire, extraceArguments: ExtraceArguments): TraceSystem
 }
 hide TraceSystemBuilder fields
 
 TraceSystemBuilder --> TraceSystem: builds
 
 class TraceActionsRunnerBuilder {
-  + build(wire: Wire, signal: Signal, traceSystem: TraceSystem, traceArgs: TraceArguments): TraceActionsRunner
+  + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): TraceActionsRunner
 }
 hide TraceActionsRunnerBuilder fields
 
+TraceActionsRunnerBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
 TraceActionsRunnerBuilder --> TraceActionsRunner: builds
 
 class Environment {
@@ -86,7 +86,7 @@ class Environment {
 
 Environment "-m_Signal" -- "1" Signal
 
-class TraceArguments {
+class ExtraceArguments {
   
 }
 
@@ -199,7 +199,7 @@ SleepAction --> AbstractTraceAction
 ' Wired general class
 ' setWire - in CmdLineApp
 ' ExtraceActionCmdLineBuilder - build action from CmdLineArgs
-' TraceArgumentsBuilder -> ExtraceArgsBuilder
+' ExtraceArgumentsBuilder -> ExtraceArgsBuilder
 ' ExtraceActionBuilder - build action from ExtraceArgs
 ' ExtraceActionBuilder uses ExtraceActionsRunnerBuilder
 

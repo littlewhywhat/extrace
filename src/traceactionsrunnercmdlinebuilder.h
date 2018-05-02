@@ -29,17 +29,14 @@
 class TraceActionsRunnerCmdLineBuilder : public ActionCmdLineBuilder {
   public:
     TraceActionsRunnerCmdLineBuilder(TraceArgumentsBuilder     * traceArgumentsBuilder,
-                                     TraceSystemBuilder        * traceSystemBuilder,
                                      TraceActionsRunnerBuilder * traceActionsRunner):
                                      m_TraceArgumentsBuilder(traceArgumentsBuilder),
-                                     m_TraceSystemBuilder(traceSystemBuilder),
                                      m_TraceActionsRunnerBuilder(traceActionsRunner) {}
 
     Action * build(const Wire & wire, const Signal & signal,
                    const CmdLineArgs & cmdLineArgs) const override;
   private:
     TraceArgumentsBuilder * m_TraceArgumentsBuilder = NULL;
-    TraceSystemBuilder    * m_TraceSystemBuilder = NULL;
     TraceActionsRunnerBuilder * m_TraceActionsRunnerBuilder = NULL;
 };
 
