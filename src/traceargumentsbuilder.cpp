@@ -171,6 +171,7 @@ const TraceArguments * TraceArgumentsBuilder::build(const Wire & wire, const Cmd
     return createHelpTraceArguments();
   }
   auto * traceArguments = createTraceArguments(arguments);
+  traceArguments->setAppName(cmdLineArgs.getAppName());
   if (traceArguments->hasHelpMessage()
        || traceArguments->listCategoriesEnabled()
        || traceArguments->hasKernelCategoryFilename()

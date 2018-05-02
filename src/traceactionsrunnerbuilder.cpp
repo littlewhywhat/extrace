@@ -25,11 +25,14 @@
 #include "dumpaction.h"
 #include "stopaction.h"
 #include "cleanupaction.h"
+#include "environment.h"
 
 TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire,
-                                                      Environment * environment,
+                                                      const Signal & signal,
                                                       TraceSystem * traceSystem,
                                                       const TraceArguments & traceArguments) const{
+  auto * environment        = new Environment(signal, traceArguments.getAppName(), 
+                                              !traceArguments.ignoreSignalsEnabled());  
   auto * traceActionsRunner = new TraceActionsRunner(wire, environment, traceSystem);
 
   if (traceArguments.listCategoriesEnabled()) {

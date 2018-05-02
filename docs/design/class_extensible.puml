@@ -41,6 +41,8 @@ interface ActionCmdLineBuilder {
 }
 hide ActionCmdLineBuilder fields
 
+ActionCmdLineBuilder --> Action: builds
+
 class TraceActionsRunnerCmdLineBuilder {
   + build(wire: Wire, signal: Signal, cmdLineArgs: CmdLineArgs): Action 
 }
@@ -50,7 +52,6 @@ TraceActionsRunnerCmdLineBuilder .> ActionCmdLineBuilder
 TraceActionsRunnerCmdLineBuilder "-m_TraceArgumentsBuilder" -- "1" TraceArgumentsBuilder
 TraceActionsRunnerCmdLineBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
 TraceActionsRunnerCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" TraceActionsRunnerBuilder
-TraceActionsRunnerCmdLineBuilder --> Environment: uses
 
 class TraceArgumentsBuilder {
   + build(wire: Wire, cmdLineArgs: CmdLineArgs): TraceArguments
@@ -60,15 +61,21 @@ class TraceArgumentsBuilder {
 }
 hide TraceArgumentsBuilder fields
 
+TraceArgumentsBuilder --> TraceArguments: builds
+
 class TraceSystemBuilder {
   + build(wire: Wire, traceArguments: TraceArguments): TraceSystem
 }
 hide TraceSystemBuilder fields
 
+TraceSystemBuilder --> TraceSystem: builds
+
 class TraceActionsRunnerBuilder {
-  + build(wire: Wire, environment: Environment, traceSystem: TraceSystem, traceArgs: TraceArguments): TraceActionsRunner
+  + build(wire: Wire, signal: Signal, traceSystem: TraceSystem, traceArgs: TraceArguments): TraceActionsRunner
 }
 hide TraceActionsRunnerBuilder fields
+
+TraceActionsRunnerBuilder --> TraceActionsRunner: builds
 
 class Environment {
   - m_Name: string
@@ -79,5 +86,121 @@ class Environment {
 
 Environment "-m_Signal" -- "1" Signal
 
+class TraceArguments {
+  
+}
+
+class TraceSystem {
+  + getFileSystem(): FileSystem
+  + getKernelSystem(): KernelSystem
+  + getAndroidSystem(): AndroidSystem
+  + getTrace(): Trace
+}
+hide TraceSystem fields
+
+TraceSystem "m_FileSystem" -- "1" FileSystem
+TraceSystem "m_KernelSystem" -- "1" KernelSystem
+TraceSystem "m_AndroidSystem" -- "1" AndroidSystem
+TraceSystem "m_Trace" -- "1" Trace
+
+class TraceActionsRunner {
+  + tryRun(): bool
+  + addTraceAction(traceAction: TraceAction): void
+}
+hide TraceActionsRunner fields
+
+TraceActionsRunner ..> Action
+TraceActionsRunner "-m_Environment" -- "1" Environment
+TraceActionsRunner "-m_TraceSystem" -- "1" TraceSystem
+TraceActionsRunner "-m_TraceActions" -- "0..*" TraceAction
+
+interface FileSystem {
+  + {abstract} fileExists(filename: const char*): bool
+  + {abstract} fileIsWritable(filename: const char*): bool
+  + {abstract} truncateFile(path: const char*): bool
+  + {abstract} writeStr(filename: const char*, str: const char*): bool
+  + {abstract} appendStr(filename: const char*, str: const char*): bool
+}
+hide FileSystem fields
+
+interface KernelSystem {
+  + {abstract} tryOpenToWriteOrCreate(filename: string): int
+  + {abstract} try_sendfile(fd_from: int, fd_to: int): bool
+  + {abstract} compress_trace_to(traceFD: int, outFd: int): bool
+  + {abstract} writeClockSyncMarker(): bool
+  + {abstract} setTraceOverwriteEnable(enable: bool): bool
+  + {abstract} setTracingEnabled(enable: bool): bool
+  + {abstract} clearTrace(): bool
+  + {abstract} getTracePipeFd(): int
+  + {abstract} getTraceFd(): int
+  + {abstract} try_send(fd_from: int, fd_to: int): bool
+  + {abstract} setTraceBufferSizeKB(size: int): bool
+  + {abstract} setGlobalClockEnable(enable: bool): bool
+  + {abstract} setPrintTgidEnableIfPresent(enable: bool): bool
+  + {abstract} setKernelTraceFuncs(funcs: vector<string>): bool
+  + {abstract} enableKernelTraceEvents(ids: vector<string>): bool
+  + {abstract} getCategories(): vector<TracingCategory>
+  + {abstract} disableKernelTraceEvents(): bool
+  + {abstract} isCategorySupported(category: TracingCategory) const: bool
+}
+hide KernelSystem fields
+
+interface AndroidSystem {
+  + {abstract} has_core_services(): bool
+  + {abstract} getCategories(): vector<TracingCategory>
+  + {abstract} disableAllCategories(): void
+  + {abstract} pokeBinderServices(): bool
+  + {abstract} clearAppProperties(): void
+  + {abstract} log_dumping_trace(): void
+  + {abstract} property_get_core_service_names(content: string): void
+  + {abstract} setAppCmdlineProperty(appNames: vector<string>): bool
+  + {abstract} tryEnableCategories(categories: vector<string>): bool
+}
+hide AndroidSystem fields
+
+interface Trace {
+  + addKernelCategory(categoryName: string): void
+  + addAndroidCategory(categoryName: string): void
+  + addApp(appName: string): void
+  + addFunction(funcName: string): void
+  + setUp(): bool 
+  + cleanUp(): void 
+  + start(): bool 
+  + stop(): void 
+}
+hide Trace fields
+
+interface Action {
+  + tryRun(): bool
+}
+hide Action fields
+
+interface TraceAction {
+  + runIn(environment: Environment, traceSystem: TraceSystem): bool
+}
+hide TraceAction fields
+
+abstract class AbstractTraceAction {
+  
+}
+hide AbstractTraceAction fields
+
+AbstractTraceAction ..> TraceAction
+
+class SleepAction {
+  - duration: int
+  --
+  + runIn(environment: Environment, traceSystem: TraceSystem): bool
+}
+
+SleepAction --> AbstractTraceAction
+
+' Environment construction could be deeper
+' Wired general class
+' setWire - in CmdLineApp
+' ExtraceActionCmdLineBuilder - build action from CmdLineArgs
+' TraceArgumentsBuilder -> ExtraceArgsBuilder
+' ExtraceActionBuilder - build action from ExtraceArgs
+' ExtraceActionBuilder uses ExtraceActionsRunnerBuilder
 
 @enduml

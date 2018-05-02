@@ -21,12 +21,12 @@
 #include "tracesystem.h"
 #include "tracearguments.h"
 #include "traceactionsrunner.h"
-#include "environment.h"
 
 class TraceActionsRunnerBuilder {
   public:
-    TraceActionsRunner * build(const Wire & wire, Environment * environment,
-                               TraceSystem * traceSystem, const TraceArguments & traceArguments) const;
+    TraceActionsRunner * build(const Wire & wire, const Signal & signal,
+                               TraceSystem * traceSystem,
+                               const TraceArguments & traceArguments) const;
 };
 
 #endif // LTTLWHWHT_TRACEACTIONSRUNNERBUILDER_H

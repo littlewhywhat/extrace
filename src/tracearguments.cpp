@@ -16,6 +16,10 @@
 
 #include "tracearguments.h"
 
+void TraceArguments::setAppName(const string & appName) {
+  m_AppName = appName;
+}
+
 void TraceArguments::setHelpMessage(const string & message) {
   m_HelpMessage = message;
 }
@@ -164,6 +168,10 @@ const string & TraceArguments::getKernelCategoryFilename() const {
 
 const string & TraceArguments::getOutputFilename() const {
   return m_OutputFilename;
+}
+
+const string & TraceArguments::getAppName() const {
+  return m_AppName;
 }
 
 uint32_t TraceArguments::getBufferSize() const {
