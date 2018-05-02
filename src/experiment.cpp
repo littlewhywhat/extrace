@@ -7,7 +7,7 @@
 #include "androidsystembuilder.h"
 #include "kernelsystembuilder.h"
 #include "tracebuilder.h"
-#include "traceactionsrunnerbuilder.h"
+#include "extraceactionsrunnerbuilder.h"
 
 #include <signal.h>
 
@@ -36,7 +36,7 @@ int main(int argc, const char ** argv) {
   cmdLineApp.setArgs(new CmdLineArgs(argc, argv));
   cmdLineApp.setActionCmdLineBuilder(new ExtraceActionCmdLineBuilder(
                                          new ExtraceArgumentsBuilder(),
-                                         new TraceActionsRunnerBuilder(
+                                         new ExtraceActionsRunnerBuilder(
                                              new TraceSystemBuilder(
                                                  new KernelSystemBuilder(),
                                                  new AndroidSystemBuilder(),

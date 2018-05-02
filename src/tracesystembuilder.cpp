@@ -16,8 +16,16 @@
 
 #include "tracesystembuilder.h"
 
+#include "filesystem_impl.h"
+
+TraceSystemBuilder::~TraceSystemBuilder() {
+  delete m_KernelSystemBuilder;
+  delete m_AndroidSystemBuilder;
+  delete m_TraceBuilder;
+}
+
 TraceSystem * TraceSystemBuilder::build(const Wire & wire, const ExtraceArguments & traceArguments) const {
-  FileSystem * fileSystem = NULL;
+  FileSystem * fileSystem = new FileSystemImpl(wire);
   auto * kernelSystem  = m_KernelSystemBuilder->build(wire, fileSystem);
   auto * androidSystem = m_AndroidSystemBuilder->build(wire);
   auto * trace         = m_TraceBuilder->build(wire, kernelSystem, androidSystem,

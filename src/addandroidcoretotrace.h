@@ -17,18 +17,13 @@
 #ifndef LTTLWHWHT_ADDANDROIDCORETOTRACE_H
 #define LTTLWHWHT_ADDANDROIDCORETOTRACE_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
-#include "wire.h"
-#include "tracesystem.h"
-#include "environment.h"
-
-using namespace std;
-
-class AddAndroidCoreToTrace : public AbstractTraceAction {
+class AddAndroidCoreToTrace : public TraceAction {
   public:
-    AddAndroidCoreToTrace(const Wire & wire) : AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & system) override;
+    AddAndroidCoreToTrace(const Wire & wire, const shared_ptr<TraceSystem> & traceSystem):
+                          TraceAction(wire, traceSystem) {}
+    bool tryRun() override;
 };
 
 #endif // LTTLWHWHT_ADDANDROIDCORETOTRACE_H

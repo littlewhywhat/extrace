@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_TRACEACTIONSRUNNERBUILDER_H
-#define LTTLWHWHT_TRACEACTIONSRUNNERBUILDER_H
+#ifndef LTTLWHWHT_EXTRACEACTIONSRUNNERBUILDER_H
+#define LTTLWHWHT_EXTRACEACTIONSRUNNERBUILDER_H
 
 #include "wire.h"
+#include "signal.h"
 #include "extracearguments.h"
-#include "traceactionsrunner.h"
+#include "actionsrunner.h"
 #include "tracesystembuilder.h"
 
-class TraceActionsRunnerBuilder {
+class ExtraceActionsRunnerBuilder {
   public:
-    TraceActionsRunnerBuilder(TraceSystemBuilder * traceSystemBuilder):
-                              m_TraceSystemBuilder(traceSystemBuilder) {}
-    ~TraceActionsRunnerBuilder();
-    TraceActionsRunner * build(const Wire & wire, const Signal & signal,
-                               const ExtraceArguments & traceArguments) const;
+    ExtraceActionsRunnerBuilder(TraceSystemBuilder * traceSystemBuilder):
+                                m_TraceSystemBuilder(traceSystemBuilder) {}
+    ~ExtraceActionsRunnerBuilder();
+    ActionsRunner * build(const Wire & wire, Signal & signal,
+                          const ExtraceArguments & traceArguments) const;
   private:
     TraceSystemBuilder * m_TraceSystemBuilder = NULL;
 };
 
-#endif // LTTLWHWHT_TRACEACTIONSRUNNERBUILDER_H
+#endif // LTTLWHWHT_EXTRACEACTIONSRUNNERBUILDER_H

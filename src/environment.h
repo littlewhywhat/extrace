@@ -17,22 +17,16 @@
 #ifndef LTTLWHWHT_ENVIRONMENT_H
 #define LTTLWHWHT_ENVIRONMENT_H
 
-#include "signal.h"
-
 #include <string>
 
 using namespace std;
 
 class Environment {
   public:
-    Environment(const Signal & signal, const string & appName, bool canBeInterrupted):
-                m_Signal(signal), m_AppName(appName), m_CanBeInterrupted(canBeInterrupted) {}
-    bool isInterrupted() const;
+    Environment(const string & appName): m_AppName(appName) {}
     const string & getAppName() const;
   private:
-    const Signal & m_Signal;
     const string & m_AppName;
-    bool m_CanBeInterrupted = true;
 };
 
 #endif // LTTLWHWHT_ENVIRONMENT_H

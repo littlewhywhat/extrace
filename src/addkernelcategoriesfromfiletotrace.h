@@ -17,22 +17,18 @@
 #ifndef LTTLWHWHT_ADDKERNELCATEGORIESFROMFILETOTRACE_H
 #define LTTLWHWHT_ADDKERNELCATEGORIESFROMFILETOTRACE_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
 #include <string>
 
-#include "wire.h"
-#include "environment.h"
-#include "tracesystem.h"
-
-using namespace std;
-
-class AddKernelCategoriesFromFileToTrace : public AbstractTraceAction {
+class AddKernelCategoriesFromFileToTrace : public TraceAction {
   public:
-    AddKernelCategoriesFromFileToTrace(const Wire & wire, const string & filename):
-                                        AbstractTraceAction(wire),
+    AddKernelCategoriesFromFileToTrace(const Wire & wire,
+                                       const shared_ptr<TraceSystem> & traceSystem,
+                                       const string & filename):
+                                        TraceAction(wire, traceSystem),
                                         m_Filename(filename) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    bool tryRun() override;
   private:
     string m_Filename;
 };

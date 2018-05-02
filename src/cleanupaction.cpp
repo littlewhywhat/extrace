@@ -15,9 +15,9 @@
  */
 #include "cleanupaction.h"
 
-bool CleanUpAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool CleanUpAction::tryRun() {
   bool ok = true;
-  traceSystem.getTrace().cleanUp();
+  m_TraceSystem->getTrace().cleanUp();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error CleanUpAction::tryRun\n");
   }

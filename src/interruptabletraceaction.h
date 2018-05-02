@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTIONRUNNERBUILDER_H
-#define LTTLWHWHT_ACTIONRUNNERBUILDER_H
+#ifndef LTTLWHWHT_INTERRUPTABLETRACEACTION_H
+#define LTTLWHWHT_INTERRUPTABLETRACEACTION_H
 
-#include "actionrunner.h"
-#include "systemcore.h"
-#include "extracearguments.h"
+#include "traceaction.h"
 
-class ActionRunnerBuilder 
-{
+#include "signal.h"
+
+class InterruptableTraceAction : public TraceAction {
   public:
-    void setSystemCoreBuilder(SystemCore::Builder * systemCoreBuilder);
-    ActionRunner * buildFrom(const ExtraceArguments & arguments) const;
-  private:
-    SystemCore::Builder * m_SystemCoreBuilder = NULL;
+    InterruptableTraceAction(const Wire & wire, shared_ptr<TraceSystem> traceSystem,
+                             const Signal & signal):
+                             TraceAction(wire, traceSystem), m_Signal(signal) {}
+    virtual ~InterruptableTraceAction() {}
+  protected:
+    const Signal & m_Signal;
 };
 
-#endif // LTTLWHWHT_ACTIONRUNNERBUILDER_H
+#endif // LTTLWHWHT_INTERRUPTABLETRACEACTION_H

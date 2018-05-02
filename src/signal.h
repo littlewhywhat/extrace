@@ -21,7 +21,10 @@ class Signal {
   public:
     void fire();
     bool isFired() const;
+    void turnOn();
+    void turnOff();
   private:
+    bool m_TurnedOn = true;
     bool m_Fired = false;
 };
 

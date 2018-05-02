@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "addandroidcoretotrace.h"
 
 #include "androidtoolbox.h"
 
-bool AddAndroidCoreToTrace::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool AddAndroidCoreToTrace::tryRun() {
   set<string> tokens;
-  if (traceSystem.getAndroidSystem().has_core_services()) {
+  if (m_TraceSystem->getAndroidSystem().has_core_services()) {
     string value;
-    traceSystem.getAndroidSystem().property_get_core_service_names(value);
+    m_TraceSystem->getAndroidSystem().property_get_core_service_names(value);
     AndroidToolBox().parseToTokens(value.c_str(), ",", tokens);
     for (const auto & token : tokens) {
-      traceSystem.getTrace().addApp(token.c_str());
+      m_TraceSystem->getTrace().addApp(token.c_str());
     }
     return true;
   }

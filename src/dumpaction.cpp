@@ -25,11 +25,11 @@ void DumpAction::enableCompression() {
   m_Compress = true;
 }
 
-bool DumpAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool DumpAction::tryRun() {
   FILE * outputStream = m_Wire.getOutputStream();
   FILE * errorStream = m_Wire.getErrorStream();
   int outFd = fileno(outputStream);
-  KernelSystem & kernelSystem = traceSystem.getKernelSystem();
+  KernelSystem & kernelSystem = m_TraceSystem->getKernelSystem();
   if (!m_OutputFile.empty()) {
     outFd = kernelSystem.tryOpenToWriteOrCreate(m_OutputFile.c_str());
     if (outFd == -1) {
@@ -61,8 +61,9 @@ bool DumpAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) 
 }
 
 TraceAction * DumpAction::Builder::buildFrom(const Wire & wire,
+                                             const shared_ptr<TraceSystem> & traceSystem,
                                              const ExtraceArguments & arguments) const {
-  auto * dumpAction = new DumpAction(wire);
+  auto * dumpAction = new DumpAction(wire, traceSystem);
   if (arguments.compressionEnabled())
   {
     dumpAction->enableCompression();

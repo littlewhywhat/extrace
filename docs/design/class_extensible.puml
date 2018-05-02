@@ -48,10 +48,10 @@ hide ExtraceActionCmdLineBuilder fields
 
 ExtraceActionCmdLineBuilder .> ActionCmdLineBuilder
 ExtraceActionCmdLineBuilder "-m_ExtraceArgumentsBuilder" -- "1" ExtraceArgumentsBuilder
-ExtraceActionCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" ExtraceActionBuilder
+ExtraceActionCmdLineBuilder "-m_ExtraceActionsRunnerBuilder" -- "1" ExtraceActionBuilder
 
 interface ExtraceActionBuilder {
-  + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): ActionsRunner
+  + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): Action
 }
 hide ExtraceActionBuilder fields
 
@@ -70,14 +70,35 @@ class TraceSystemBuilder {
 }
 hide TraceSystemBuilder fields
 
-class TraceActionsRunnerBuilder {
+TraceSystemBuilder "-m_AndroidSystemBuilder" -- "1" AndroidSystemBuilder
+TraceSystemBuilder "-m_KernelSystemBuilder" -- "1" KernelSystemBuilder
+TraceSystemBuilder "-m_TraceBuilder" -- "1" TraceBuilder
+
+class AndroidSystemBuilder {
+  + build(wire: Wire): AndroidSystem
+  - initDefaultCategories(androidSystemImpl: AndroidSystemImpl)
+}
+hide AndroidSystemBuilder fields
+
+class KernelSystemBuilder {
+  + build(wire: Wire): KernelSystem
+  - initDefaultCategories(kernelSystemImpl: KernelSystemImpl)
+}
+hide KernelSystemBuilder fields
+
+class TraceBuilder {
+  + build(wire: Wire, kernelSystem: KernelSystem, androidSystem: AndroidSystem, extraceArgs: ExtraceArguments): Trace
+}
+hide TraceBuilder fields
+
+class ExtraceActionsRunnerBuilder {
   + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): ActionsRunner
 }
-hide TraceActionsRunnerBuilder fields
+hide ExtraceActionsRunnerBuilder fields
 
-TraceActionsRunnerBuilder .> ExtraceActionBuilder
-TraceActionsRunnerBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
-TraceActionsRunnerBuilder --> ActionsRunner: builds
+ExtraceActionsRunnerBuilder .> ExtraceActionBuilder
+ExtraceActionsRunnerBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
+ExtraceActionsRunnerBuilder --> ActionsRunner: builds
 
 class ExtraceArguments {
   

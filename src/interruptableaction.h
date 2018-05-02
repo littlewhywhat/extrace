@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-#include "actionrunner.h"
+#ifndef LTTLWHWHT_INTERRUPTABLEACTION_H
+#define LTTLWHWHT_INTERRUPTABLEACTION_H
 
-ActionRunner::~ActionRunner() {
-  delete m_Action;
-}
+#include "action.h"
 
-bool ActionRunner::tryRun() {
-  if (m_Action) {
-    return m_Action->tryRun();
-  }
-  return false;
-}
+#include "signal.h"
+
+class InterruptableAction : public Action {
+  public:
+    InterruptableAction(const Wire & wire, const Signal & signal):
+                        Action(wire), m_Signal(signal) {}
+    virtual ~InterruptableAction() {}
+  protected:
+    const Signal & m_Signal;
+};
+
+#endif // LTTLWHWHT_INTERRUPTABLEACTION_H

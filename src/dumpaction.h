@@ -17,26 +17,26 @@
 #ifndef LTTLWHWHT_DUMPACTION_H
 #define LTTLWHWHT_DUMPACTION_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
 #include <string>
-
-#include "wire.h"
-#include "environment.h"
-#include "tracesystem.h"
+#include <memory>
 
 #include "extracearguments.h"
 
-class DumpAction : public AbstractTraceAction {
+class DumpAction : public TraceAction {
   public:
-    DumpAction(const Wire & wire): AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    DumpAction(const Wire & wire, const shared_ptr<TraceSystem> & traceSystem):
+               TraceAction(wire, traceSystem) {}
+    bool tryRun() override;
     void setOutputFile(const string & outputFile);
     void enableCompression();
     class Builder 
     {
       public:
-        TraceAction * buildFrom(const Wire & wire, const ExtraceArguments & traceArguments) const;
+        TraceAction * buildFrom(const Wire & wire,
+                                const shared_ptr<TraceSystem> & traceSystem,
+                                const ExtraceArguments & traceArguments) const;
     };
   private:
     string m_OutputFile;

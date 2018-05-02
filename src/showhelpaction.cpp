@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ABSTRACTTRACEACTION_H
-#define LTTLWHWHT_ABSTRACTTRACEACTION_H
+#include "showhelpaction.h"
 
-#include "traceaction.h"
-
-#include "wire.h"
-
-class AbstractTraceAction : public TraceAction {
-  public:
-    AbstractTraceAction(const Wire & wire): m_Wire(wire) {}
-    virtual ~AbstractTraceAction() {}
-  protected:
-    const Wire & m_Wire;
-};
-
-#endif // LTTLWHWHT_ABSTRACTTRACEACTION_H
+bool ShowHelpAction::tryRun() {
+  fprintf(m_Wire.getErrorStream(), m_HelpMessage.c_str(), m_Environment->getAppName().c_str());
+  return true;
+}
