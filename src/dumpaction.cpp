@@ -17,71 +17,59 @@
 
 #include <unistd.h> // close
 
-void DumpAction::setKernelSystem(KernelSystem * kernelSystem) {
-  m_KernelSystem = kernelSystem;
-}
-
-void DumpAction::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-void DumpAction::setOutputFile(const char * outputFile) {
+void DumpAction::setOutputFile(const string & outputFile) {
   m_OutputFile = outputFile;
-}
-
-void DumpAction::setOutputStream(FILE * outStream) {
-  m_OutStream = outStream;
 }
 
 void DumpAction::enableCompression() {
   m_Compress = true;
 }
 
-bool DumpAction::tryRun() {
-  int outFd = fileno(m_OutStream);
+bool DumpAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+  FILE * outputStream = m_Wire.getOutputStream();
+  FILE * errorStream = m_Wire.getErrorStream();
+  int outFd = fileno(outputStream);
+  KernelSystem & kernelSystem = traceSystem.getKernelSystem();
   if (!m_OutputFile.empty()) {
-    outFd = m_KernelSystem->tryOpenToWriteOrCreate(m_OutputFile.c_str());
+    outFd = kernelSystem.tryOpenToWriteOrCreate(m_OutputFile.c_str());
     if (outFd == -1) {
-      fprintf(m_ErrorStream, "error DumpAction::tryRun\n");
+      fprintf(errorStream, "error DumpAction::tryRun\n");
       return false;
     }
   } 
   dprintf(outFd, "TRACE:\n");
 
-  int traceFD = m_KernelSystem->getTraceFd();
+  int traceFD = kernelSystem.getTraceFd();
   if (traceFD == -1) {
-    fprintf(m_ErrorStream, "error DumpAction::tryRun\n");
+    fprintf(errorStream, "error DumpAction::tryRun\n");
     return false;
   }
   bool ok = true;
   if (m_Compress) {
-    ok &= m_KernelSystem->compress_trace_to(traceFD, outFd);
+    ok &= kernelSystem.compress_trace_to(traceFD, outFd);
   } else {
-    ok &= m_KernelSystem->try_sendfile(traceFD, outFd);
+    ok &= kernelSystem.try_sendfile(traceFD, outFd);
   }
   if (!ok) {
-    fprintf(m_ErrorStream, "error DumpAction::tryRun\n");
+    fprintf(errorStream, "error DumpAction::tryRun\n");
   }
   close(traceFD);
   if (!m_OutputFile.empty()) {
     close(outFd);
   }
-  return m_KernelSystem->clearTrace();
+  return kernelSystem.clearTrace();
 }
 
-Action * DumpAction::Builder::buildFrom(const SystemCore & systemCore,
-                                        const ExtraceArguments & arguments) const {
-  auto * dumpAction = new DumpAction();
-  if (arguments.enableCompression())
+TraceAction * DumpAction::Builder::buildFrom(const Wire & wire,
+                                             const TraceArguments & arguments) const {
+  auto * dumpAction = new DumpAction(wire);
+  if (arguments.compressionEnabled())
   {
     dumpAction->enableCompression();
   }
-  if (arguments.haveDumpFilename())
+  if (arguments.hasOutputFilename())
   {
-    dumpAction->setOutputFile(arguments.getDumpFilename().c_str());
+    dumpAction->setOutputFile(arguments.getOutputFilename());
   }
-  dumpAction->setErrorStream(systemCore.getErrorStream());
-  dumpAction->setOutputStream(systemCore.getOutputStream());
-  dumpAction->setKernelSystem(systemCore.getKernelSystem());
   return dumpAction;
 }

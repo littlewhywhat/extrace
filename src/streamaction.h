@@ -17,29 +17,17 @@
 #ifndef LTTLWHWHT_STREAMACTION_H
 #define LTTLWHWHT_STREAMACTION_H
 
-#include "interruptableaction.h"
+#include "abstracttraceaction.h"
 
-#include <stdio.h>  // FILE
-
-#include "kernelsystem.h"
-#include "systemcore.h"
+#include "environment.h"
+#include "tracesystem.h"
 
 using namespace std;
 
-class StreamAction : public InterruptableAction {
+class StreamAction : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setErrorStream(FILE * errorStream);
-    void setOutputStream(FILE * outStream);
-    void setKernelSystem(KernelSystem * kernelSystem);
-    class Builder {
-      public:
-        InterruptableAction * buildFrom(const SystemCore & systemCore) const;  
-    };
-  private:
-    KernelSystem * m_KernelSystem;
-    FILE * m_ErrorStream;
-    FILE * m_OutStream;
+    StreamAction(const Wire & wire): AbstractTraceAction(wire) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
 };
 
 #endif // LTTLWHWHT_STREAMACTION_H

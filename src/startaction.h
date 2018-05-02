@@ -17,30 +17,17 @@
 #ifndef LTTLWHWHT_STARTACTION_H
 #define LTTLWHWHT_STARTACTION_H
 
-#include "action.h"
+#include "abstracttraceaction.h"
 
-#include "trace.h"
-#include "kernelsystem.h"
-#include "systemcore.h"
+#include "tracesystem.h"
+#include "environment.h"
 
 using namespace std;
 
-class StartAction : public Action {
+class StartAction : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setTrace(Trace * trace);
-    void setErrorStream(FILE * errorStream);
-    void setOutputStream(FILE * outStream);
-    void setKernelSystem(KernelSystem * kernelSystem);
-    class Builder {
-      public:
-        Action * buildFrom(const SystemCore & systemCore) const;
-    };
-  private:
-    Trace * m_Trace;
-    KernelSystem * m_KernelSystem;
-    FILE * m_ErrorStream;
-    FILE * m_OutStream;
+    StartAction(const Wire & wire): AbstractTraceAction(wire) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
 };
 
 #endif // LTTLWHWHT_STARTACTION_H

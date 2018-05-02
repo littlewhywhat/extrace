@@ -17,27 +17,19 @@
 #ifndef LTTLWHWHT_STOPACTION_H
 #define LTTLWHWHT_STOPACTION_H
 
-#include "action.h"
+#include "abstracttraceaction.h"
 
 #include <cstdio>
 
-#include "trace.h"
-#include "systemcore.h"
+#include "environment.h"
+#include "tracesystem.h"
 
 using namespace std;
 
-class StopAction : public Action {
+class StopAction : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setTrace(Trace * trace);
-    void setErrorStream(FILE * errorStream);
-    class Builder {
-      public:
-        Action * buildFrom(const SystemCore & systemCore) const;
-    };
-  private:
-    Trace * m_Trace;
-    FILE * m_ErrorStream;
+    StopAction(const Wire & wire): AbstractTraceAction(wire) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
 };
 
 #endif // LTTLWHWHT_STOPACTION_H

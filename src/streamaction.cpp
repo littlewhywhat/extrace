@@ -15,42 +15,23 @@
  */
 #include "streamaction.h"
 
-void StreamAction::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-void StreamAction::setOutputStream(FILE * outStream) {
-  m_OutStream = outStream;
-}
-
-void StreamAction::setKernelSystem(KernelSystem * kernelSystem) {
-  m_KernelSystem = kernelSystem;
-}
-
-bool StreamAction::tryRun() {
+bool StreamAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
   bool ok = true;
-  int traceStream = m_KernelSystem->getTracePipeFd();
+  int traceStream = traceSystem.getKernelSystem().getTracePipeFd();
   if (traceStream == -1) {
-      fprintf(m_ErrorStream, "error StreamAction::tryRun\n");
+      fprintf(m_Wire.getErrorStream(), "error StreamAction::tryRun\n");
       return false;
   }
-  while (!m_Interrupted) {
-      if (!m_KernelSystem->try_send(traceStream, fileno(m_OutStream))) {
-          if (!m_Interrupted) {
-            fprintf(m_ErrorStream, "error StreamAction::tryRun - stream aborted\n");
+  FILE * outputStream = m_Wire.getOutputStream();
+  while (!environment.isInterrupted()) {
+      if (!traceSystem.getKernelSystem().try_send(traceStream, fileno(outputStream))) {
+          if (!environment.isInterrupted()) {
+            fprintf(m_Wire.getErrorStream(), "error StreamAction::tryRun - stream aborted\n");
             ok = false;
           }
           break;
       }
-      fflush(m_OutStream);
+      fflush(outputStream);
   }
   return ok;
-}
-
-InterruptableAction * StreamAction::Builder::buildFrom(const SystemCore & systemCore) const {
-  StreamAction * streamAction = new StreamAction();
-  streamAction->setErrorStream(systemCore.getErrorStream());
-  streamAction->setOutputStream(systemCore.getOutputStream());
-  streamAction->setKernelSystem(systemCore.getKernelSystem());
-  return streamAction;
 }

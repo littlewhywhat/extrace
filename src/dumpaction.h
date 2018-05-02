@@ -17,35 +17,28 @@
 #ifndef LTTLWHWHT_DUMPACTION_H
 #define LTTLWHWHT_DUMPACTION_H
 
-#include "action.h"
+#include "abstracttraceaction.h"
 
 #include <string>
-#include <cstdio>
 
-#include "kernelsystem.h"
-#include "systemcore.h"
-#include "extracearguments.h"
+#include "wire.h"
+#include "environment.h"
+#include "tracesystem.h"
 
-using namespace std;
+#include "tracearguments.h"
 
-class DumpAction : public Action {
+class DumpAction : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setKernelSystem(KernelSystem * kernelSystem);
-    void setErrorStream(FILE * errorStream);
-    void setOutputFile(const char * outputFile);
-    void setOutputStream(FILE * outStream);
+    DumpAction(const Wire & wire): AbstractTraceAction(wire) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    void setOutputFile(const string & outputFile);
     void enableCompression();
     class Builder 
     {
       public:
-        Action * buildFrom(const SystemCore & systemCore,
-                           const ExtraceArguments & arguments) const;
+        TraceAction * buildFrom(const Wire & wire, const TraceArguments & traceArguments) const;
     };
   private:
-    KernelSystem * m_KernelSystem;
-    FILE * m_ErrorStream;
-    FILE * m_OutStream;
     string m_OutputFile;
     bool m_Compress = false;
 };

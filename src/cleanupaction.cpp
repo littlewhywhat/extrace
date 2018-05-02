@@ -15,29 +15,11 @@
  */
 #include "cleanupaction.h"
 
-#include <cstdio>
-
-void CleanUpAction::setTrace(Trace * trace) {
-  m_Trace = trace;
-}
-
-void CleanUpAction::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-bool CleanUpAction::tryRun() {
+bool CleanUpAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
   bool ok = true;
-  m_Trace->cleanUp();
+  traceSystem.getTrace().cleanUp();
   if (!ok) {
-    fprintf(m_ErrorStream, "error CleanUpAction::tryRun\n");
+    fprintf(m_Wire.getErrorStream(), "error CleanUpAction::tryRun\n");
   }
   return ok;
-}
-
-Action * CleanUpAction::Builder::buildFrom(const SystemCore & systemCore)
-{
-  auto * cleanUpAction = new CleanUpAction();
-  cleanUpAction->setTrace(systemCore.getTrace());
-  cleanUpAction->setErrorStream(systemCore.getErrorStream());
-  return cleanUpAction;
 }

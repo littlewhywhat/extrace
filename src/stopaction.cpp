@@ -17,27 +17,11 @@
 
 #include <cstdio>
 
-void StopAction::setTrace(Trace * trace) {
-  m_Trace = trace;
-}
-
-void StopAction::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-bool StopAction::tryRun() {
+bool StopAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
   bool ok = true;
-  m_Trace->stop();
+  traceSystem.getTrace().stop();
   if (!ok) {
-    fprintf(m_ErrorStream, "error StopAction::tryRun\n");
+    fprintf(m_Wire.getErrorStream(), "error StopAction::tryRun\n");
   }
   return ok;
-}
-
-Action * StopAction::Builder::buildFrom(const SystemCore & systemCore) const
-{
-  auto * stopAction = new StopAction();
-  stopAction->setTrace(systemCore.getTrace());
-  stopAction->setErrorStream(systemCore.getErrorStream());
-  return stopAction;
 }
