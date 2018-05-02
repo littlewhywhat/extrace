@@ -32,10 +32,6 @@ void CmdLineApp::setActionCmdLineBuilder(ActionCmdLineBuilder * actionCmdLineBui
   m_ActionCmdLineBuilder = actionCmdLineBuilder;
 }
 
-void CmdLineApp::setAppName(const char * appName) {
-  m_AppName = appName;
-}
-
 CmdLineApp::~CmdLineApp() {
   delete m_CmdLineArgs;
   delete m_Wire;
@@ -45,10 +41,7 @@ int CmdLineApp::run() {
   if (!m_CmdLineArgs || !m_ActionCmdLineBuilder) {
     return EXIT_FAILURE;
   }
-  ActionRunner actionRunner(m_ActionCmdLineBuilder->build(*m_Wire,
-                                                          m_AppName,
-                                                          m_Signal,
-                                                          *m_CmdLineArgs));
+  ActionRunner actionRunner(m_ActionCmdLineBuilder->build(*m_Wire, m_Signal, *m_CmdLineArgs));
   if (actionRunner.tryRun()) {
     return EXIT_SUCCESS;
   }

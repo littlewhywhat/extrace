@@ -18,11 +18,10 @@
 #include "environment.h"
 
 Action * TraceActionsRunnerCmdLineBuilder::build(const Wire & wire,
-                                                 const string & appName,
                                                  const Signal & signal,
                                                  const CmdLineArgs & cmdLineArgs) const {
   auto   sp_traceArguments  = unique_ptr<const TraceArguments>(m_TraceArgumentsBuilder->build(wire, cmdLineArgs));
-  auto * environment        = new Environment(signal, appName, (*sp_traceArguments).ignoreSignalsEnabled());
+  auto * environment        = new Environment(signal, cmdLineArgs.getAppName(), (*sp_traceArguments).ignoreSignalsEnabled());
   auto * traceSystem        = m_TraceSystemBuilder->build(wire, *sp_traceArguments);
   auto * traceActionsRunner = m_TraceActionsRunnerBuilder->build(wire, environment, traceSystem, *sp_traceArguments);
   return traceActionsRunner;

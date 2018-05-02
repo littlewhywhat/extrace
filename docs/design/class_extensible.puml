@@ -1,11 +1,10 @@
 @startuml
 
 class CmdLineApp {
-  - m_AppName: string
-  --
   + run(): int
   + handleSignal(): void
 }
+hide CmdLineApp fields
 
 CmdLineApp "m_Wire" -- "1" Wire
 CmdLineApp "m_CmdLineArgs" -- "1" CmdLineArgs
@@ -29,15 +28,56 @@ class Signal {
 }
 
 class CmdLineArgs {
+  - m_AppName: string
   - m_Args: vector<string>
   --
   + getCount(): int
-  + get(id: int): string  
+  + get(id: int): string
+  + getAppName(): string  
 }
 
 interface ActionCmdLineBuilder {
-  + build(wire: Wire, signal: Signal, appName: string, cmdLineArgs: CmdLineArgs): Action
+  + {abstract} build(wire: Wire, signal: Signal, cmdLineArgs: CmdLineArgs): Action
 }
 hide ActionCmdLineBuilder fields
+
+class TraceActionsRunnerCmdLineBuilder {
+  + build(wire: Wire, signal: Signal, cmdLineArgs: CmdLineArgs): Action 
+}
+hide TraceActionsRunnerCmdLineBuilder fields
+
+TraceActionsRunnerCmdLineBuilder .> ActionCmdLineBuilder
+TraceActionsRunnerCmdLineBuilder "-m_TraceArgumentsBuilder" -- "1" TraceArgumentsBuilder
+TraceActionsRunnerCmdLineBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
+TraceActionsRunnerCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" TraceActionsRunnerBuilder
+TraceActionsRunnerCmdLineBuilder --> Environment: uses
+
+class TraceArgumentsBuilder {
+  + build(wire: Wire, cmdLineArgs: CmdLineArgs): TraceArguments
+  - createHelpTraceArguments(): TraceArguments
+  - createTraceArguments(arguments: Arguments): TraceArguments
+  - getHelpMessage(): string
+}
+hide TraceArgumentsBuilder fields
+
+class TraceSystemBuilder {
+  + build(wire: Wire, traceArguments: TraceArguments): TraceSystem
+}
+hide TraceSystemBuilder fields
+
+class TraceActionsRunnerBuilder {
+  + build(wire: Wire, environment: Environment, traceSystem: TraceSystem, traceArgs: TraceArguments): TraceActionsRunner
+}
+hide TraceActionsRunnerBuilder fields
+
+class Environment {
+  - m_Name: string
+  - m_CanBeInterrupted: bool
+  --
+  + isInterrupted(): bool
+}
+
+Environment "-m_Signal" -- "1" Signal
+
 
 @enduml

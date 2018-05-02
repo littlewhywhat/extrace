@@ -33,8 +33,7 @@ void registerSignalHandler()
 }
 
 int main(int argc, const char ** argv) {
-  cmdLineApp.setAppName(argv[0]);
-  cmdLineApp.setArgs(new CmdLineArgs(argc-1, argv+1));
+  cmdLineApp.setArgs(new CmdLineArgs(argc, argv));
   cmdLineApp.setActionCmdLineBuilder(new TraceActionsRunnerCmdLineBuilder(
                                          new TraceArgumentsBuilder(),
                                          new TraceSystemBuilder(

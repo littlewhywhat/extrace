@@ -28,8 +28,10 @@ class CmdLineArgs {
     CmdLineArgs(int argc, const char** argv);
     uint32_t getCount() const;
     const string & get(uint32_t id) const;
+    const string & getAppName() const;
   private:
     vector<string> m_Args;
+    string m_AppName;
 };
 
 #endif // LTTLWHWHT_CMDLINEARGS_H
