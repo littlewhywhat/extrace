@@ -17,17 +17,14 @@
 #ifndef LTTLWHWHT_STREAMACTION_H
 #define LTTLWHWHT_STREAMACTION_H
 
-#include "abstracttraceaction.h"
+#include "interruptabletraceaction.h"
 
-#include "environment.h"
-#include "tracesystem.h"
-
-using namespace std;
-
-class StreamAction : public AbstractTraceAction {
+class StreamAction : public InterruptableTraceAction {
   public:
-    StreamAction(const Wire & wire): AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    StreamAction(const Wire & wire, const shared_ptr<TraceSystem> & traceSystem,
+                 const Signal & signal):
+                 InterruptableTraceAction(wire, traceSystem, signal) {}
+    bool tryRun() override;
 };
 
 #endif // LTTLWHWHT_STREAMACTION_H

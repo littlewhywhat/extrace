@@ -17,9 +17,9 @@
 
 #include <cstdio>
 
-bool StopAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool StopAction::tryRun() {
   bool ok = true;
-  traceSystem.getTrace().stop();
+  m_TraceSystem->getTrace().stop();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error StopAction::tryRun\n");
   }

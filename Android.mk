@@ -92,7 +92,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
 			src/signal.cpp \
 			src/cmdlineapp.cpp \
-			src/actionrunner.cpp \
 			src/environment.cpp \
 			src/kernelsystembuilder.cpp \
 			src/androidsystembuilder.cpp \
@@ -107,8 +106,9 @@ LOCAL_SRC_FILES:= \
 			src/cleanupaction.cpp \
 			src/stopaction.cpp \
 			src/dumpaction.cpp \
-			src/traceactionsrunner.cpp \
-			src/traceactionsrunnerbuilder.cpp \
+			src/showhelpaction.cpp \
+			src/actionsrunner.cpp \
+			src/extraceactionsrunnerbuilder.cpp \
 			src/extraceactioncmdlinebuilder.cpp \
 			src/tracesystem.cpp \
 			src/extracearguments.cpp \
@@ -119,6 +119,7 @@ LOCAL_SRC_FILES:= \
 			src/cmdlineargs.cpp \
 			src/wire.cpp \
 			src/systemtime_impl.cpp \
+			src/filesystem_impl.cpp \
 			src/kernelsystem_impl.cpp \
 			src/androidsystem_impl.cpp \
 			src/trace_impl.cpp \

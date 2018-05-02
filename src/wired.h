@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-#include "traceactionsrunner.h"
+#ifndef LTTLWHWHT_WIRED_H
+#define LTTLWHWHT_WIRED_H
 
-TraceActionsRunner::~TraceActionsRunner() {
-  delete m_TraceSystem;
-  delete m_Environment;
-  for (auto * traceAction : m_TraceActions) {
-    delete traceAction;
-  }
-}
+#include "wire.h"
 
-void TraceActionsRunner::addTraceAction(TraceAction * traceAction) {
-  m_TraceActions.push_back(traceAction);
-}
+class Wired 
+{
+  public:
+    Wired(const Wire & wire): m_Wire(wire) {}
+  protected:
+    const Wire & m_Wire;
+};
 
-bool TraceActionsRunner::tryRun() {
-  for (auto * traceAction : m_TraceActions) {
-    if (!traceAction->tryRunIn(*m_Environment, *m_TraceSystem)) {
-      return false;
-    }
-  }
-  return true;
-}
+#endif // LTTLWHWHT_WIRED_H

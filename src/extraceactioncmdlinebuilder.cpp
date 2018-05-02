@@ -15,12 +15,16 @@
  */
 
 #include "extraceactioncmdlinebuilder.h"
-#include "environment.h"
+
+ExtraceActionCmdLineBuilder::~ExtraceActionCmdLineBuilder() {
+  delete m_ExtraceArgumentsBuilder;
+  delete m_ExtraceActionsRunnerBuilder;
+}
 
 Action * ExtraceActionCmdLineBuilder::build(const Wire & wire,
-                                                 const Signal & signal,
-                                                 const CmdLineArgs & cmdLineArgs) const {
+                                            Signal & signal,
+                                            const CmdLineArgs & cmdLineArgs) const {
   auto   sp_traceArguments  = unique_ptr<const ExtraceArguments>(m_ExtraceArgumentsBuilder->build(wire, cmdLineArgs));
-  auto * traceActionsRunner = m_TraceActionsRunnerBuilder->build(wire, signal, *sp_traceArguments);
+  auto * traceActionsRunner = m_ExtraceActionsRunnerBuilder->build(wire, signal, *sp_traceArguments);
   return traceActionsRunner;
 }

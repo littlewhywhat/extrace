@@ -17,20 +17,14 @@
 #ifndef LTTLWHWHT_LISTSUPPORTEDCATEGORIES_H
 #define LTTLWHWHT_LISTSUPPORTEDCATEGORIES_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
-#include <cstdio>
-
-#include "environment.h"
-#include "tracesystem.h"
-#include "wire.h"
-
-using namespace std;
-
-class ListSupportedCategories : public AbstractTraceAction {
+class ListSupportedCategories : public TraceAction {
   public:
-    ListSupportedCategories(const Wire & wire): AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    ListSupportedCategories(const Wire & wire, 
+                            const shared_ptr<TraceSystem> & traceSystem):
+                            TraceAction(wire, traceSystem) {}
+    bool tryRun() override;
 };
 
 #endif // LTTLWHWHT_LISTSUPPORTEDCATEGORIES_H

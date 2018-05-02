@@ -15,10 +15,10 @@
  */
 #include "startaction.h"
 
-bool StartAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool StartAction::tryRun() {
   bool ok = true;
-  ok &= traceSystem.getTrace().setUp();
-  ok &= traceSystem.getTrace().start();
+  ok &= m_TraceSystem->getTrace().setUp();
+  ok &= m_TraceSystem->getTrace().start();
 
   if (ok) {
     fprintf(m_Wire.getOutputStream(), "started trace...\n");
@@ -29,8 +29,8 @@ bool StartAction::tryRunIn(Environment & environment, TraceSystem & traceSystem)
     // contain entries from only one CPU can cause "begin" entries without a
     // matching "end" entry to show up if a task gets migrated from one CPU to
     // another.
-    ok &= traceSystem.getKernelSystem().clearTrace();
-    ok &= traceSystem.getKernelSystem().writeClockSyncMarker();
+    ok &= m_TraceSystem->getKernelSystem().clearTrace();
+    ok &= m_TraceSystem->getKernelSystem().writeClockSyncMarker();
   } else {
     fprintf(m_Wire.getErrorStream(), "error StartAction::tryRun\n");
   }

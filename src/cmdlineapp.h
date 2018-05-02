@@ -22,9 +22,6 @@
 #include "actioncmdlinebuilder.h"
 #include "signal.h"
 
-#include <cstdio>
-#include <string>
-
 class CmdLineApp {
   public:
     CmdLineApp(): m_Wire(new Wire(stdout, stderr)) {}

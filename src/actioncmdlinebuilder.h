@@ -18,13 +18,14 @@
 #define LTTLWHWHT_ACTIONCMDLINEBUILDER_H
 
 #include "action.h"
+#include "signal.h"
 #include "wire.h"
 #include "cmdlineargs.h"
 
 class ActionCmdLineBuilder {
   public:
     virtual ~ActionCmdLineBuilder() {}
-    virtual Action * build(const Wire & wire, const Signal & signal,
+    virtual Action * build(const Wire & wire, Signal & signal,
                            const CmdLineArgs & cmdLineArgs) const = 0;
 };
 

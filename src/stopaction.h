@@ -17,19 +17,14 @@
 #ifndef LTTLWHWHT_STOPACTION_H
 #define LTTLWHWHT_STOPACTION_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
-#include <cstdio>
-
-#include "environment.h"
-#include "tracesystem.h"
-
-using namespace std;
-
-class StopAction : public AbstractTraceAction {
+class StopAction : public TraceAction {
   public:
-    StopAction(const Wire & wire): AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    StopAction(const Wire & wire,
+               const shared_ptr<TraceSystem> & traceSystem):
+               TraceAction(wire, traceSystem) {}
+    bool tryRun() override;
 };
 
 #endif // LTTLWHWHT_STOPACTION_H

@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_TRACEACTIONSRUNNERCMDLINEBUILDER_H
-#define LTTLWHWHT_TRACEACTIONSRUNNERCMDLINEBUILDER_H
+#ifndef LTTLWHWHT_EXTRACEACTIONSRUNNERCMDLINEBUILDER_H
+#define LTTLWHWHT_EXTRACEACTIONSRUNNERCMDLINEBUILDER_H
 
 #include "actioncmdlinebuilder.h"
 
-#include "action.h"
-#include "wire.h"
-#include "cmdlineargs.h"
 #include "extraceargumentsbuilder.h"
-#include "tracesystembuilder.h"
-#include "traceactionsrunnerbuilder.h"
+#include "extraceactionsrunnerbuilder.h"
 
 class ExtraceActionCmdLineBuilder : public ActionCmdLineBuilder {
   public:
     ExtraceActionCmdLineBuilder(ExtraceArgumentsBuilder     * traceArgumentsBuilder,
-                                     TraceActionsRunnerBuilder * traceActionsRunner):
-                                     m_ExtraceArgumentsBuilder(traceArgumentsBuilder),
-                                     m_TraceActionsRunnerBuilder(traceActionsRunner) {}
-
-    Action * build(const Wire & wire, const Signal & signal,
+                                ExtraceActionsRunnerBuilder * traceActionsRunner):
+                                m_ExtraceArgumentsBuilder(traceArgumentsBuilder),
+                                m_ExtraceActionsRunnerBuilder(traceActionsRunner) {}
+    ~ExtraceActionCmdLineBuilder();
+    Action * build(const Wire & wire, Signal & signal,
                    const CmdLineArgs & cmdLineArgs) const override;
   private:
     ExtraceArgumentsBuilder * m_ExtraceArgumentsBuilder = NULL;
-    TraceActionsRunnerBuilder * m_TraceActionsRunnerBuilder = NULL;
+    ExtraceActionsRunnerBuilder * m_ExtraceActionsRunnerBuilder = NULL;
 };
 
-#endif // LTTLWHWHT_TRACEACTIONSRUNNERCMDLINEBUILDER_H
+#endif // LTTLWHWHT_EXTRACEACTIONSRUNNERCMDLINEBUILDER_H

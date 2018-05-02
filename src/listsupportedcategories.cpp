@@ -15,15 +15,15 @@
  */
 #include "listsupportedcategories.h"
 
-bool ListSupportedCategories::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
-  auto & kernelSystem = traceSystem.getKernelSystem();
+bool ListSupportedCategories::tryRun() {
+  auto & kernelSystem = m_TraceSystem->getKernelSystem();
   const auto & kernelCategories = kernelSystem.getCategories();
   for (const auto & category : kernelCategories) {
       if (kernelSystem.isCategorySupported(category)) {
           fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
       }
   }
-  auto & androidSystem = traceSystem.getAndroidSystem();
+  auto & androidSystem = m_TraceSystem->getAndroidSystem();
   const auto & androidCategories = androidSystem.getCategories();
   for (const auto & category : androidCategories) {
       // is there a way to check?

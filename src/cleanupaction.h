@@ -17,16 +17,14 @@
 #ifndef LTTLWHWHT_CLEANUPACTION_H
 #define LTTLWHWHT_CLEANUPACTION_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
-#include "wire.h"
-#include "environment.h"
-#include "tracesystem.h"
-
-class CleanUpAction : public AbstractTraceAction {
+class CleanUpAction : public TraceAction {
   public:
-    CleanUpAction(const Wire & wire): AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    CleanUpAction(const Wire & wire,
+                  const shared_ptr<TraceSystem> & traceSystem):
+                  TraceAction(wire, traceSystem) {}
+    bool tryRun() override;
 };
 
 #endif // LTTLWHWHT_CLEANUPACTION_H

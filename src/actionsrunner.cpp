@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sleepaction.h"
 
-#include <time.h> // nanosleep, struct timespec
-#include <errno.h>
+#include "actionsrunner.h"
 
-bool SleepAction::tryRun() {
-  bool ok = true;
-  struct timespec timeLeft;
-  timeLeft.tv_sec = m_DurationSeconds;
-  timeLeft.tv_nsec = 0;
-  do {
-    if (m_Signal.isFired()) {
-      ok = false;
-      break;
-    }
-  } while (nanosleep(&timeLeft, &timeLeft) == -1 && errno == EINTR);
-  if (!ok) {
-    fprintf(m_Wire.getErrorStream(), "error SleepAction::tryRun - sleep aborted\n");
+ActionsRunner::~ActionsRunner() {
+  for (auto * action : m_Actions) {
+    delete action;
   }
-  return ok;
+}
+
+void ActionsRunner::addAction(Action * action) {
+  m_Actions.push_back(action);
+}
+
+bool ActionsRunner::tryRun() {
+  for (auto * action : m_Actions) {
+    if (!action->tryRun()) {
+      return false;
+    }
+  }
+  return true;
 }

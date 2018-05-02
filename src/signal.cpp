@@ -16,10 +16,18 @@
 
 #include "signal.h"
 
+void Signal::turnOn() {
+  m_TurnedOn = true;
+}
+
+void Signal::turnOff() {
+  m_TurnedOn = false;
+}
+
 void Signal::fire() {
   m_Fired = true;
 }
 
 bool Signal::isFired() const {
-  return m_Fired;
+  return m_Fired && m_TurnedOn;
 }

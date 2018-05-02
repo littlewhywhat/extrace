@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTIONRUNNER_H
-#define LTTLWHWHT_ACTIONRUNNER_H
+#ifndef LTTLWHWHT_SHOWHELPACTION_H
+#define LTTLWHWHT_SHOWHELPACTION_H
 
 #include "action.h"
+
 #include "environment.h"
 
-class ActionRunner {
+class ShowHelpAction : public Action {
   public:
-    ActionRunner(Action * action): m_Action(action) {}
-    ~ActionRunner();
-    bool tryRun();
+    ShowHelpAction(const Wire & wire, const shared_ptr<Environment> & environment,
+                   const string & helpMessage): Action(wire), m_Environment(environment),
+                   m_HelpMessage(helpMessage) {}
+    bool tryRun() override;
   private:
-    Action * m_Action = NULL;
+    shared_ptr<Environment> m_Environment; 
+    string m_HelpMessage;
 };
 
-#endif // LTTLWHWHT_ACTIONRUNNER_H
+#endif // LTTLWHWHT_SHOWHELPACTION_H

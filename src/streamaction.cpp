@@ -15,17 +15,17 @@
  */
 #include "streamaction.h"
 
-bool StreamAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool StreamAction::tryRun() {
   bool ok = true;
-  int traceStream = traceSystem.getKernelSystem().getTracePipeFd();
+  int traceStream = m_TraceSystem->getKernelSystem().getTracePipeFd();
   if (traceStream == -1) {
       fprintf(m_Wire.getErrorStream(), "error StreamAction::tryRun\n");
       return false;
   }
   FILE * outputStream = m_Wire.getOutputStream();
-  while (!environment.isInterrupted()) {
-      if (!traceSystem.getKernelSystem().try_send(traceStream, fileno(outputStream))) {
-          if (!environment.isInterrupted()) {
+  while (!m_Signal.isFired()) {
+      if (!m_TraceSystem->getKernelSystem().try_send(traceStream, fileno(outputStream))) {
+          if (!m_Signal.isFired()) {
             fprintf(m_Wire.getErrorStream(), "error StreamAction::tryRun - stream aborted\n");
             ok = false;
           }

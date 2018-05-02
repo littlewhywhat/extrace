@@ -17,10 +17,11 @@
 #ifndef LTTLWHWHT_ACTION_H
 #define LTTLWHWHT_ACTION_H
 
-#include "environment.h"
+#include "wired.h"
 
-class Action {
+class Action : public Wired {
   public:
+    Action(const Wired & wire): Wired(wire) {}
     virtual ~Action() {}
     virtual bool tryRun() = 0;
 };

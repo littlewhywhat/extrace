@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "addkernelcategoriesfromfiletotrace.h"
 
 #include "androidtoolbox.h"
 
-bool AddKernelCategoriesFromFileToTrace::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
+bool AddKernelCategoriesFromFileToTrace::tryRun() {
   set<string> tokens;
   if (!AndroidToolBox().parseFileToTokens(m_Filename.c_str(), " ", tokens)) {
     fprintf(m_Wire.getErrorStream(), "AddKernelCategoriesFromFileToTrace::tryRunIn - error parsing category file \"%s\"\n", m_Filename.c_str());
     return false;
   }
   for (const auto & token : tokens) {
-     traceSystem.getTrace().addKernelCategory(token.c_str());
+     m_TraceSystem->getTrace().addKernelCategory(token.c_str());
   }
   return true;
 }

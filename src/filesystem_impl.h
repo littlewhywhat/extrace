@@ -20,6 +20,8 @@
 
 #include "filesystem.h"
 
+#include "wire.h"
+
 class FileSystemImpl : public FileSystem {
   public:
     FileSystemImpl(const Wire & wire): m_Wire(wire) {}
@@ -35,7 +37,7 @@ class FileSystemImpl : public FileSystem {
     // Read a string from a file, returning true if the read is successful
     bool readStr(const char* filename, char* str, int max_size) override;
   private:
-    const Wire & wire;
+    const Wire & m_Wire;
     bool _writeStr(const char* filename, const char* str, int flags);
 };
 

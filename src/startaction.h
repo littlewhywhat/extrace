@@ -17,17 +17,13 @@
 #ifndef LTTLWHWHT_STARTACTION_H
 #define LTTLWHWHT_STARTACTION_H
 
-#include "abstracttraceaction.h"
+#include "traceaction.h"
 
-#include "tracesystem.h"
-#include "environment.h"
-
-using namespace std;
-
-class StartAction : public AbstractTraceAction {
+class StartAction : public TraceAction {
   public:
-    StartAction(const Wire & wire): AbstractTraceAction(wire) {}
-    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
+    StartAction(const Wire & wire, const shared_ptr<TraceSystem> traceSystem):
+                TraceAction(wire, traceSystem) {}
+    bool tryRun() override;
 };
 
 #endif // LTTLWHWHT_STARTACTION_H

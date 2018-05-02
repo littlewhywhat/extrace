@@ -17,13 +17,19 @@
 #ifndef LTTLWHWHT_TRACEACTION_H
 #define LTTLWHWHT_TRACEACTION_H
 
-#include "tracesystem.h"
-#include "environment.h"
+#include "action.h"
 
-class TraceAction {
+#include <memory>
+
+#include "tracesystem.h"
+
+class TraceAction : public Action {
   public:
+    TraceAction(const Wire & wire, shared_ptr<TraceSystem> traceSystem):
+                Action(wire), m_TraceSystem(traceSystem) {}
     virtual ~TraceAction() {}
-    virtual bool tryRunIn(Environment & environment, TraceSystem & system) = 0;
+  protected:
+    shared_ptr<TraceSystem> m_TraceSystem;
 };
 
 #endif // LTTLWHWHT_TRACEACTION_H

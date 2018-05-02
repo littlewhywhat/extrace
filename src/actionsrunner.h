@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ACTION_RUNNER_IMPL_H
-#define LTTLWHWHT_ACTION_RUNNER_IMPL_H
+#ifndef LTTLWHWHT_ACTIONSRUNNER_H
+#define LTTLWHWHT_ACTIONSRUNNER_H
 
-#include "actionrunner.h"
+#include "action.h"
 
 #include <vector>
 
-#include "action.h"
-#include "systemcore.h"
-#include "interruptableaction.h"
-
 using namespace std;
 
-class ActionRunnerImpl : public ActionRunner {
+class ActionsRunner : public Action {
   public:
-    ~ActionRunnerImpl();
-    void handleSignal() override;
-    void enableInterrupts();
-    bool tryRunActions() override;
-    void addInterruptableAction(InterruptableAction * action);
+    ActionsRunner(const Wire & wire): Action(wire) {}
+    ~ActionsRunner();
     void addAction(Action * action);
-    void setSystemCore(SystemCore * systemCore);
+    bool tryRun() override;
   private:
-    SystemCore * m_SystemCore = NULL;
-    bool m_InterruptsEnabled = false;
     vector<Action*> m_Actions;
-    vector<InterruptableAction*> m_InterruptableActions;
 };
 
-#endif // LTTLWHWHT_ACTION_RUNNER_IMPL_H
+#endif // LTTLWHWHT_ACTIONSRUNNER_H

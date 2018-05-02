@@ -32,6 +32,7 @@ class TraceSystemBuilder {
                        m_KernelSystemBuilder(kernelSystemBuilder),
                        m_AndroidSystemBuilder(androidSystemBuilder),
                        m_TraceBuilder(traceBuilder) {}
+    ~TraceSystemBuilder();
     TraceSystem * build(const Wire & wire, const ExtraceArguments & traceArguments) const;
   private:
     KernelSystemBuilder * m_KernelSystemBuilder = NULL;
