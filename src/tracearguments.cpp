@@ -114,6 +114,14 @@ bool TraceArguments::hasKernelFunctions() const {
   return !m_KernelFunctions.empty();
 }
 
+bool TraceArguments::hasInitSleepDuration() const {
+  return m_InitSleepDuration != 0;
+}
+
+bool TraceArguments::hasMidSleepDuration() const {
+  return m_MidSleepDuration != 0;
+}
+
 bool TraceArguments::circleBufferEnabled() const {
   return m_CircleBuffer;
 }

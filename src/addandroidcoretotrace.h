@@ -17,34 +17,18 @@
 #ifndef LTTLWHWHT_ADDANDROIDCORETOTRACE_H
 #define LTTLWHWHT_ADDANDROIDCORETOTRACE_H
 
-#include "action.h"
+#include "abstracttraceaction.h"
 
-#include <cstdio>
-
-#include "trace.h"
-#include "androidsystem.h"
-#include "toolbox.h"
-#include "systemcore.h"
-#include "extracearguments.h"
+#include "wire.h"
+#include "tracesystem.h"
+#include "environment.h"
 
 using namespace std;
 
-class AddAndroidCoreToTrace : public Action {
+class AddAndroidCoreToTrace : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setTrace(Trace * traceImpl);
-    void setErrorStream(FILE * errorStream);
-    void setToolBox(ToolBox * toolBox);
-    void setAndroidSystem(AndroidSystem * androidSystem);
-    class Builder {
-      public:
-        Action * buildFrom(const SystemCore & systemCore) const;
-    };
-  private:
-    Trace * m_Trace;
-    AndroidSystem * m_AndroidSystem;
-    ToolBox * m_ToolBox;
-    FILE * m_ErrorStream;
+    AddAndroidCoreToTrace(const Wire & wire) : AbstractTraceAction(wire) {}
+    bool tryRunIn(Environment & environment, TraceSystem & system) override;
 };
 
 #endif // LTTLWHWHT_ADDANDROIDCORETOTRACE_H

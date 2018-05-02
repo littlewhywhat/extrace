@@ -15,42 +15,19 @@
  */
 #include "addandroidcoretotrace.h"
 
-void AddAndroidCoreToTrace::setTrace(Trace * trace) {
-  m_Trace = trace;
-}
+#include "androidtoolbox.h"
 
-void AddAndroidCoreToTrace::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-void AddAndroidCoreToTrace::setAndroidSystem(AndroidSystem * androidSystem) {
-  m_AndroidSystem = androidSystem;
-}
-
-void AddAndroidCoreToTrace::setToolBox(ToolBox * toolBox) {
-  m_ToolBox = toolBox;
-}
-
-bool AddAndroidCoreToTrace::tryRun() {
+bool AddAndroidCoreToTrace::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
   set<string> tokens;
-  if (m_AndroidSystem->has_core_services()) {
+  if (traceSystem.getAndroidSystem().has_core_services()) {
     string value;
-    m_AndroidSystem->property_get_core_service_names(value);
-    m_ToolBox->parseToTokens(value.c_str(), ",", tokens);
+    traceSystem.getAndroidSystem().property_get_core_service_names(value);
+    AndroidToolBox().parseToTokens(value.c_str(), ",", tokens);
     for (const auto & token : tokens) {
-      m_Trace->addApp(token.c_str());
+      traceSystem.getTrace().addApp(token.c_str());
     }
     return true;
   }
-  fprintf(m_ErrorStream, "Can't enable core services - not supported\n");
+  fprintf(m_Wire.getErrorStream(), "AddAndroidCoreToTrace::tryRunIn - Can't enable core services - not supported\n");
   return false;
-}
-
-Action * AddAndroidCoreToTrace::Builder::buildFrom(const SystemCore & systemCore) const {
-  auto * addAndroidCoreToTrace = new AddAndroidCoreToTrace();
-  addAndroidCoreToTrace->setErrorStream(systemCore.getErrorStream());
-  addAndroidCoreToTrace->setTrace(systemCore.getTrace());
-  addAndroidCoreToTrace->setAndroidSystem(systemCore.getAndroidSystem());
-  addAndroidCoreToTrace->setToolBox(systemCore.getToolBox());
-  return addAndroidCoreToTrace;
 }

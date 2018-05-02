@@ -17,34 +17,23 @@
 #ifndef LTTLWHWHT_ADDKERNELCATEGORIESFROMFILETOTRACE_H
 #define LTTLWHWHT_ADDKERNELCATEGORIESFROMFILETOTRACE_H
 
-#include "action.h"
+#include "abstracttraceaction.h"
 
-#include <cstdio>
 #include <string>
 
-#include "trace.h"
-#include "androidsystem.h"
-#include "toolbox.h"
-#include "systemcore.h"
-#include "extracearguments.h"
+#include "wire.h"
+#include "environment.h"
+#include "tracesystem.h"
 
 using namespace std;
 
-class AddKernelCategoriesFromFileToTrace : public Action {
+class AddKernelCategoriesFromFileToTrace : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setTrace(Trace * trace);
-    void setErrorStream(FILE * errorStream);
-    void setToolBox(ToolBox * toolBox);
-    void setFilename(const string & filename);
-    class Builder {
-      public:
-        Action * buildFrom(const SystemCore & systemCore, const ExtraceArguments & arguments) const;
-    };
+    AddKernelCategoriesFromFileToTrace(const Wire & wire, const string & filename):
+                                        AbstractTraceAction(wire),
+                                        m_Filename(filename) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
   private:
-    Trace * m_Trace;
-    ToolBox * m_ToolBox;
-    FILE * m_ErrorStream;
     string m_Filename;
 };
 
