@@ -24,7 +24,8 @@
 class ActionCmdLineBuilder {
   public:
     virtual ~ActionCmdLineBuilder() {}
-    virtual Action * build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const = 0;
+    virtual Action * build(const Wire & wire, const string & appName,
+                           const Signal & signal, const CmdLineArgs & cmdLineArgs) const = 0;
 };
 
 #endif // LTTLWHWHT_ACTIONCMDLINEBUILDER_H

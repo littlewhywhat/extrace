@@ -27,13 +27,16 @@
 
 class TraceActionsRunner : public Action {
   public:
-    TraceActionsRunner(const Wire & wire, TraceSystem * traceSystem, const TraceArguments & traceArguments):
-                       m_Wire(wire), m_TraceSystem(traceSystem) {};
+    TraceActionsRunner(const Wire & wire, Environment * environment,
+                       TraceSystem * traceSystem):
+                       m_Wire(wire), m_Environment(environment),
+                       m_TraceSystem(traceSystem) {};
     ~TraceActionsRunner();
     void addTraceAction(TraceAction * traceAction);
-    bool tryRunIn(Environment & environment) override;
+    bool tryRun() override;
   private:
     const Wire & m_Wire;
+    Environment * m_Environment = NULL;
     TraceSystem * m_TraceSystem = NULL;
     vector<TraceAction*> m_TraceActions;
 };

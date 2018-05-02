@@ -24,7 +24,7 @@ class ActionRunner {
   public:
     ActionRunner(Action * action): m_Action(action) {}
     ~ActionRunner();
-    bool tryRunIn(Environment & environment);
+    bool tryRun();
   private:
     Action * m_Action = NULL;
 };

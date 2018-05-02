@@ -21,9 +21,9 @@
 #include "addkernelcategoriesfromfiletotrace.h"
 #include "sleepaction.h"
 
-TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, TraceSystem * traceSystem,
-                                                      const TraceArguments & traceArguments) const {
-  auto * traceActionsRunner = new TraceActionsRunner(wire, traceSystem, traceArguments);
+TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire, Environment * environment, TraceSystem * traceSystem,
+      const TraceArguments & traceArguments) const{
+  auto * traceActionsRunner = new TraceActionsRunner(wire, environment, traceSystem);
 
   if (traceArguments.listCategoriesEnabled()) {
     traceActionsRunner->addTraceAction(new ListSupportedCategories(wire));

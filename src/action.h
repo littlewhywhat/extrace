@@ -22,7 +22,7 @@
 class Action {
   public:
     virtual ~Action() {}
-    virtual bool tryRunIn(Environment & environment) = 0;
+    virtual bool tryRun() = 0;
 };
 
 #endif // LTTLWHWHT_ACTION_H
