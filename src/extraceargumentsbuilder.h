@@ -18,20 +18,20 @@
 #define LTTLWHWHT_TRACEARGUMENTSBUILDER_H
 
 #include "arguments.h"
-#include "tracearguments.h"
+#include "extracearguments.h"
 #include "wire.h"
 #include "cmdlineargs.h"
 #include "cmdlineargsparser.h"
 
 #include <string>
 
-class TraceArgumentsBuilder {
+class ExtraceArgumentsBuilder {
   public:
-    const TraceArguments * build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const;
+    const ExtraceArguments * build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const;
   private:
     void registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsParser) const;
-    TraceArguments * createHelpTraceArguments() const;
-    TraceArguments * createTraceArguments(const Arguments & arguments) const;
+    ExtraceArguments * createHelpExtraceArguments() const;
+    ExtraceArguments * createExtraceArguments(const Arguments & arguments) const;
     const string & getHelpMessage() const;
 };
 

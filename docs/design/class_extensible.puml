@@ -41,8 +41,6 @@ interface ActionCmdLineBuilder {
 }
 hide ActionCmdLineBuilder fields
 
-ActionCmdLineBuilder --> Action: builds
-
 class ExtraceActionCmdLineBuilder {
   + build(wire: Wire, signal: Signal, cmdLineArgs: CmdLineArgs): Action 
 }
@@ -50,7 +48,12 @@ hide ExtraceActionCmdLineBuilder fields
 
 ExtraceActionCmdLineBuilder .> ActionCmdLineBuilder
 ExtraceActionCmdLineBuilder "-m_ExtraceArgumentsBuilder" -- "1" ExtraceArgumentsBuilder
-ExtraceActionCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" TraceActionsRunnerBuilder
+ExtraceActionCmdLineBuilder "-m_TraceActionsRunnerBuilder" -- "1" ExtraceActionBuilder
+
+interface ExtraceActionBuilder {
+  + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): ActionsRunner
+}
+hide ExtraceActionBuilder fields
 
 class ExtraceArgumentsBuilder {
   + build(wire: Wire, cmdLineArgs: CmdLineArgs): ExtraceArguments
@@ -60,31 +63,21 @@ class ExtraceArgumentsBuilder {
 }
 hide ExtraceArgumentsBuilder fields
 
-ExtraceArgumentsBuilder --> ExtraceArguments: builds
+ExtraceArgumentsBuilder --> ExtraceArguments
 
 class TraceSystemBuilder {
   + build(wire: Wire, extraceArguments: ExtraceArguments): TraceSystem
 }
 hide TraceSystemBuilder fields
 
-TraceSystemBuilder --> TraceSystem: builds
-
 class TraceActionsRunnerBuilder {
-  + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): TraceActionsRunner
+  + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): ActionsRunner
 }
 hide TraceActionsRunnerBuilder fields
 
+TraceActionsRunnerBuilder .> ExtraceActionBuilder
 TraceActionsRunnerBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
-TraceActionsRunnerBuilder --> TraceActionsRunner: builds
-
-class Environment {
-  - m_Name: string
-  - m_CanBeInterrupted: bool
-  --
-  + isInterrupted(): bool
-}
-
-Environment "-m_Signal" -- "1" Signal
+TraceActionsRunnerBuilder --> ActionsRunner: builds
 
 class ExtraceArguments {
   
@@ -103,16 +96,14 @@ TraceSystem "m_KernelSystem" -- "1" KernelSystem
 TraceSystem "m_AndroidSystem" -- "1" AndroidSystem
 TraceSystem "m_Trace" -- "1" Trace
 
-class TraceActionsRunner {
+class ActionsRunner {
   + tryRun(): bool
   + addTraceAction(traceAction: TraceAction): void
 }
-hide TraceActionsRunner fields
+hide ActionsRunner fields
 
-TraceActionsRunner ..> Action
-TraceActionsRunner "-m_Environment" -- "1" Environment
-TraceActionsRunner "-m_TraceSystem" -- "1" TraceSystem
-TraceActionsRunner "-m_TraceActions" -- "0..*" TraceAction
+ActionsRunner ..> Action
+ActionsRunner "-m_TraceActions" -- "0..*" Action
 
 interface FileSystem {
   + {abstract} fileExists(filename: const char*): bool
@@ -175,25 +166,12 @@ interface Action {
 }
 hide Action fields
 
-interface TraceAction {
-  + runIn(environment: Environment, traceSystem: TraceSystem): bool
-}
+abstract class TraceAction
 hide TraceAction fields
+hide TraceAction methods
 
-abstract class AbstractTraceAction {
-  
-}
-hide AbstractTraceAction fields
-
-AbstractTraceAction ..> TraceAction
-
-class SleepAction {
-  - duration: int
-  --
-  + runIn(environment: Environment, traceSystem: TraceSystem): bool
-}
-
-SleepAction --> AbstractTraceAction
+TraceAction -|> Action
+TraceAction "-m_TraceSystem" -- "1" TraceSystem
 
 ' Environment construction could be deeper
 ' Wired general class

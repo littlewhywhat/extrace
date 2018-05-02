@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "extraceconsoleapp.h"
 
-//! I am a builder class to build ExtraceConsoleApp with all dependencies
-class ExtraceConsoleAppBuilder 
-{
-  public:
-    //! Builds ExtraceConsoleApp
-    ExtraceConsoleApp * build(void) const;
-};
+#include "extraceactioncmdlinebuilder.h"
+#include "environment.h"
+
+Action * ExtraceActionCmdLineBuilder::build(const Wire & wire,
+                                                 const Signal & signal,
+                                                 const CmdLineArgs & cmdLineArgs) const {
+  auto   sp_traceArguments  = unique_ptr<const ExtraceArguments>(m_ExtraceArgumentsBuilder->build(wire, cmdLineArgs));
+  auto * traceActionsRunner = m_TraceActionsRunnerBuilder->build(wire, signal, *sp_traceArguments);
+  return traceActionsRunner;
+}

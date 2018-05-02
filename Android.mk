@@ -109,10 +109,10 @@ LOCAL_SRC_FILES:= \
 			src/dumpaction.cpp \
 			src/traceactionsrunner.cpp \
 			src/traceactionsrunnerbuilder.cpp \
-			src/traceactionsrunnercmdlinebuilder.cpp \
+			src/extraceactioncmdlinebuilder.cpp \
 			src/tracesystem.cpp \
-			src/tracearguments.cpp \
-			src/traceargumentsbuilder.cpp \
+			src/extracearguments.cpp \
+			src/extraceargumentsbuilder.cpp \
 	    src/androidtoolbox.cpp \
 			src/arguments.cpp \
 			src/cmdlineargsparser.cpp \

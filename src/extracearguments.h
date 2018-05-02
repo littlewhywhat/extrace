@@ -14,50 +14,88 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_EXTRACEARGUMENTS_H
-#define LTTLWHWHT_EXTRACEARGUMENTS_H
+#ifndef LTTLWHWHT_TRACEARGUMENTS_H
+#define LTTLWHWHT_TRACEARGUMENTS_H
 
-#include "arguments.h"
-#include "argsparser.h"
+#include <string>
+#include <vector>
+#include <stdint.h>
 
-class ExtraceArguments 
-{
+using namespace std;
+
+class ExtraceArguments {
   public:
-    void setArguments(const Arguments * arguments);
-    void registerTo(ArgsParser & argsParser) const;
-    bool areCorrect() const;
-    void printHelp(FILE * out, const string & appName) const;
-    bool haveHelpOption() const;
-    bool haveListCategoriesOption() const;
-    bool haveDumpFilename() const;
-    const string & getDumpFilename() const;
-    bool enableCompression() const;
-    bool enableAsyncStart() const;
-    bool enableAsyncStop() const;
-    bool enableAsyncDump() const;
-    bool enableStream() const;
-    bool enableListCategories() const;
-    bool enableCoreServices() const;
-    bool enableCircleBuffer() const;
-    bool enableInterrupts() const;
-    bool haveKernelCategoryFilename() const;
+    ExtraceArguments();
+    void setAppName(const string & appName);
+    void setHelpMessage(const string & message);
+    void enableCircleBuffer();
+    void enableIgnoreSignals();
+    void enableCompression();
+    void enableAsyncStart();
+    void enableAsyncStop();
+    void enableAsyncDump();
+    void enableStream();
+    void enableListCategories();
+    void enableCoreServices();
+    void setKernelCategoryFilename(const string & filename);
+    void setOutputFilename(const string & filename);
+    void setBufferSize(uint32_t size);
+    void setInitSleepDuration(uint32_t duration);
+    void setMidSleepDuration(uint32_t duration);
+    void setApps(const vector<string> & apps);
+    void setAndroidCategories(const vector<string> & categories);
+    void setKernelCategories(const vector<string> & categories);
+    void setKernelFunctions(const vector<string> & functions);
+    bool hasHelpMessage() const;
+    bool hasKernelCategoryFilename() const;
+    bool hasOutputFilename() const;
+    bool hasApps() const;
+    bool hasAndroidCategories() const;
+    bool hasKernelCategories() const;
+    bool hasKernelFunctions() const;
+    bool hasInitSleepDuration() const;
+    bool hasMidSleepDuration() const;
+    bool circleBufferEnabled() const;
+    bool ignoreSignalsEnabled() const;
+    bool compressionEnabled() const;
+    bool asyncStartEnabled() const;
+    bool asyncStopEnabled() const;
+    bool asyncDumpEnabled() const;
+    bool streamEnabled() const;
+    bool listCategoriesEnabled() const;
+    bool coreServicesEnabled() const;
+    const string & getAppName() const;
     const string & getKernelCategoryFilename() const;
-    bool specifyBufferSize() const;
-    int getBufferSize() const;
-    bool specifyInitSleepDuration() const;
-    int getInitSleepDuration() const;
-    bool specifyMidSleepDuration() const;
-    int getMidSleepDuration() const;
-    bool haveApps() const;
-    const vector<string> & getApps() const;
-    bool haveAndroidCategories() const;
+    const string & getOutputFilename() const;
+    const string & getHelpMessage() const;
+    uint32_t getBufferSize() const;
+    uint32_t getInitSleepDuration() const;
+    uint32_t getMidSleepDuration() const;
+    const vector<string> getApps() const;
     const vector<string> & getAndroidCategories() const;
-    bool haveKernelCategories() const;
     const vector<string> & getKernelCategories() const;
-    bool haveKernelFunctions() const;
     const vector<string> & getKernelFunctions() const;
   private:
-    const Arguments * m_Arguments;
+    bool m_CircleBuffer = false;
+    bool m_IgnoreSignals = false;
+    bool m_Compression = false;
+    bool m_AsyncStart = false;
+    bool m_AsyncStop = false;
+    bool m_AsyncDump = false;
+    bool m_Stream = false;
+    bool m_ListCategories = false;
+    bool m_CoreServices = false;
+    string m_AppName;
+    string m_HelpMessage;
+    string m_OutputFilename;
+    string m_KernelCategoryFilename;
+    uint32_t m_BufferSize = 1024;
+    uint32_t m_InitSleepDuration = 0;
+    uint32_t m_MidSleepDuration = 5;
+    vector<string> m_Apps;
+    vector<string> m_AndroidCategories;
+    vector<string> m_KernelCategories;
+    vector<string> m_KernelFunctions;
 };
 
-#endif // LTTLWHWHT_EXTRACEARGUMENTS_H
+#endif // LTTLWHWHT_TRACEARGUMENTS_H

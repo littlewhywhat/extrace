@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "traceargumentsbuilder.h"
+#include "extraceargumentsbuilder.h"
 #include "androidtoolbox.h"
 
 static const char * HELP_OPTION_NAME = "Help";
@@ -65,7 +65,7 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "                    of outstream.\n"
          " --acore          add core services.\n";
 
-void TraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsParser) const {
+void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsParser) const {
   cmdLineArgsParser.register_boolean("--help", HELP_OPTION_NAME);
   cmdLineArgsParser.register_boolean("-c", CIRCLE_BUFFER_OPTION_NAME);
   cmdLineArgsParser.register_boolean("-n", IGNORE_SIGNALS_OPTION_NAME);
@@ -87,14 +87,14 @@ void TraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsP
   cmdLineArgsParser.registerCommaSepList("-k", KERNEL_FUNC_OPTION_NAME);
 }
 
-TraceArguments * TraceArgumentsBuilder::createHelpTraceArguments() const {
-  TraceArguments * traceArguments = new TraceArguments();
+ExtraceArguments * ExtraceArgumentsBuilder::createHelpExtraceArguments() const {
+  ExtraceArguments * traceArguments = new ExtraceArguments();
   traceArguments->setHelpMessage(getHelpMessage());
   return traceArguments;
 }
 
-TraceArguments * TraceArgumentsBuilder::createTraceArguments(const Arguments & arguments) const {
-  TraceArguments * traceArguments = new TraceArguments();
+ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Arguments & arguments) const {
+  ExtraceArguments * traceArguments = new ExtraceArguments();
   if (arguments.is_enabled(HELP_OPTION_NAME)) {
     traceArguments->setHelpMessage(getHelpMessage());
   }
@@ -163,14 +163,14 @@ TraceArguments * TraceArgumentsBuilder::createTraceArguments(const Arguments & a
   return traceArguments;
 }
 
-const TraceArguments * TraceArgumentsBuilder::build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const {
+const ExtraceArguments * ExtraceArgumentsBuilder::build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const {
   CmdLineArgsParser cmdLineArgsParser(make_shared<AndroidToolBox>());
   registerCmdLineOpts(cmdLineArgsParser);
   Arguments arguments;
   if (cmdLineArgsParser.parse(arguments, cmdLineArgs) != cmdLineArgs.getCount()) {
-    return createHelpTraceArguments();
+    return createHelpExtraceArguments();
   }
-  auto * traceArguments = createTraceArguments(arguments);
+  auto * traceArguments = createExtraceArguments(arguments);
   traceArguments->setAppName(cmdLineArgs.getAppName());
   if (traceArguments->hasHelpMessage()
        || traceArguments->listCategoriesEnabled()
@@ -185,6 +185,6 @@ const TraceArguments * TraceArgumentsBuilder::build(const Wire & wire, const Cmd
   return traceArguments;
 }
 
-const string & TraceArgumentsBuilder::getHelpMessage() const {
+const string & ExtraceArgumentsBuilder::getHelpMessage() const {
   return HELP_MESSAGE;
 }
