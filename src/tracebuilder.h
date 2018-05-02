@@ -21,14 +21,14 @@
 #include "kernelsystem.h"
 #include "androidsystem.h"
 #include "trace.h"
-#include "tracearguments.h"
+#include "extracearguments.h"
 
 class TraceBuilder {
   public:
     Trace * build(const Wire & wire,
                   KernelSystem * kernelSystem,
                   AndroidSystem * androidSystem,
-                  const TraceArguments & traceArguments) const;
+                  const ExtraceArguments & traceArguments) const;
 };
 
 #endif // LTTLWHWHT_TRACEBUILDER_H

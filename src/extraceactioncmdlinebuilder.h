@@ -22,21 +22,21 @@
 #include "action.h"
 #include "wire.h"
 #include "cmdlineargs.h"
-#include "traceargumentsbuilder.h"
+#include "extraceargumentsbuilder.h"
 #include "tracesystembuilder.h"
 #include "traceactionsrunnerbuilder.h"
 
-class TraceActionsRunnerCmdLineBuilder : public ActionCmdLineBuilder {
+class ExtraceActionCmdLineBuilder : public ActionCmdLineBuilder {
   public:
-    TraceActionsRunnerCmdLineBuilder(TraceArgumentsBuilder     * traceArgumentsBuilder,
+    ExtraceActionCmdLineBuilder(ExtraceArgumentsBuilder     * traceArgumentsBuilder,
                                      TraceActionsRunnerBuilder * traceActionsRunner):
-                                     m_TraceArgumentsBuilder(traceArgumentsBuilder),
+                                     m_ExtraceArgumentsBuilder(traceArgumentsBuilder),
                                      m_TraceActionsRunnerBuilder(traceActionsRunner) {}
 
     Action * build(const Wire & wire, const Signal & signal,
                    const CmdLineArgs & cmdLineArgs) const override;
   private:
-    TraceArgumentsBuilder * m_TraceArgumentsBuilder = NULL;
+    ExtraceArgumentsBuilder * m_ExtraceArgumentsBuilder = NULL;
     TraceActionsRunnerBuilder * m_TraceActionsRunnerBuilder = NULL;
 };
 

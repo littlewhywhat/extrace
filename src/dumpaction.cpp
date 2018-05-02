@@ -61,7 +61,7 @@ bool DumpAction::tryRunIn(Environment & environment, TraceSystem & traceSystem) 
 }
 
 TraceAction * DumpAction::Builder::buildFrom(const Wire & wire,
-                                             const TraceArguments & arguments) const {
+                                             const ExtraceArguments & arguments) const {
   auto * dumpAction = new DumpAction(wire);
   if (arguments.compressionEnabled())
   {

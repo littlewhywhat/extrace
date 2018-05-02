@@ -33,7 +33,7 @@ TraceActionsRunnerBuilder::~TraceActionsRunnerBuilder() {
 
 TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire,
                                                       const Signal & signal,
-                                                      const TraceArguments & traceArguments) const{
+                                                      const ExtraceArguments & traceArguments) const{
   auto * traceSystem        = m_TraceSystemBuilder->build(wire, traceArguments);
   auto * environment        = new Environment(signal, traceArguments.getAppName(), 
                                               !traceArguments.ignoreSignalsEnabled());  

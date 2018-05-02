@@ -1,0 +1,77 @@
+@startuml
+
+interface Action {
+  + {abstract} tryRun(): bool
+}
+hide Action fields
+
+interface TraceAction {
+  + {abstract} tryRun(): bool
+}
+hide TraceAction fields
+
+abstract class WiredAction
+hide WiredAction fields
+hide WiredAction methods
+
+WiredAction -|> Action
+WiredAction "m_Wire" -- "1" Wire
+
+abstract class EnvironmentAction
+hide EnvironmentAction fields
+hide EnvironmentAction methods
+
+EnvironmentAction --|> WiredAction
+EnvironmentAction "-m_Environment" -- "1" Environment
+
+abstract class TraceAction {
+  
+}
+hide TraceAction fields
+
+TraceAction --|> WiredAction
+TraceAction "-m_TraceSystem" -- "1" TraceSystem
+
+abstract class InterruptableAction {
+  # isInterrupted(): bool
+}
+hide InterruptableAction fields
+
+InterruptableAction --|> WiredAction
+InterruptableAction "-m_Signal" -- "1" Signal
+
+abstract class InterruptableTraceAction {
+  
+}
+hide InterruptableTraceAction fields
+hide InterruptableTraceAction methods
+
+InterruptableTraceAction --|> TraceAction
+InterruptableTraceAction "-m_Signal" -- "1" Signal
+
+class SleepAction {
+  - duration: int
+  --
+  + tryRun(): bool
+}
+
+SleepAction ..> InterruptableAction
+
+class Signal
+hide Signal fields
+hide Signal methods
+
+class TraceSystem
+hide TraceSystem fields
+hide TraceSystem methods
+
+class Wire
+hide Wire fields
+hide Wire methods
+
+class Environment {
+  - m_Name: string
+}
+hide Environment methods
+
+@enduml

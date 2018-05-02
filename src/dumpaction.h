@@ -25,7 +25,7 @@
 #include "environment.h"
 #include "tracesystem.h"
 
-#include "tracearguments.h"
+#include "extracearguments.h"
 
 class DumpAction : public AbstractTraceAction {
   public:
@@ -36,7 +36,7 @@ class DumpAction : public AbstractTraceAction {
     class Builder 
     {
       public:
-        TraceAction * buildFrom(const Wire & wire, const TraceArguments & traceArguments) const;
+        TraceAction * buildFrom(const Wire & wire, const ExtraceArguments & traceArguments) const;
     };
   private:
     string m_OutputFile;

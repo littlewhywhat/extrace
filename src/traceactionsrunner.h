@@ -19,7 +19,7 @@
 
 #include "wire.h"
 #include "tracesystem.h"
-#include "tracearguments.h"
+#include "extracearguments.h"
 #include "traceaction.h"
 #include "action.h"
 

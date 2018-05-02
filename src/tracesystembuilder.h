@@ -21,7 +21,7 @@
 #include "androidsystembuilder.h"
 #include "tracebuilder.h"
 #include "wire.h"
-#include "tracearguments.h"
+#include "extracearguments.h"
 #include "tracesystem.h"
 
 class TraceSystemBuilder {
@@ -32,7 +32,7 @@ class TraceSystemBuilder {
                        m_KernelSystemBuilder(kernelSystemBuilder),
                        m_AndroidSystemBuilder(androidSystemBuilder),
                        m_TraceBuilder(traceBuilder) {}
-    TraceSystem * build(const Wire & wire, const TraceArguments & traceArguments) const;
+    TraceSystem * build(const Wire & wire, const ExtraceArguments & traceArguments) const;
   private:
     KernelSystemBuilder * m_KernelSystemBuilder = NULL;
     AndroidSystemBuilder * m_AndroidSystemBuilder = NULL;

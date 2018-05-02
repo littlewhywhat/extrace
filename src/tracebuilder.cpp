@@ -20,7 +20,7 @@
 
 Trace * TraceBuilder::build(const Wire & wire, KernelSystem * kernelSystem,
                             AndroidSystem * androidSystem,
-                            const TraceArguments & traceArguments) const {
+                            const ExtraceArguments & traceArguments) const {
   auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem);
   if (traceArguments.circleBufferEnabled()) {
     traceImpl->enableTraceOverwrite();
