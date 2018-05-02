@@ -17,7 +17,8 @@
 #include "cmdlineargs.h"
 
 CmdLineArgs::CmdLineArgs(int argc, const char** argv) {
-  for (int i = 0; i < argc; i++) {
+  m_AppName = argv[0];
+  for (int i = 1; i < argc; i++) {
     m_Args.push_back(argv[i]);
   }
 }
@@ -28,4 +29,8 @@ uint32_t CmdLineArgs::getCount() const {
 
 const string & CmdLineArgs::get(uint32_t id) const {
   return m_Args[id];
+}
+
+const string & CmdLineArgs::getAppName() const {
+  return m_AppName;
 }

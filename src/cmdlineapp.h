@@ -32,14 +32,12 @@ class CmdLineApp {
     int run();
     void setArgs(const CmdLineArgs * cmdLineArgs);
     void setActionCmdLineBuilder(ActionCmdLineBuilder * actionCmdLineBuilder);
-    void setAppName(const char * appName);
     void handleSignal();
   private:
     Wire * m_Wire = NULL;
     const CmdLineArgs * m_CmdLineArgs = NULL;
     const ActionCmdLineBuilder * m_ActionCmdLineBuilder = NULL;
     Signal m_Signal;
-    string m_AppName;
 };
 
 #endif // LTTLWHWHT_CMDLINEAPP_H
