@@ -27,10 +27,14 @@
 #include "cleanupaction.h"
 #include "environment.h"
 
+TraceActionsRunnerBuilder::~TraceActionsRunnerBuilder() {
+  delete m_TraceSystemBuilder;
+}
+
 TraceActionsRunner * TraceActionsRunnerBuilder::build(const Wire & wire,
                                                       const Signal & signal,
-                                                      TraceSystem * traceSystem,
                                                       const TraceArguments & traceArguments) const{
+  auto * traceSystem        = m_TraceSystemBuilder->build(wire, traceArguments);
   auto * environment        = new Environment(signal, traceArguments.getAppName(), 
                                               !traceArguments.ignoreSignalsEnabled());  
   auto * traceActionsRunner = new TraceActionsRunner(wire, environment, traceSystem);

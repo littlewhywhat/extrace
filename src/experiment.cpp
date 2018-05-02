@@ -36,12 +36,13 @@ int main(int argc, const char ** argv) {
   cmdLineApp.setArgs(new CmdLineArgs(argc, argv));
   cmdLineApp.setActionCmdLineBuilder(new TraceActionsRunnerCmdLineBuilder(
                                          new TraceArgumentsBuilder(),
-                                         new TraceSystemBuilder(
-                                             new KernelSystemBuilder(),  // TODO
-                                             new AndroidSystemBuilder(), // TODO
-                                             new TraceBuilder()          // TODO
-                                         ),
-                                         new TraceActionsRunnerBuilder() // TODO
+                                         new TraceActionsRunnerBuilder(
+                                             new TraceSystemBuilder(
+                                                 new KernelSystemBuilder(),
+                                                 new AndroidSystemBuilder(),
+                                                 new TraceBuilder()
+                                             )
+                                         )
                                     ));
   registerSignalHandler();
   return cmdLineApp.run();
