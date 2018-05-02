@@ -18,6 +18,7 @@
 
 TraceActionsRunner::~TraceActionsRunner() {
   delete m_TraceSystem;
+  delete m_Environment;
   for (auto * traceAction : m_TraceActions) {
     delete traceAction;
   }
@@ -27,9 +28,9 @@ void TraceActionsRunner::addTraceAction(TraceAction * traceAction) {
   m_TraceActions.push_back(traceAction);
 }
 
-bool TraceActionsRunner::tryRunIn(Environment & environment) {
+bool TraceActionsRunner::tryRun() {
   for (auto * traceAction : m_TraceActions) {
-    if (!traceAction->tryRunIn(environment, *m_TraceSystem)) {
+    if (!traceAction->tryRunIn(*m_Environment, *m_TraceSystem)) {
       return false;
     }
   }

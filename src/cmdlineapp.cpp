@@ -18,7 +18,6 @@
 
 #include <cstdlib>
 
-#include "environment.h"
 #include "actionrunner.h"
 
 void CmdLineApp::handleSignal() {
@@ -46,9 +45,11 @@ int CmdLineApp::run() {
   if (!m_CmdLineArgs || !m_ActionCmdLineBuilder) {
     return EXIT_FAILURE;
   }
-  Environment environment(m_Signal, m_AppName);
-  ActionRunner actionRunner(m_ActionCmdLineBuilder->build(*m_Wire, *m_CmdLineArgs));
-  if (actionRunner.tryRunIn(environment)) {
+  ActionRunner actionRunner(m_ActionCmdLineBuilder->build(*m_Wire,
+                                                          m_AppName,
+                                                          m_Signal,
+                                                          *m_CmdLineArgs));
+  if (actionRunner.tryRun()) {
     return EXIT_SUCCESS;
   }
   return EXIT_FAILURE;

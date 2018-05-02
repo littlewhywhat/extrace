@@ -25,13 +25,14 @@ using namespace std;
 
 class Environment {
   public:
-    Environment(const Signal & signal, const string & name):
-                m_Signal(signal), m_Name(name) {}
+    Environment(const Signal & signal, const string & name, bool canBeInterrupted):
+                m_Signal(signal), m_Name(name), m_CanBeInterrupted(canBeInterrupted) {}
     bool isInterrupted() const;
     const string & getName() const;
   private:
     const Signal & m_Signal;
     const string & m_Name;
+    bool m_CanBeInterrupted = true;
 };
 
 #endif // LTTLWHWHT_ENVIRONMENT_H

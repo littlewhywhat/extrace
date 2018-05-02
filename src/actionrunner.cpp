@@ -20,9 +20,9 @@ ActionRunner::~ActionRunner() {
   delete m_Action;
 }
 
-bool ActionRunner::tryRunIn(Environment & environment) {
+bool ActionRunner::tryRun() {
   if (m_Action) {
-    return m_Action->tryRunIn(environment);
+    return m_Action->tryRun();
   }
   return false;
 }

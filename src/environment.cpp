@@ -17,7 +17,7 @@
 #include "environment.h"
 
 bool Environment::isInterrupted() const {
-  return m_Signal.isFired();
+  return m_Signal.isFired() && m_CanBeInterrupted;
 }
 
 const string & Environment::getName() const {
