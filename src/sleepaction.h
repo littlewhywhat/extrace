@@ -17,32 +17,24 @@
 #ifndef LTTLWHWHT_SLEEPACTION_H
 #define LTTLWHWHT_SLEEPACTION_H
 
-#include "interruptableaction.h"
+#include "abstracttraceaction.h"
 
 #include <inttypes.h> // uint32_t
-#include <stdio.h>    // FILE
 
-#include "systemcore.h"
-#include "extracearguments.h"
+#include "wire.h"
+#include "environment.h"
+#include "tracesystem.h"
 
 using namespace std;
 
-class SleepAction : public InterruptableAction {
+class SleepAction : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setDurationSeconds(uint32_t durationSeconds);
-    void setErrorStream(FILE * errorStream);
-    class InitSleepBuilder {
-      public:
-        InterruptableAction * buildFrom(const ExtraceArguments & arguments) const;
-    };
-    class MidSleepBuilder {
-      public:
-        InterruptableAction * buildFrom(const ExtraceArguments & arguments) const;
-    };
+    SleepAction(const Wire & wire, uint32_t durationSeconds):
+                  AbstractTraceAction(wire),
+                  m_DurationSeconds(durationSeconds) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
   private:
-    uint32_t m_DurationSeconds = 5;
-    FILE * m_ErrorStream;
+    uint32_t m_DurationSeconds = 0;
 };
 
 #endif // LTTLWHWHT_SLEEPACTION_H

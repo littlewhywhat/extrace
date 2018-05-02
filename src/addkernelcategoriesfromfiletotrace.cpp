@@ -15,43 +15,16 @@
  */
 #include "addkernelcategoriesfromfiletotrace.h"
 
-void AddKernelCategoriesFromFileToTrace::setTrace(Trace * trace) {
-  m_Trace = trace;
-}
+#include "androidtoolbox.h"
 
-void AddKernelCategoriesFromFileToTrace::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-void AddKernelCategoriesFromFileToTrace::setToolBox(ToolBox * toolBox) {
-  m_ToolBox = toolBox;
-}
-
-void AddKernelCategoriesFromFileToTrace::setFilename(const string & filename) {
-  m_Filename = filename;
-}
-
-bool AddKernelCategoriesFromFileToTrace::tryRun() {
+bool AddKernelCategoriesFromFileToTrace::tryRunIn(Environment & environment, TraceSystem & traceSystem) {
   set<string> tokens;
-  if (!m_ToolBox->parseFileToTokens(m_Filename.c_str(), " ", tokens)) {
-    fprintf(m_ErrorStream, "error parsing category file \"%s\"\n", m_Filename.c_str());
+  if (!AndroidToolBox().parseFileToTokens(m_Filename.c_str(), " ", tokens)) {
+    fprintf(m_Wire.getErrorStream(), "AddKernelCategoriesFromFileToTrace::tryRunIn - error parsing category file \"%s\"\n", m_Filename.c_str());
     return false;
   }
   for (const auto & token : tokens) {
-     m_Trace->addKernelCategory(token.c_str());
+     traceSystem.getTrace().addKernelCategory(token.c_str());
   }
   return true;
-}
-
-Action * AddKernelCategoriesFromFileToTrace::Builder::buildFrom(const SystemCore & systemCore,
-                                                            const ExtraceArguments & arguments) const {
-  auto * addKernelCategoriesFromFileToTrace = new AddKernelCategoriesFromFileToTrace();
-  if (arguments.haveKernelCategoryFilename())
-  {
-    addKernelCategoriesFromFileToTrace->setFilename(arguments.getKernelCategoryFilename());
-  }
-  addKernelCategoriesFromFileToTrace->setErrorStream(systemCore.getErrorStream());
-  addKernelCategoriesFromFileToTrace->setTrace(systemCore.getTrace());
-  addKernelCategoriesFromFileToTrace->setToolBox(systemCore.getToolBox());
-  return addKernelCategoriesFromFileToTrace;
 }

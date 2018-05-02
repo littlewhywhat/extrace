@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
+#ifndef LTTLWHWHT_ABSTRACTTRACEACTION_H
+#define LTTLWHWHT_ABSTRACTTRACEACTION_H
+
 #include "traceaction.h"
 
-bool TraceAction::tryRunIn(Environment & environment, TraceSystem & system) {
-  if (m_HelpMessage.empty())
-    fprintf(m_Wire.getErrorStream(), "Hello %s\n", environment.getName().c_str());
-  else
-    fprintf(m_Wire.getErrorStream(), m_HelpMessage.c_str(), environment.getName().c_str());
-  return true;
-}
+#include "wire.h"
+
+class AbstractTraceAction : public TraceAction {
+  public:
+    AbstractTraceAction(const Wire & wire): m_Wire(wire) {}
+    virtual ~AbstractTraceAction() {}
+  protected:
+    const Wire & m_Wire;
+};
+
+#endif // LTTLWHWHT_ABSTRACTTRACEACTION_H

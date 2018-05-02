@@ -98,7 +98,10 @@ LOCAL_SRC_FILES:= \
 			src/androidsystembuilder.cpp \
 			src/tracesystembuilder.cpp \
 			src/tracebuilder.cpp \
-			src/traceaction.cpp \
+			src/listsupportedcategories.cpp \
+			src/addandroidcoretotrace.cpp \
+			src/addkernelcategoriesfromfiletotrace.cpp \
+			src/sleepaction.cpp \
 			src/traceactionsrunner.cpp \
 			src/traceactionsrunnerbuilder.cpp \
 			src/traceactionsrunnercmdlinebuilder.cpp \

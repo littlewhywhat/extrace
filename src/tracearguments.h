@@ -52,6 +52,8 @@ class TraceArguments {
     bool hasAndroidCategories() const;
     bool hasKernelCategories() const;
     bool hasKernelFunctions() const;
+    bool hasInitSleepDuration() const;
+    bool hasMidSleepDuration() const;
     bool circleBufferEnabled() const;
     bool ignoreSignalsEnabled() const;
     bool compressionEnabled() const;

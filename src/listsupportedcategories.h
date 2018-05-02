@@ -17,30 +17,20 @@
 #ifndef LTTLWHWHT_LISTSUPPORTEDCATEGORIES_H
 #define LTTLWHWHT_LISTSUPPORTEDCATEGORIES_H
 
-#include "action.h"
+#include "abstracttraceaction.h"
 
 #include <cstdio>
 
-#include "androidsystem.h"
-#include "kernelsystem.h"
-#include "systemcore.h"
+#include "environment.h"
+#include "tracesystem.h"
+#include "wire.h"
 
 using namespace std;
 
-class ListSupportedCategories : public Action {
+class ListSupportedCategories : public AbstractTraceAction {
   public:
-    bool tryRun() override;
-    void setOutputStream(FILE * outputStream);
-    void setAndroidSystem(AndroidSystem * AndroidSystem);
-    void setKernelSystem(KernelSystem * kernelSystem);
-    class Builder {
-      public:
-        Action * buildFrom(const SystemCore & systemCore) const;
-    };
-  private:
-    AndroidSystem * m_AndroidSystem;
-    KernelSystem * m_KernelSystem;
-    FILE * m_OutputStream;
+    ListSupportedCategories(const Wire & wire): AbstractTraceAction(wire) {}
+    bool tryRunIn(Environment & environment, TraceSystem & traceSystem) override;
 };
 
 #endif // LTTLWHWHT_LISTSUPPORTEDCATEGORIES_H

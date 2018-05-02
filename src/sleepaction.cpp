@@ -18,43 +18,19 @@
 #include <time.h> // nanosleep, struct timespec
 #include <errno.h>
 
-void SleepAction::setDurationSeconds(uint32_t durationSeconds) {
-  m_DurationSeconds = durationSeconds;
-}
-
-void SleepAction::setErrorStream(FILE * errorStream) {
-  m_ErrorStream = errorStream;
-}
-
-bool SleepAction::tryRun() {
+bool SleepAction::tryRunIn(Environment & environment, TraceSystem & system) {
   bool ok = true;
   struct timespec timeLeft;
   timeLeft.tv_sec = m_DurationSeconds;
   timeLeft.tv_nsec = 0;
   do {
-    if (m_Interrupted) {
+    if (environment.isInterrupted()) {
       ok = false;
       break;
     }
   } while (nanosleep(&timeLeft, &timeLeft) == -1 && errno == EINTR);
   if (!ok) {
-    fprintf(m_ErrorStream, "error SleepAction::tryRun - sleep aborted\n");
+    fprintf(m_Wire.getErrorStream(), "error SleepAction::tryRun - sleep aborted\n");
   }
   return ok;
-}
-
-InterruptableAction * SleepAction::InitSleepBuilder::buildFrom(const ExtraceArguments & arguments) const {
-  auto * sleepAction = new SleepAction();
-  if (arguments.specifyInitSleepDuration()) {
-    sleepAction->setDurationSeconds(arguments.getInitSleepDuration());
-  }
-  return sleepAction;
-}
-
-InterruptableAction * SleepAction::MidSleepBuilder::buildFrom(const ExtraceArguments & arguments) const {
-  auto * sleepAction = new SleepAction();
-  if (arguments.specifyMidSleepDuration()) {
-    sleepAction->setDurationSeconds(arguments.getMidSleepDuration());
-  }
-  return sleepAction;
 }
