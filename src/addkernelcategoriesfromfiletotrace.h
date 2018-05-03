@@ -24,9 +24,9 @@
 class AddKernelCategoriesFromFileToTrace : public TraceAction {
   public:
     AddKernelCategoriesFromFileToTrace(const Wire & wire,
-                                       const shared_ptr<TraceSystem> & traceSystem,
+                                       const shared_ptr<Trace> & trace,
                                        const string & filename):
-                                        TraceAction(wire, traceSystem),
+                                        TraceAction(wire, trace),
                                         m_Filename(filename) {}
     bool tryRun() override;
   private:

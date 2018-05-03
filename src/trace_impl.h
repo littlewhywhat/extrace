@@ -21,20 +21,23 @@
 
 #include "kernelsystem.h"
 #include "androidsystem.h"
+#include "filesystem.h"
 #include "wire.h"
 
 #include <vector>
 #include <string>
 #include <memory>
 #include <cstdio>
+#include <unistd.h> // close
 
 using namespace std;
 
 class TraceImpl : public Trace {
   public:
     TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
-               KernelSystem * kernelSystem): m_Wire(wire),
-               m_AndroidSystem(androidSystem), m_KernelSystem(kernelSystem) {}
+               KernelSystem * kernelSystem, FileSystem * fileSystem):
+               m_Wire(wire), m_AndroidSystem(androidSystem),
+               m_KernelSystem(kernelSystem), m_FileSystem(fileSystem) {}
     ~TraceImpl();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
@@ -49,12 +52,23 @@ class TraceImpl : public Trace {
     void addAndroidCategory(const char * categoryName) override;
     void addApp(const char * appName) override;
     void addFunction(const char * funcName) override;
+    bool trySendTo(const string & filename) override;
+    bool trySendCompressedTo(const string & filename) override;
+    bool trySendToOutput() override;
+    bool trySendCompressedToOutput() override;
+    bool tryStream(const Signal & signal) override;
+    bool tryAddKernelCategoriesFromFile(const string & filename) override;
+    bool tryEnableAndroidCoreServices() override;
+    void printSupportedCategories() override;
+    bool tryClear() override;
+    bool tryWriteClockSyncMarker() override;
     void enableTraceOverwrite();
     void setTraceBufferSizeKB(uint32_t size);
   private:
     const Wire & m_Wire;
     AndroidSystem * m_AndroidSystem;
     KernelSystem * m_KernelSystem;
+    FileSystem * m_FileSystem;
     bool m_TraceOverwriteSwitch = false;
     uint32_t m_TraceBufferSizeKB = 2048;
     vector<string> m_KernelCategories;

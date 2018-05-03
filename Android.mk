@@ -95,7 +95,6 @@ LOCAL_SRC_FILES:= \
 			src/environment.cpp \
 			src/kernelsystembuilder.cpp \
 			src/androidsystembuilder.cpp \
-			src/tracesystembuilder.cpp \
 			src/tracebuilder.cpp \
 			src/listsupportedcategories.cpp \
 			src/addandroidcoretotrace.cpp \
@@ -110,7 +109,6 @@ LOCAL_SRC_FILES:= \
 			src/actionsrunner.cpp \
 			src/extraceactionsrunnerbuilder.cpp \
 			src/extraceactioncmdlinebuilder.cpp \
-			src/tracesystem.cpp \
 			src/extracearguments.cpp \
 			src/extraceargumentsbuilder.cpp \
 	    src/androidtoolbox.cpp \

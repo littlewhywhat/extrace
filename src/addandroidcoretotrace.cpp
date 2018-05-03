@@ -19,16 +19,5 @@
 #include "androidtoolbox.h"
 
 bool AddAndroidCoreToTrace::tryRun() {
-  set<string> tokens;
-  if (m_TraceSystem->getAndroidSystem().has_core_services()) {
-    string value;
-    m_TraceSystem->getAndroidSystem().property_get_core_service_names(value);
-    AndroidToolBox().parseToTokens(value.c_str(), ",", tokens);
-    for (const auto & token : tokens) {
-      m_TraceSystem->getTrace().addApp(token.c_str());
-    }
-    return true;
-  }
-  fprintf(m_Wire.getErrorStream(), "AddAndroidCoreToTrace::tryRunIn - Can't enable core services - not supported\n");
-  return false;
+  return m_Trace->tryEnableAndroidCoreServices();
 }

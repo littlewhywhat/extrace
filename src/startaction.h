@@ -21,8 +21,8 @@
 
 class StartAction : public TraceAction {
   public:
-    StartAction(const Wire & wire, const shared_ptr<TraceSystem> traceSystem):
-                TraceAction(wire, traceSystem) {}
+    StartAction(const Wire & wire, const shared_ptr<Trace> trace):
+                TraceAction(wire, trace) {}
     bool tryRun() override;
 };
 

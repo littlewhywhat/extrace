@@ -16,16 +16,6 @@
 
 #include "addkernelcategoriesfromfiletotrace.h"
 
-#include "androidtoolbox.h"
-
 bool AddKernelCategoriesFromFileToTrace::tryRun() {
-  set<string> tokens;
-  if (!AndroidToolBox().parseFileToTokens(m_Filename.c_str(), " ", tokens)) {
-    fprintf(m_Wire.getErrorStream(), "AddKernelCategoriesFromFileToTrace::tryRunIn - error parsing category file \"%s\"\n", m_Filename.c_str());
-    return false;
-  }
-  for (const auto & token : tokens) {
-     m_TraceSystem->getTrace().addKernelCategory(token.c_str());
-  }
-  return true;
+  return m_Trace->tryAddKernelCategoriesFromFile(m_Filename);
 }

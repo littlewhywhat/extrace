@@ -65,14 +65,13 @@ hide ExtraceArgumentsBuilder fields
 
 ExtraceArgumentsBuilder --> ExtraceArguments
 
-class TraceSystemBuilder {
+class TraceBuilder {
   + build(wire: Wire, extraceArguments: ExtraceArguments): TraceSystem
 }
-hide TraceSystemBuilder fields
+hide TraceBuilder fields
 
-TraceSystemBuilder "-m_AndroidSystemBuilder" -- "1" AndroidSystemBuilder
-TraceSystemBuilder "-m_KernelSystemBuilder" -- "1" KernelSystemBuilder
-TraceSystemBuilder "-m_TraceBuilder" -- "1" TraceBuilder
+TraceBuilder "-m_AndroidSystemBuilder" -- "1" AndroidSystemBuilder
+TraceBuilder "-m_KernelSystemBuilder" -- "1" KernelSystemBuilder
 
 class AndroidSystemBuilder {
   + build(wire: Wire): AndroidSystem
@@ -86,36 +85,18 @@ class KernelSystemBuilder {
 }
 hide KernelSystemBuilder fields
 
-class TraceBuilder {
-  + build(wire: Wire, kernelSystem: KernelSystem, androidSystem: AndroidSystem, extraceArgs: ExtraceArguments): Trace
-}
-hide TraceBuilder fields
-
 class ExtraceActionsRunnerBuilder {
   + build(wire: Wire, signal: Signal, extraceArguments: ExtraceArguments): ActionsRunner
 }
 hide ExtraceActionsRunnerBuilder fields
 
 ExtraceActionsRunnerBuilder .> ExtraceActionBuilder
-ExtraceActionsRunnerBuilder "-m_TraceSystemBuilder" -- "1" TraceSystemBuilder
+ExtraceActionsRunnerBuilder "-m_TraceBuilder" -- "1" TraceBuilder
 ExtraceActionsRunnerBuilder --> ActionsRunner: builds
 
 class ExtraceArguments {
   
 }
-
-class TraceSystem {
-  + getFileSystem(): FileSystem
-  + getKernelSystem(): KernelSystem
-  + getAndroidSystem(): AndroidSystem
-  + getTrace(): Trace
-}
-hide TraceSystem fields
-
-TraceSystem "m_FileSystem" -- "1" FileSystem
-TraceSystem "m_KernelSystem" -- "1" KernelSystem
-TraceSystem "m_AndroidSystem" -- "1" AndroidSystem
-TraceSystem "m_Trace" -- "1" Trace
 
 class ActionsRunner {
   + tryRun(): bool
@@ -135,6 +116,9 @@ interface FileSystem {
   + {abstract} appendStr(filename: const char*, str: const char*): bool
 }
 hide FileSystem fields
+
+class FileSystemImpl
+FileSystemImpl .. FileSystem
 
 interface KernelSystem {
   + {abstract} tryStreamTrace(signal: Signal): bool
@@ -166,6 +150,7 @@ class KernelSystemImpl {
 hide KernelSystemImpl fields
 
 KernelSystemImpl ..> KernelSystem
+KernelSystemImpl "-m_FileSystem" -- "1" FileSystem
 
 interface AndroidSystem {
   + {abstract} has_core_services(): bool
@@ -180,17 +165,47 @@ interface AndroidSystem {
 }
 hide AndroidSystem fields
 
+class AndroidSystemImpl
+AndroidSystem ..> AndroidSystemImpl
+
 interface Trace {
-  + addKernelCategory(categoryName: string): void
-  + addAndroidCategory(categoryName: string): void
-  + addApp(appName: string): void
-  + addFunction(funcName: string): void
-  + setUp(): bool 
-  + cleanUp(): void 
-  + start(): bool 
-  + stop(): void 
+  + {abstract} addKernelCategory(categoryName: string): void
+  + {abstract} addAndroidCategory(categoryName: string): void
+  + {abstract} addApp(appName: string): void
+  + {abstract} addFunction(funcName: string): void
+  + {abstract} setUp(): bool 
+  + {abstract} cleanUp(): void 
+  + {abstract} start(): bool 
+  + {abstract} stop(): void 
+  + {abstract} tryStream(signal: Signal): bool
+  + {abstract} trySendTo(filename: string): bool
+  + {abstract} trySendCompressedTo(filename: string): bool
+  + {abstract} trySendToOutput(): bool
+  + {abstract} trySendCompressedToOutput(): bool
+  + {abstract} tryAddKernelCategoriesFromFile(filename: string): bool
+  + {abstract} tryEnableAndroidCoreServices(): bool
+  + {abstract} printSupportedCategories(): void
+  + {abstract} tryClear(): bool
+  + {abstract} tryWriteClockSyncMarker(): bool
 }
 hide Trace fields
+
+class TraceImpl {
+  - m_TraceOverwriteSwitch: bool
+  - m_TraceBufferSizeKB: int
+  - m_KernelCategories: vector<string>
+  - m_AndroidCategories: vector<string>
+  - m_Apps: vector<string>
+  - m_Functions: vector<string>
+  --
+  + enableTraceOverwrite();
+  + setTraceBufferSizeKB(size: int)
+}
+
+TraceImpl ..> Trace
+TraceImpl "-m_FileSystem" -- "1" FileSystem
+TraceImpl "-m_KernelSystem" -- "1" KernelSystem
+TraceImpl "-m_AndroidSystem" -- "1" AndroidSystem
 
 interface Action {
   + tryRun(): bool
@@ -202,7 +217,7 @@ hide TraceAction fields
 hide TraceAction methods
 
 TraceAction -|> Action
-TraceAction "-m_TraceSystem" -- "1" TraceSystem
+TraceAction "-m_Trace" -- "1" Trace
 
 ' Environment construction could be deeper
 ' Wired general class

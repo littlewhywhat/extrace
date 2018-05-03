@@ -17,18 +17,23 @@
 #ifndef LTTLWHWHT_TRACEBUILDER_H
 #define LTTLWHWHT_TRACEBUILDER_H
 
+#include "kernelsystembuilder.h"
+#include "androidsystembuilder.h"
 #include "wire.h"
-#include "kernelsystem.h"
-#include "androidsystem.h"
-#include "trace.h"
 #include "extracearguments.h"
+#include "trace.h"
 
 class TraceBuilder {
   public:
-    Trace * build(const Wire & wire,
-                  KernelSystem * kernelSystem,
-                  AndroidSystem * androidSystem,
-                  const ExtraceArguments & traceArguments) const;
+    TraceBuilder(KernelSystemBuilder * kernelSystemBuilder,
+                 AndroidSystemBuilder * androidSystemBuilder):
+                 m_KernelSystemBuilder(kernelSystemBuilder),
+                 m_AndroidSystemBuilder(androidSystemBuilder) {}
+    ~TraceBuilder();
+    Trace * build(const Wire & wire, const ExtraceArguments & traceArguments) const;
+  private:
+    KernelSystemBuilder * m_KernelSystemBuilder = NULL;
+    AndroidSystemBuilder * m_AndroidSystemBuilder = NULL;
 };
 
 #endif // LTTLWHWHT_TRACEBUILDER_H

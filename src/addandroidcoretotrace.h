@@ -21,8 +21,8 @@
 
 class AddAndroidCoreToTrace : public TraceAction {
   public:
-    AddAndroidCoreToTrace(const Wire & wire, const shared_ptr<TraceSystem> & traceSystem):
-                          TraceAction(wire, traceSystem) {}
+    AddAndroidCoreToTrace(const Wire & wire, const shared_ptr<Trace> & trace):
+                          TraceAction(wire, trace) {}
     bool tryRun() override;
 };
 

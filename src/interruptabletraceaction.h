@@ -23,9 +23,9 @@
 
 class InterruptableTraceAction : public TraceAction {
   public:
-    InterruptableTraceAction(const Wire & wire, shared_ptr<TraceSystem> traceSystem,
+    InterruptableTraceAction(const Wire & wire, shared_ptr<Trace> trace,
                              const Signal & signal):
-                             TraceAction(wire, traceSystem), m_Signal(signal) {}
+                             TraceAction(wire, trace), m_Signal(signal) {}
     virtual ~InterruptableTraceAction() {}
   protected:
     const Signal & m_Signal;

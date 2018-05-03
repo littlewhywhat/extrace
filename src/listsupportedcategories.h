@@ -22,8 +22,8 @@
 class ListSupportedCategories : public TraceAction {
   public:
     ListSupportedCategories(const Wire & wire, 
-                            const shared_ptr<TraceSystem> & traceSystem):
-                            TraceAction(wire, traceSystem) {}
+                            const shared_ptr<Trace> & trace):
+                            TraceAction(wire, trace) {}
     bool tryRun() override;
 };
 

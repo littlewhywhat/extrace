@@ -17,6 +17,12 @@
 #ifndef LTTLWHWHT_TRACE_H
 #define LTTLWHWHT_TRACE_H
 
+#include "signal.h"
+
+#include <string>
+
+using namespace std;
+
 class Trace {
   public:
     virtual ~Trace() {}
@@ -34,6 +40,16 @@ class Trace {
     // Disable tracing in the kernel.
     virtual void stop() = 0;
     // Read data from the tracing pipe and forward to outstream
+    virtual bool trySendTo(const string & filename) = 0;
+    virtual bool trySendCompressedTo(const string & filename) = 0;
+    virtual bool trySendToOutput() = 0;
+    virtual bool trySendCompressedToOutput() = 0;
+    virtual bool tryStream(const Signal & signal) = 0;
+    virtual bool tryAddKernelCategoriesFromFile(const string & filename) = 0;
+    virtual bool tryEnableAndroidCoreServices() = 0;
+    virtual void printSupportedCategories() = 0;
+    virtual bool tryClear() = 0;
+    virtual bool tryWriteClockSyncMarker() = 0;
 };
 
 #endif // LTTLWHWHT_TRACE_H

@@ -16,18 +16,6 @@
 #include "listsupportedcategories.h"
 
 bool ListSupportedCategories::tryRun() {
-  auto & kernelSystem = m_TraceSystem->getKernelSystem();
-  const auto & kernelCategories = kernelSystem.getCategories();
-  for (const auto & category : kernelCategories) {
-      if (kernelSystem.isCategorySupported(category)) {
-          fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
-      }
-  }
-  auto & androidSystem = m_TraceSystem->getAndroidSystem();
-  const auto & androidCategories = androidSystem.getCategories();
-  for (const auto & category : androidCategories) {
-      // is there a way to check?
-      fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
-  }
+  m_Trace->printSupportedCategories();
   return true;
 }

@@ -16,5 +16,5 @@
 #include "streamaction.h"
 
 bool StreamAction::tryRun() {
-  return m_TraceSystem->getKernelSystem().tryStreamTrace(m_Signal);
+  return m_Trace->tryStream(m_Signal);
 }

@@ -26,42 +26,24 @@ void DumpAction::enableCompression() {
 }
 
 bool DumpAction::tryRun() {
-  FILE * errorStream = m_Wire.getErrorStream();
-  auto & kernelSystem = m_TraceSystem->getKernelSystem();
-  auto & fileSystem = m_TraceSystem->getFileSystem();
-
-  int outFd;
   if (!m_OutputFile.empty()) {
-    outFd = fileSystem.tryOpenFileToWriteOrCreate(m_OutputFile.c_str());
-    if (outFd == -1) {
-      fprintf(errorStream, "error DumpAction::tryRun\n");
-      return false;
-    }
+    if (m_Compress) {
+      return m_Trace->trySendCompressedTo(m_OutputFile);
+    } 
+    return m_Trace->trySendTo(m_OutputFile);
+  } 
+  else if (m_Compress) {
+    return m_Trace->trySendCompressedToOutput();
   }
   else {
-    outFd = fileno(m_Wire.getOutputStream());
+    return m_Trace->trySendToOutput();
   }
-
-  bool ok = true;
-  if (m_Compress) {
-    ok &= kernelSystem.trySendTraceCompressedTo(outFd);
-  } else {
-    ok &= kernelSystem.trySendTraceTo(outFd);
-  }
-  if (!ok) {
-    fprintf(errorStream, "error DumpAction::tryRun\n");
-  }
-
-  if (!m_OutputFile.empty()) {
-    close(outFd);
-  }
-  return ok;
 }
 
 TraceAction * DumpAction::Builder::buildFrom(const Wire & wire,
-                                             const shared_ptr<TraceSystem> & traceSystem,
+                                             const shared_ptr<Trace> & trace,
                                              const ExtraceArguments & arguments) const {
-  auto * dumpAction = new DumpAction(wire, traceSystem);
+  auto * dumpAction = new DumpAction(wire, trace);
   if (arguments.compressionEnabled())
   {
     dumpAction->enableCompression();
