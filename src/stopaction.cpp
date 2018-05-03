@@ -19,7 +19,7 @@
 
 bool StopAction::tryRun() {
   bool ok = true;
-  m_TraceSystem->getTrace().stop();
+  m_Trace->stop();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error StopAction::tryRun\n");
   }

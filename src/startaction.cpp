@@ -17,8 +17,8 @@
 
 bool StartAction::tryRun() {
   bool ok = true;
-  ok &= m_TraceSystem->getTrace().setUp();
-  ok &= m_TraceSystem->getTrace().start();
+  ok &= m_Trace->setUp();
+  ok &= m_Trace->start();
 
   if (ok) {
     fprintf(m_Wire.getOutputStream(), "started trace...\n");
@@ -29,8 +29,8 @@ bool StartAction::tryRun() {
     // contain entries from only one CPU can cause "begin" entries without a
     // matching "end" entry to show up if a task gets migrated from one CPU to
     // another.
-    ok &= m_TraceSystem->getKernelSystem().clearTrace();
-    ok &= m_TraceSystem->getKernelSystem().writeClockSyncMarker();
+    ok &= m_Trace->tryClear();
+    ok &= m_Trace->tryWriteClockSyncMarker();
   } else {
     fprintf(m_Wire.getErrorStream(), "error StartAction::tryRun\n");
   }

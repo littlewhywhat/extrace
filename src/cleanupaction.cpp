@@ -17,7 +17,7 @@
 
 bool CleanUpAction::tryRun() {
   bool ok = true;
-  m_TraceSystem->getTrace().cleanUp();
+  m_Trace->cleanUp();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error CleanUpAction::tryRun\n");
   }

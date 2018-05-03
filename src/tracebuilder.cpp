@@ -16,12 +16,19 @@
 
 #include "tracebuilder.h"
 
+#include "filesystem_impl.h"
 #include "trace_impl.h"
 
-Trace * TraceBuilder::build(const Wire & wire, KernelSystem * kernelSystem,
-                            AndroidSystem * androidSystem,
-                            const ExtraceArguments & traceArguments) const {
-  auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem);
+TraceBuilder::~TraceBuilder() {
+  delete m_KernelSystemBuilder;
+  delete m_AndroidSystemBuilder;
+}
+
+Trace * TraceBuilder::build(const Wire & wire, const ExtraceArguments & traceArguments) const {
+  FileSystem * fileSystem = new FileSystemImpl(wire);
+  auto * kernelSystem  = m_KernelSystemBuilder->build(wire, fileSystem);
+  auto * androidSystem = m_AndroidSystemBuilder->build(wire);
+  auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem, fileSystem);
   if (traceArguments.circleBufferEnabled()) {
     traceImpl->enableTraceOverwrite();
   }
@@ -47,4 +54,4 @@ Trace * TraceBuilder::build(const Wire & wire, KernelSystem * kernelSystem,
     }
   }
   return traceImpl;
-}
+};

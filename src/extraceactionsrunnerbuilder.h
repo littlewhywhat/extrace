@@ -21,17 +21,17 @@
 #include "signal.h"
 #include "extracearguments.h"
 #include "actionsrunner.h"
-#include "tracesystembuilder.h"
+#include "tracebuilder.h"
 
 class ExtraceActionsRunnerBuilder {
   public:
-    ExtraceActionsRunnerBuilder(TraceSystemBuilder * traceSystemBuilder):
-                                m_TraceSystemBuilder(traceSystemBuilder) {}
+    ExtraceActionsRunnerBuilder(TraceBuilder * traceBuilder):
+                                m_TraceBuilder(traceBuilder) {}
     ~ExtraceActionsRunnerBuilder();
     ActionsRunner * build(const Wire & wire, Signal & signal,
                           const ExtraceArguments & traceArguments) const;
   private:
-    TraceSystemBuilder * m_TraceSystemBuilder = NULL;
+    TraceBuilder * m_TraceBuilder = NULL;
 };
 
 #endif // LTTLWHWHT_EXTRACEACTIONSRUNNERBUILDER_H

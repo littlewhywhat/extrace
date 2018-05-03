@@ -16,7 +16,13 @@
 
 #include "trace_impl.h"
 
-TraceImpl::~TraceImpl() {}
+#include "androidtoolbox.h"
+
+TraceImpl::~TraceImpl() {
+  delete m_FileSystem;
+  delete m_KernelSystem;
+  delete m_AndroidSystem;
+}
 
 void TraceImpl::enableTraceOverwrite() {
   m_TraceOverwriteSwitch = true;
@@ -106,4 +112,87 @@ void TraceImpl::stop() {
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::stop\n");
   }
+}
+
+bool TraceImpl::trySendTo(const string & filename) {
+  int outFd = m_FileSystem->tryOpenFileToWriteOrCreate(filename.c_str());
+  if (outFd == -1) {
+    fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
+    return false;
+  }
+  bool ok = m_KernelSystem->trySendTraceTo(outFd);
+  close(outFd);
+  return ok;
+}
+
+bool TraceImpl::trySendCompressedTo(const string & filename) {
+  int outFd = m_FileSystem->tryOpenFileToWriteOrCreate(filename.c_str());
+  if (outFd == -1) {
+    fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
+    return false;
+  }
+  bool ok = m_KernelSystem->trySendTraceCompressedTo(outFd);
+  close(outFd);
+  return ok; 
+}
+
+bool TraceImpl::trySendToOutput() {
+  return m_KernelSystem->trySendTraceTo(fileno(m_Wire.getOutputStream()));
+}
+
+bool TraceImpl::trySendCompressedToOutput() {
+  return m_KernelSystem->trySendTraceCompressedTo(fileno(m_Wire.getOutputStream()));
+}
+
+bool TraceImpl::tryStream(const Signal & signal) {
+  return m_KernelSystem->tryStreamTrace(signal); 
+}
+
+bool TraceImpl::tryAddKernelCategoriesFromFile(const string & filename) {
+  set<string> tokens;
+  if (!AndroidToolBox().parseFileToTokens(filename.c_str(), " ", tokens)) {
+    fprintf(m_Wire.getErrorStream(), "TraceImpl::tryAddKernelCategoriesFromFile - error parsing category file \"%s\"\n", filename.c_str());
+    return false;
+  }
+  for (const auto & token : tokens) {
+     addKernelCategory(token.c_str());
+  }
+  return true;
+}
+
+bool TraceImpl::tryEnableAndroidCoreServices() {
+  set<string> tokens;
+  if (m_AndroidSystem->has_core_services()) {
+    string value;
+    m_AndroidSystem->property_get_core_service_names(value);
+    AndroidToolBox().parseToTokens(value.c_str(), ",", tokens);
+    for (const auto & token : tokens) {
+      addApp(token.c_str());
+    }
+    return true;
+  }
+  fprintf(m_Wire.getErrorStream(), "TraceImpl::tryEnableAndroidCoreServices - Can't enable core services - not supported\n");
+  return false;
+}
+
+void TraceImpl::printSupportedCategories() {
+  const auto & kernelCategories = m_KernelSystem->getCategories();
+  for (const auto & category : kernelCategories) {
+      if (m_KernelSystem->isCategorySupported(category)) {
+          fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
+      }
+  }
+  const auto & androidCategories = m_AndroidSystem->getCategories();
+  for (const auto & category : androidCategories) {
+      // is there a way to check?
+      fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
+  }
+}
+
+bool TraceImpl::tryClear() {
+  return m_KernelSystem->clearTrace();
+}
+
+bool TraceImpl::tryWriteClockSyncMarker() {
+  return m_KernelSystem->writeClockSyncMarker();
 }

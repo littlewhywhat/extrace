@@ -21,15 +21,15 @@
 
 #include <memory>
 
-#include "tracesystem.h"
+#include "trace.h"
 
 class TraceAction : public Action {
   public:
-    TraceAction(const Wire & wire, shared_ptr<TraceSystem> traceSystem):
-                Action(wire), m_TraceSystem(traceSystem) {}
+    TraceAction(const Wire & wire, shared_ptr<Trace> trace):
+                Action(wire), m_Trace(trace) {}
     virtual ~TraceAction() {}
   protected:
-    shared_ptr<TraceSystem> m_TraceSystem;
+    shared_ptr<Trace> m_Trace;
 };
 
 #endif // LTTLWHWHT_TRACEACTION_H

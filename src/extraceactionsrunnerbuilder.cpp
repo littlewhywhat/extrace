@@ -32,13 +32,13 @@
 #include "showhelpaction.h"
 
 ExtraceActionsRunnerBuilder::~ExtraceActionsRunnerBuilder() {
-  delete m_TraceSystemBuilder;
+  delete m_TraceBuilder;
 }
 
 ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
                                                    Signal & signal,
                                                    const ExtraceArguments & extraceArguments) const{
-  auto traceSystem = shared_ptr<TraceSystem>(m_TraceSystemBuilder->build(wire, extraceArguments));
+  auto trace = shared_ptr<Trace>(m_TraceBuilder->build(wire, extraceArguments));
   auto environment = shared_ptr<Environment>(new Environment(extraceArguments.getAppName()));  
   auto * actionsRunner = new ActionsRunner(wire);
   if (extraceArguments.hasHelpMessage()) {
@@ -47,17 +47,17 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
     return actionsRunner;
   }
   if (extraceArguments.listCategoriesEnabled()) {
-    actionsRunner->addAction(new ListSupportedCategories(wire, traceSystem));
+    actionsRunner->addAction(new ListSupportedCategories(wire, trace));
     return actionsRunner;
   } 
   if (extraceArguments.ignoreSignalsEnabled()) {
     signal.turnOff();
   }
   if (extraceArguments.coreServicesEnabled()) {
-    actionsRunner->addAction(new AddAndroidCoreToTrace(wire, traceSystem));
+    actionsRunner->addAction(new AddAndroidCoreToTrace(wire, trace));
   }
   if (extraceArguments.hasKernelCategoryFilename()) {
-    actionsRunner->addAction(new AddKernelCategoriesFromFileToTrace(wire, traceSystem, 
+    actionsRunner->addAction(new AddKernelCategoriesFromFileToTrace(wire, trace, 
                                              extraceArguments.getKernelCategoryFilename()));
   }
   if (extraceArguments.hasInitSleepDuration()) {
@@ -65,36 +65,36 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
                                              extraceArguments.getInitSleepDuration()));
   }
   if (extraceArguments.asyncStartEnabled()) {
-    actionsRunner->addAction(new StartAction(wire, traceSystem));
+    actionsRunner->addAction(new StartAction(wire, trace));
     if (extraceArguments.streamEnabled()) {
-      actionsRunner->addAction(new StreamAction(wire, traceSystem, signal));
+      actionsRunner->addAction(new StreamAction(wire, trace, signal));
       signal.turnOn();
     }
   }
   else if (extraceArguments.asyncStopEnabled()) {
-    actionsRunner->addAction(new StopAction(wire, traceSystem));
+    actionsRunner->addAction(new StopAction(wire, trace));
     actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, traceSystem, extraceArguments));
-    actionsRunner->addAction(new CleanUpAction(wire, traceSystem));
+                               .buildFrom(wire, trace, extraceArguments));
+    actionsRunner->addAction(new CleanUpAction(wire, trace));
   }
   else if (extraceArguments.asyncDumpEnabled()) {
     actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, traceSystem, extraceArguments));
+                               .buildFrom(wire, trace, extraceArguments));
   }
   else {
-    actionsRunner->addAction(new StartAction(wire, traceSystem));
+    actionsRunner->addAction(new StartAction(wire, trace));
     actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getInitSleepDuration()));
     if (extraceArguments.streamEnabled()) {
-      actionsRunner->addAction(new StreamAction(wire, traceSystem, signal));
+      actionsRunner->addAction(new StreamAction(wire, trace, signal));
       signal.turnOn();
     }
     actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getMidSleepDuration()));
-    actionsRunner->addAction(new StopAction(wire, traceSystem));
+    actionsRunner->addAction(new StopAction(wire, trace));
     actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, traceSystem, extraceArguments));
-    actionsRunner->addAction(new CleanUpAction(wire, traceSystem));
+                               .buildFrom(wire, trace, extraceArguments));
+    actionsRunner->addAction(new CleanUpAction(wire, trace));
   }
   return actionsRunner;
 }

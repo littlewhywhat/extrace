@@ -21,9 +21,9 @@
 
 class StreamAction : public InterruptableTraceAction {
   public:
-    StreamAction(const Wire & wire, const shared_ptr<TraceSystem> & traceSystem,
+    StreamAction(const Wire & wire, const shared_ptr<Trace> & trace,
                  const Signal & signal):
-                 InterruptableTraceAction(wire, traceSystem, signal) {}
+                 InterruptableTraceAction(wire, trace, signal) {}
     bool tryRun() override;
 };
 

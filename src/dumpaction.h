@@ -26,8 +26,8 @@
 
 class DumpAction : public TraceAction {
   public:
-    DumpAction(const Wire & wire, const shared_ptr<TraceSystem> & traceSystem):
-               TraceAction(wire, traceSystem) {}
+    DumpAction(const Wire & wire, const shared_ptr<Trace> & trace):
+               TraceAction(wire, trace) {}
     bool tryRun() override;
     void setOutputFile(const string & outputFile);
     void enableCompression();
@@ -35,7 +35,7 @@ class DumpAction : public TraceAction {
     {
       public:
         TraceAction * buildFrom(const Wire & wire,
-                                const shared_ptr<TraceSystem> & traceSystem,
+                                const shared_ptr<Trace> & trace,
                                 const ExtraceArguments & traceArguments) const;
     };
   private:
