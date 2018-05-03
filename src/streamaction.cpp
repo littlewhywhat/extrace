@@ -16,22 +16,5 @@
 #include "streamaction.h"
 
 bool StreamAction::tryRun() {
-  bool ok = true;
-  int traceStream = m_TraceSystem->getKernelSystem().getTracePipeFd();
-  if (traceStream == -1) {
-      fprintf(m_Wire.getErrorStream(), "error StreamAction::tryRun\n");
-      return false;
-  }
-  FILE * outputStream = m_Wire.getOutputStream();
-  while (!m_Signal.isFired()) {
-      if (!m_TraceSystem->getKernelSystem().try_send(traceStream, fileno(outputStream))) {
-          if (!m_Signal.isFired()) {
-            fprintf(m_Wire.getErrorStream(), "error StreamAction::tryRun - stream aborted\n");
-            ok = false;
-          }
-          break;
-      }
-      fflush(outputStream);
-  }
-  return ok;
+  return m_TraceSystem->getKernelSystem().tryStreamTrace(m_Signal);
 }

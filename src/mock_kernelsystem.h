@@ -37,7 +37,7 @@ class MockKernelSystem : public KernelSystem {
     MOCK_METHOD1(setGlobalClockEnable, bool(bool enable));
     MOCK_METHOD1(setPrintTgidEnableIfPresent, bool(bool enable));
     MOCK_METHOD1(setKernelTraceFuncs, bool(const vector<string> & funcs));
-    MOCK_METHOD1(enableKernelTraceEvents, bool(const vector<string> & ids));
+    MOCK_METHOD1(setKernelTraceCategories, bool(const vector<string> & ids));
     MOCK_CONST_METHOD0(getCategories, const vector<TracingCategory>&(void));
     MOCK_METHOD0(disableKernelTraceEvents, bool());
     MOCK_CONST_METHOD1(isCategorySupported, bool(const TracingCategory& category));

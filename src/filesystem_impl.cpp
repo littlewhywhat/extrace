@@ -22,6 +22,15 @@
 #include <unistd.h> // access
 #include <fcntl.h>  // creat, open
 
+int FileSystemImpl::tryOpenFileToWriteOrCreate(const char* filename)
+{
+    int outFd = open(filename, O_WRONLY | O_CREAT);
+    if (outFd == -1) {
+      printf("Failed to open '%s', err=%d", filename, errno);
+    }
+    return outFd;
+}
+
 bool FileSystemImpl::fileExists(const char* filename)
 {
     return access(filename, F_OK) != -1;

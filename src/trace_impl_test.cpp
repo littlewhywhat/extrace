@@ -62,7 +62,7 @@ class TraceImplTest : public ::testing::Test {
                                  .WillOnce(Return(true));
       EXPECT_CALL(*kernelSystem, disableKernelTraceEvents())
                                  .WillOnce(Return(true));
-      EXPECT_CALL(*kernelSystem, enableKernelTraceEvents(emptyVector))
+      EXPECT_CALL(*kernelSystem, setKernelTraceCategories(emptyVector))
                                  .WillOnce(Return(true));
       ASSERT_TRUE(trace.setUp());
       EXPECT_EQ(GetCapturedStdout(), string());
@@ -96,7 +96,7 @@ class TraceImplTest : public ::testing::Test {
                                  .WillOnce(Return(true));
       EXPECT_CALL(*kernelSystem, disableKernelTraceEvents())
                                  .WillOnce(Return(true));
-      EXPECT_CALL(*kernelSystem, enableKernelTraceEvents(kernelCategories))
+      EXPECT_CALL(*kernelSystem, setKernelTraceCategories(kernelCategories))
                                  .WillOnce(Return(true));
       trace.addFunction(function1.c_str());
       trace.addApp(app1.c_str());
@@ -128,7 +128,7 @@ class TraceImplTest : public ::testing::Test {
                                  .WillOnce(Return(true));
       EXPECT_CALL(*kernelSystem, disableKernelTraceEvents())
                                  .WillOnce(Return(true));
-      EXPECT_CALL(*kernelSystem, enableKernelTraceEvents(emptyVector))
+      EXPECT_CALL(*kernelSystem, setKernelTraceCategories(emptyVector))
                                  .WillOnce(Return(true));
       ASSERT_FALSE(trace.setUp());
       EXPECT_EQ(GetCapturedStdout(), string("error TraceImpl::setUp\n"));

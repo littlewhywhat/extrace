@@ -26,38 +26,36 @@ void DumpAction::enableCompression() {
 }
 
 bool DumpAction::tryRun() {
-  FILE * outputStream = m_Wire.getOutputStream();
   FILE * errorStream = m_Wire.getErrorStream();
-  int outFd = fileno(outputStream);
-  KernelSystem & kernelSystem = m_TraceSystem->getKernelSystem();
+  auto & kernelSystem = m_TraceSystem->getKernelSystem();
+  auto & fileSystem = m_TraceSystem->getFileSystem();
+
+  int outFd;
   if (!m_OutputFile.empty()) {
-    outFd = kernelSystem.tryOpenToWriteOrCreate(m_OutputFile.c_str());
+    outFd = fileSystem.tryOpenFileToWriteOrCreate(m_OutputFile.c_str());
     if (outFd == -1) {
       fprintf(errorStream, "error DumpAction::tryRun\n");
       return false;
     }
-  } 
-  dprintf(outFd, "TRACE:\n");
-
-  int traceFD = kernelSystem.getTraceFd();
-  if (traceFD == -1) {
-    fprintf(errorStream, "error DumpAction::tryRun\n");
-    return false;
   }
+  else {
+    outFd = fileno(m_Wire.getOutputStream());
+  }
+
   bool ok = true;
   if (m_Compress) {
-    ok &= kernelSystem.compress_trace_to(traceFD, outFd);
+    ok &= kernelSystem.trySendTraceCompressedTo(outFd);
   } else {
-    ok &= kernelSystem.try_sendfile(traceFD, outFd);
+    ok &= kernelSystem.trySendTraceTo(outFd);
   }
   if (!ok) {
     fprintf(errorStream, "error DumpAction::tryRun\n");
   }
-  close(traceFD);
+
   if (!m_OutputFile.empty()) {
     close(outFd);
   }
-  return kernelSystem.clearTrace();
+  return ok;
 }
 
 TraceAction * DumpAction::Builder::buildFrom(const Wire & wire,

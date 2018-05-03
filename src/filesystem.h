@@ -23,6 +23,7 @@
 class FileSystem {
   public:
     virtual ~FileSystem() {}
+    virtual int tryOpenFileToWriteOrCreate(const char* filename) = 0;
     virtual bool fileExists(const char* filename) = 0;
     virtual bool fileIsWritable(const char* filename) = 0;
     virtual bool truncateFile(const char* path) = 0;

@@ -127,6 +127,7 @@ ActionsRunner ..> Action
 ActionsRunner "-m_TraceActions" -- "0..*" Action
 
 interface FileSystem {
+  + {abstract} tryOpenFileToWriteOrCreate(filename: string): int
   + {abstract} fileExists(filename: const char*): bool
   + {abstract} fileIsWritable(filename: const char*): bool
   + {abstract} truncateFile(path: const char*): bool
@@ -136,26 +137,35 @@ interface FileSystem {
 hide FileSystem fields
 
 interface KernelSystem {
-  + {abstract} tryOpenToWriteOrCreate(filename: string): int
-  + {abstract} try_sendfile(fd_from: int, fd_to: int): bool
-  + {abstract} compress_trace_to(traceFD: int, outFd: int): bool
+  + {abstract} tryStreamTrace(signal: Signal): bool
+  + {abstract} trySendTraceTo(int outFD): bool
+  + {abstract} trySendTraceCompressedTo(int outFD): bool
   + {abstract} writeClockSyncMarker(): bool
   + {abstract} setTraceOverwriteEnable(enable: bool): bool
   + {abstract} setTracingEnabled(enable: bool): bool
   + {abstract} clearTrace(): bool
-  + {abstract} getTracePipeFd(): int
-  + {abstract} getTraceFd(): int
-  + {abstract} try_send(fd_from: int, fd_to: int): bool
   + {abstract} setTraceBufferSizeKB(size: int): bool
   + {abstract} setGlobalClockEnable(enable: bool): bool
   + {abstract} setPrintTgidEnableIfPresent(enable: bool): bool
   + {abstract} setKernelTraceFuncs(funcs: vector<string>): bool
-  + {abstract} enableKernelTraceEvents(ids: vector<string>): bool
+  + {abstract} setKernelTraceCategories(ids: vector<string>): bool
   + {abstract} getCategories(): vector<TracingCategory>
   + {abstract} disableKernelTraceEvents(): bool
   + {abstract} isCategorySupported(category: TracingCategory) const: bool
 }
 hide KernelSystem fields
+
+class KernelSystemImpl {
+  - try_send(fd_from: int, fd_to: int): bool
+  - try_sendfile(fd_from: int, fd_to: int): bool
+  - compress_trace_to(traceFD: int, outFd: int): bool
+  - getTracePipeFd(): int
+  - getTraceFd(): int
+  - try_send(fd_from: int, fd_to: int): bool
+}
+hide KernelSystemImpl fields
+
+KernelSystemImpl ..> KernelSystem
 
 interface AndroidSystem {
   + {abstract} has_core_services(): bool

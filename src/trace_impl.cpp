@@ -63,7 +63,7 @@ bool TraceImpl::setUp() {
   ok &= m_KernelSystem->disableKernelTraceEvents();
 
   // Enable all the sysfs enables that are in an enabled category.
-  ok &= m_KernelSystem->enableKernelTraceEvents(m_KernelCategories);
+  ok &= m_KernelSystem->setKernelTraceCategories(m_KernelCategories);
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::setUp\n");
   }
