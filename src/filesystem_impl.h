@@ -25,6 +25,7 @@
 class FileSystemImpl : public FileSystem {
   public:
     FileSystemImpl(const Wire & wire): m_Wire(wire) {}
+    int tryOpenFileToWriteOrCreate(const char* filename) override;
     bool fileExists(const char* filename) override;
     // Check whether a file is writable.
     bool fileIsWritable(const char* filename) override;

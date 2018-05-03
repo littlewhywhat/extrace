@@ -30,13 +30,57 @@
 KernelSystemImpl::~KernelSystemImpl()
 {}
 
-int KernelSystemImpl::tryOpenToWriteOrCreate(const char* filename)
-{
-    int outFd = open(filename, O_WRONLY | O_CREAT);
-    if (outFd == -1) {
-      printf("Failed to open '%s', err=%d", filename, errno);
-    }
-    return outFd;
+bool KernelSystemImpl::trySendTraceTo(int outFD) {
+  int traceFD = getTraceFd();
+  if (traceFD == -1) {
+    fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceTo\n");
+    return false;
+  }
+  dprintf(outFD, "TRACE:\n");
+  bool ok = try_sendfile(traceFD, outFD);
+  if (!ok) {
+    fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceTo\n");
+  }
+  close(traceFD);
+  ok &= clearTrace();
+  return ok;
+}
+
+bool KernelSystemImpl::trySendTraceCompressedTo(int outFD) {
+  int traceFD = getTraceFd();
+  if (traceFD == -1) {
+    fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceCompressedTo\n");
+    return false;
+  }
+  dprintf(outFD, "TRACE:\n");
+  bool ok = compress_trace_to(traceFD, outFD);
+  if (!ok) {
+    fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceCompressedTo\n");
+  }
+  close(traceFD);
+  ok &= clearTrace();
+  return ok;
+}
+
+bool KernelSystemImpl::tryStreamTrace(const Signal & signal) {
+  bool ok = true;
+  int traceStream = getTracePipeFd();
+  if (traceStream == -1) {
+      fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::tryStreamTraceTo\n");
+      return false;
+  }
+  FILE * outputStream = m_Wire.getOutputStream();
+  while (!signal.isFired()) {
+      if (!try_send(traceStream, fileno(outputStream))) {
+          if (!signal.isFired()) {
+            fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::tryStreamTraceTo - stream aborted\n");
+            ok = false;
+          }
+          break;
+      }
+      fflush(outputStream);
+  }
+  return ok;
 }
 
 bool KernelSystemImpl::try_sendfile(int fd_from, int fd_to)
@@ -313,7 +357,7 @@ bool KernelSystemImpl::disableKernelTraceEvents() {
     return ok;
 }
 
-bool KernelSystemImpl::enableKernelTraceEvents(const std::vector<string> & ids) {
+bool KernelSystemImpl::setKernelTraceCategories(const std::vector<string> & ids) {
     bool ok = true;
     for (const auto & id : ids) {
         if (m_Categories.find(id) == m_Categories.end()) {

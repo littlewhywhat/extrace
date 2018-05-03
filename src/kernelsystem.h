@@ -19,6 +19,8 @@
 #define LTTLWHWHT_KERNELSYSTEM_H
 
 #include "tracingcategory.h"
+#include "signal.h"
+
 #include <set>
 #include <string>
 #include <stdio.h>
@@ -28,9 +30,9 @@ using namespace std;
 class KernelSystem {
   public:
     virtual ~KernelSystem() {}
-    virtual int tryOpenToWriteOrCreate(const char* filename) = 0;
-    virtual bool try_sendfile(int fd_from, int fd_to) = 0;
-    virtual bool compress_trace_to(int traceFD, int outFd) = 0;
+    virtual bool tryStreamTrace(const Signal & signal) = 0;
+    virtual bool trySendTraceTo(int outFD) = 0;
+    virtual bool trySendTraceCompressedTo(int outFD) = 0;
     virtual bool writeClockSyncMarker() = 0;
     // Enable or disable overwriting of the kernel trace buffers.  Disabling this
     // will cause tracing to stop once the trace buffers have filled up.
@@ -38,14 +40,11 @@ class KernelSystem {
     // Enable or disable kernel tracing.
     virtual bool setTracingEnabled(bool enable) = 0;
     virtual bool clearTrace() = 0;
-    virtual int getTracePipeFd() = 0;
-    virtual int getTraceFd() = 0;
-    virtual bool try_send(int fd_from, int fd_to) = 0;
     virtual bool setTraceBufferSizeKB(int size) = 0;
     virtual bool setGlobalClockEnable(bool enable) = 0;
     virtual bool setPrintTgidEnableIfPresent(bool enable) = 0;
     virtual bool setKernelTraceFuncs(const vector<string> & funcs) = 0;
-    virtual bool enableKernelTraceEvents(const vector<string> & ids) = 0;
+    virtual bool setKernelTraceCategories(const vector<string> & ids) = 0;
     virtual const vector<TracingCategory> & getCategories() const = 0;
     // Disable all /sys/ enable files.
     virtual bool disableKernelTraceEvents() = 0;

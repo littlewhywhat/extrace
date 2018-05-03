@@ -17,12 +17,12 @@ hide WiredAction methods
 WiredAction -|> Action
 WiredAction "m_Wire" -- "1" Wire
 
-abstract class EnvironmentAction
-hide EnvironmentAction fields
-hide EnvironmentAction methods
+class ShowHelpAction
+hide ShowHelpAction fields
+hide ShowHelpAction methods
 
-EnvironmentAction --|> WiredAction
-EnvironmentAction "-m_Environment" -- "1" Environment
+ShowHelpAction --|> WiredAction
+ShowHelpAction "-m_Environment" -- "1" Environment
 
 abstract class TraceAction {
   

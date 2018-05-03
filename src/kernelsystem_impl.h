@@ -35,16 +35,13 @@ class KernelSystemImpl : public KernelSystem {
                      m_Wire(wire), m_FileSystem(fileSystem),
                      m_ToolBox(toolBox), m_SystemTime(systemTime) {}
     ~KernelSystemImpl();
-    int tryOpenToWriteOrCreate(const char* filename);
-    bool try_sendfile(int fd_from, int fd_to);
-    bool compress_trace_to(int traceFD, int outFd) override;
+    bool tryStreamTrace(const Signal & signal) override;
+    bool trySendTraceTo(int outFD) override;
+    bool trySendTraceCompressedTo(int outFD) override;
     bool writeClockSyncMarker() override;
     bool setTraceOverwriteEnable(bool enable) override;
     bool setTracingEnabled(bool enable) override;
     bool clearTrace() override;
-    int getTracePipeFd() override;
-    int getTraceFd() override;
-    bool try_send(int fd_from, int fd_to) override;
     bool setTraceBufferSizeKB(int size) override;
     // Enable or disable the kernel's use of the global clock.  Disabling the global
     // clock will result in the kernel using a per-CPU local clock.
@@ -54,7 +51,7 @@ class KernelSystemImpl : public KernelSystem {
     bool setPrintTgidEnableIfPresent(bool enable) override;
     // Set the comma separated list of functions that the kernel is to trace.
     bool setKernelTraceFuncs(const vector<string> & funcs) override;
-    bool enableKernelTraceEvents(const vector<string> & ids);
+    bool setKernelTraceCategories(const vector<string> & ids);
     const vector<TracingCategory> & getCategories() const override;
     // Disable all /sys/ enable files.
     bool disableKernelTraceEvents();
@@ -73,6 +70,11 @@ class KernelSystemImpl : public KernelSystem {
     map<string, TracingCategory> m_Categories;
     vector<TracingCategory> m_CategoriesList;
 
+    int getTracePipeFd();
+    int getTraceFd();
+    bool try_send(int fd_from, int fd_to);
+    bool try_sendfile(int fd_from, int fd_to);
+    bool compress_trace_to(int traceFD, int outFd);
     bool writeMarker(const char * buffer);
     // Read the trace_clock sysfs file and return true if it matches the requested
     // value.  The trace_clock file format is:
