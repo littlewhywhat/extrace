@@ -186,7 +186,7 @@ uint32_t ExtraceArguments::getMidSleepDuration() const {
   return m_MidSleepDuration;
 }
 
-const vector<string> ExtraceArguments::getApps() const {
+const vector<string> & ExtraceArguments::getApps() const {
   return m_Apps;
 }
 
