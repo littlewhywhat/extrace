@@ -71,7 +71,7 @@ class ExtraceArguments {
     uint32_t getBufferSize() const;
     uint32_t getInitSleepDuration() const;
     uint32_t getMidSleepDuration() const;
-    const vector<string> getApps() const;
+    const vector<string> & getApps() const;
     const vector<string> & getAndroidCategories() const;
     const vector<string> & getKernelCategories() const;
     const vector<string> & getKernelFunctions() const;

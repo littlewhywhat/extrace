@@ -21,34 +21,31 @@
 #include "androidsystem.h"
 #include "tracingcategory.h"
 #include "wire.h"
+#include "android.h"
 
 #include <map>
+#include <vector>
+
+using namespace std;
 
 class AndroidSystemImpl : public AndroidSystem {
   public:
-    AndroidSystemImpl(const Wire & wire): m_Wire(wire) {}
+    AndroidSystemImpl(const Wire & wire, Android * android);
     bool has_core_services() const override;
-    const std::vector<TracingCategory> & getCategories() const;
-    bool tryEnableCategories(const vector<string> & categories);
-    void disableAllCategories();
-    void property_get_core_service_names(std::string & content) const override;
+    const vector<TracingCategory> & getCategories() const override;
+    bool tryEnableCategories(const vector<string> & categories) override;
+    void disableAllCategories() override;
+    void property_get_core_service_names(string & content) const override;
     bool setAppCmdlineProperty(const vector<string> & appNames) override;
     bool pokeBinderServices() override;
     void clearAppProperties() override;
     void log_dumping_trace() override;
     void add_category(const char * id, const char * name, uint64_t atrace_tag);
-    class Creator {
-      public:
-        AndroidSystemImpl * createWithDefaultCategories() const;
-    };
   private:
     const Wire & m_Wire;
-    const char* k_traceTagsProperty = "debug.atrace.tags.enableflags";
-    const char* k_coreServicesProp = "ro.atrace.core.services";
-    const char* k_traceAppsNumberProperty = "debug.atrace.app_number";
-    const char* k_traceAppsPropertyTemplate = "debug.atrace.app_%d";
-    std::vector<TracingCategory> m_CategoriesList;
-    std::map<std::string, TracingCategory> m_Categories;
+    Android * m_Android = NULL;
+    vector<TracingCategory> m_CategoriesList;
+    map<string, TracingCategory> m_Categories;
     bool setTagsProperty(uint64_t tags);
 };
 

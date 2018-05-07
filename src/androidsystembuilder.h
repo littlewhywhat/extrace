@@ -24,9 +24,6 @@
 class AndroidSystemBuilder {
   public:
     AndroidSystem * build(const Wire & wire) const;
-  private:
-    void initDefaultCategories(AndroidSystemImpl * androidSystemImpl) const;
-
 };
 
 #endif // LTTLWHWHT_ANDROIDSYSTEMBUILDER_H

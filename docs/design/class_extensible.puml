@@ -90,17 +90,55 @@ class ExtraceActionsRunnerBuilder {
 }
 hide ExtraceActionsRunnerBuilder fields
 
-ExtraceActionsRunnerBuilder .> ExtraceActionBuilder
+ExtraceActionsRunnerBuilder ..> ExtraceActionBuilder
 ExtraceActionsRunnerBuilder "-m_TraceBuilder" -- "1" TraceBuilder
 ExtraceActionsRunnerBuilder --> ActionsRunner: builds
 
 class ExtraceArguments {
-  
+  - m_CircleBuffer: bool
+  - m_IgnoreSignals: bool
+  - m_Compression: bool
+  - m_AsyncStart: bool
+  - m_AsyncStop: bool
+  - m_AsyncDump: bool
+  - m_Stream: bool
+  - m_ListCategories: bool
+  - m_CoreServices: bool
+  - m_AppName: string
+  - m_HelpMessage: string
+  - m_OutputFilename: string
+  - m_KernelCategoryFilename: string
+  - m_BufferSize: uint32_t
+  - m_InitSleepDuration: uint32_t
+  - m_MidSleepDuration: uint32_t
+  - m_Apps: vector<string>
+  - m_AndroidCategories: vector<string>
+  - m_KernelCategories: vector<string>
+  - m_KernelFunctions: vector<string>
+  --
+  + hasHelpMessage(): bool
+  + hasKernelCategoryFilename(): bool
+  + hasOutputFilename(): bool
+  + hasApps(): bool
+  + hasAndroidCategories(): bool
+  + hasKernelCategories(): bool
+  + hasKernelFunctions(): bool
+  + hasInitSleepDuration(): bool
+  + hasMidSleepDuration(): bool
+  + circleBufferEnabled(): bool
+  + ignoreSignalsEnabled(): bool
+  + compressionEnabled(): bool
+  + asyncStartEnabled(): bool
+  + asyncStopEnabled(): bool
+  + asyncDumpEnabled(): bool
+  + streamEnabled(): bool
+  + listCategoriesEnabled(): bool
+  + coreServicesEnabled(): bool
 }
 
 class ActionsRunner {
   + tryRun(): bool
-  + addTraceAction(traceAction: TraceAction): void
+  + addAction(action: Action): void
 }
 hide ActionsRunner fields
 
@@ -165,7 +203,16 @@ interface AndroidSystem {
 }
 hide AndroidSystem fields
 
-class AndroidSystemImpl
+class AndroidSystemImpl {
+  - m_Wire: Wire
+  - k_traceTagsProperty: string
+  - k_coreServicesProp: string
+  - k_traceAppsNumberProperty: string
+  - k_traceAppsPropertyTemplate: string
+  - m_CategoriesList: vector<TracingCategory>
+  - m_Categories: map<string, TracingCategory>
+  - setTagsProperty(uint64_t tags): bool
+}
 AndroidSystem ..> AndroidSystemImpl
 
 interface Trace {
@@ -218,13 +265,5 @@ hide TraceAction methods
 
 TraceAction -|> Action
 TraceAction "-m_Trace" -- "1" Trace
-
-' Environment construction could be deeper
-' Wired general class
-' setWire - in CmdLineApp
-' ExtraceActionCmdLineBuilder - build action from CmdLineArgs
-' ExtraceArgumentsBuilder -> ExtraceArgsBuilder
-' ExtraceActionBuilder - build action from ExtraceArgs
-' ExtraceActionBuilder uses ExtraceActionsRunnerBuilder
 
 @enduml

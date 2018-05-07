@@ -30,7 +30,6 @@ class AndroidSystem {
   public:
     virtual ~AndroidSystem() {}
     virtual bool has_core_services() const = 0;
-    // virtual bool setCategoriesEnableFromFile(const char * filename) = 0;
     virtual const vector<TracingCategory> & getCategories() const = 0;
     virtual bool tryEnableCategories(const vector<string> & categories) = 0;
     virtual void disableAllCategories() = 0;
