@@ -18,6 +18,7 @@
 
 #include "filesystem_impl.h"
 #include "trace_impl.h"
+#include "androidtoolbox.h"
 
 TraceBuilder::~TraceBuilder() {
   delete m_KernelSystemBuilder;
@@ -28,7 +29,9 @@ Trace * TraceBuilder::build(const Wire & wire, const ExtraceArguments & traceArg
   FileSystem * fileSystem = new FileSystemImpl(wire);
   auto * kernelSystem  = m_KernelSystemBuilder->build(wire, fileSystem);
   auto * androidSystem = m_AndroidSystemBuilder->build(wire);
-  auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem, fileSystem);
+  auto * kernelTraceSystem = new KernelTraceSystem(wire, new FTrace(wire, new FileSystemImpl(wire), 
+                                                         new AndroidToolBox()));
+  auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem, fileSystem, kernelTraceSystem);
   if (traceArguments.circleBufferEnabled()) {
     traceImpl->enableTraceOverwrite();
   }

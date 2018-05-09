@@ -18,10 +18,51 @@
 
 #include "androidtoolbox.h"
 
+// TODO
+ // "IRQ Events",
+ // "CPU Frequency",
+ // "Memory Bus Utilization",
+ // "CPU Idle",
+ // "Disk I/O",
+ // "eMMC commands",
+ // "CPU Load",
+ // "Synchronization",
+ // "Kernel Workqueues",
+ // "Kernel Memory Reclaim",
+ // "Voltage and Current Regulators",
+ // "Binder Kernel driver",
+ // "Binder global lock trace",
+ // "Page cache",
+
+TraceImpl::TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
+               KernelSystem * kernelSystem, FileSystem * fileSystem,
+               KernelTraceSystem * kernelTraceSystem):
+               m_Wire(wire), m_AndroidSystem(androidSystem),
+               m_KernelSystem(kernelSystem), m_FileSystem(fileSystem),
+               m_KernelTraceSystem(kernelTraceSystem) {
+  // TODO put in arguments
+  m_KernelTraceCategories["sched"]         = KernelTraceSystem::TraceCategory::SCHED;
+  m_KernelTraceCategories["irq"]           = KernelTraceSystem::TraceCategory::IRQ;
+  m_KernelTraceCategories["freq"]          = KernelTraceSystem::TraceCategory::FREQ;
+  m_KernelTraceCategories["membus"]        = KernelTraceSystem::TraceCategory::MEMBUS;
+  m_KernelTraceCategories["idle"]          = KernelTraceSystem::TraceCategory::IDLE;
+  m_KernelTraceCategories["disk"]          = KernelTraceSystem::TraceCategory::DISK;
+  m_KernelTraceCategories["mmc"]           = KernelTraceSystem::TraceCategory::MMC;
+  m_KernelTraceCategories["load"]          = KernelTraceSystem::TraceCategory::LOAD;
+  m_KernelTraceCategories["sync"]          = KernelTraceSystem::TraceCategory::SYNC;
+  m_KernelTraceCategories["workqueue"]     = KernelTraceSystem::TraceCategory::WORKQUEUE;
+  m_KernelTraceCategories["memreclaim"]    = KernelTraceSystem::TraceCategory::MEMRECLAIM;
+  m_KernelTraceCategories["regulator"]     = KernelTraceSystem::TraceCategory::REGULATOR;
+  m_KernelTraceCategories["binder_driver"] = KernelTraceSystem::TraceCategory::BINDER_DRIVER;
+  m_KernelTraceCategories["binder_lock"]   = KernelTraceSystem::TraceCategory::BINDER_LOCK;
+  m_KernelTraceCategories["filemap"]       = KernelTraceSystem::TraceCategory::PAGECACHE;
+}
+
 TraceImpl::~TraceImpl() {
   delete m_FileSystem;
   delete m_KernelSystem;
   delete m_AndroidSystem;
+  delete m_KernelTraceSystem;
 }
 
 void TraceImpl::enableTraceOverwrite() {
@@ -45,7 +86,7 @@ void TraceImpl::addApp(const char * appName) {
 }
 
 void TraceImpl::addFunction(const char * funcName) {
-  m_Functions.push_back(funcName);
+  m_Functions.insert(funcName);
 }
 
 bool TraceImpl::setUp() {
@@ -56,7 +97,7 @@ bool TraceImpl::setUp() {
   ok &= m_KernelSystem->setTraceBufferSizeKB(m_TraceBufferSizeKB);
   ok &= m_KernelSystem->setGlobalClockEnable(true);
   ok &= m_KernelSystem->setPrintTgidEnableIfPresent(true);
-  ok &= m_KernelSystem->setKernelTraceFuncs(m_Functions);
+  ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
 
   // Set up the tags property.
   printf("hello\n");
@@ -66,10 +107,12 @@ bool TraceImpl::setUp() {
 
   // Disable all the sysfs enables.  This is done as a separate loop from
   // the enables to allow the same enable to exist in multiple categories.
-  ok &= m_KernelSystem->disableKernelTraceEvents();
+  ok &= m_KernelTraceSystem->tryDisableAllCategories();
 
   // Enable all the sysfs enables that are in an enabled category.
-  ok &= m_KernelSystem->setKernelTraceCategories(m_KernelCategories);
+  for (const auto & category : m_KernelCategories) {
+    ok &= m_KernelTraceSystem->tryEnableCategory(m_KernelTraceCategories[category]);
+  }
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::setUp\n");
   }
@@ -79,7 +122,7 @@ bool TraceImpl::setUp() {
 void TraceImpl::cleanUp() {
   bool ok = true;
   // Disable all tracing that we're able to.
-  ok &= m_KernelSystem->disableKernelTraceEvents();
+  ok &= m_KernelTraceSystem->tryDisableAllCategories();
 
   // Reset the system properties.
   m_AndroidSystem->disableAllCategories();
@@ -91,7 +134,7 @@ void TraceImpl::cleanUp() {
   ok &= m_KernelSystem->setTraceBufferSizeKB(1);
   ok &= m_KernelSystem->setGlobalClockEnable(false);
   ok &= m_KernelSystem->setPrintTgidEnableIfPresent(false);
-  ok &= m_KernelSystem->setKernelTraceFuncs(vector<string>());
+  ok &= m_KernelTraceSystem->tryDisableAllFunctions();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::cleanUp\n");
   }
@@ -176,11 +219,10 @@ bool TraceImpl::tryEnableAndroidCoreServices() {
 }
 
 void TraceImpl::printSupportedCategories() {
-  const auto & kernelCategories = m_KernelSystem->getCategories();
-  for (const auto & category : kernelCategories) {
-      if (m_KernelSystem->isCategorySupported(category)) {
-          fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
-      }
+  for (const auto & category : m_KernelTraceCategories) {
+    if (m_KernelTraceSystem->supportsCategory(category.second)) {
+      fprintf(m_Wire.getOutputStream(), "  %s\n", category.first.c_str());
+    }
   }
   const auto & androidCategories = m_AndroidSystem->getCategories();
   for (const auto & category : androidCategories) {

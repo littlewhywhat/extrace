@@ -23,7 +23,9 @@
 #include "androidsystem.h"
 #include "filesystem.h"
 #include "wire.h"
+#include "kerneltracesystem.h"
 
+#include <map>
 #include <vector>
 #include <string>
 #include <memory>
@@ -35,9 +37,8 @@ using namespace std;
 class TraceImpl : public Trace {
   public:
     TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
-               KernelSystem * kernelSystem, FileSystem * fileSystem):
-               m_Wire(wire), m_AndroidSystem(androidSystem),
-               m_KernelSystem(kernelSystem), m_FileSystem(fileSystem) {}
+               KernelSystem * kernelSystem, FileSystem * fileSystem,
+               KernelTraceSystem * kernelTraceSystem);
     ~TraceImpl();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
@@ -69,12 +70,14 @@ class TraceImpl : public Trace {
     AndroidSystem * m_AndroidSystem;
     KernelSystem * m_KernelSystem;
     FileSystem * m_FileSystem;
+    KernelTraceSystem * m_KernelTraceSystem = NULL;
     bool m_TraceOverwriteSwitch = false;
     uint32_t m_TraceBufferSizeKB = 2048;
     vector<string> m_KernelCategories;
     vector<string> m_AndroidCategories;
     vector<string> m_Apps;
-    vector<string> m_Functions;
+    set<string> m_Functions;
+    map<string, KernelTraceSystem::TraceCategory> m_KernelTraceCategories;
 };
 
 #endif // LTTLWHWHT_TRACE_IMPL_H

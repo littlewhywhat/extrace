@@ -25,8 +25,6 @@
 class KernelSystemBuilder {
   public:
     KernelSystem * build(const Wire & wire, FileSystem * fileSystem) const;
-  private:
-    void initDefaultCategories(KernelSystemImpl * kernelSystemImpl) const;
 };
 
 #endif // LTTLWHWHT_KERNELSYSTEMBUILDER_H
