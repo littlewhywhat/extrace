@@ -43,14 +43,14 @@ class KernelSystem {
     virtual bool setTraceBufferSizeKB(int size) = 0;
     virtual bool setGlobalClockEnable(bool enable) = 0;
     virtual bool setPrintTgidEnableIfPresent(bool enable) = 0;
-    virtual bool setKernelTraceFuncs(const vector<string> & funcs) = 0;
-    virtual bool setKernelTraceCategories(const vector<string> & ids) = 0;
-    virtual const vector<TracingCategory> & getCategories() const = 0;
+    // virtual bool setKernelTraceFuncs(const vector<string> & funcs) = 0;
+    // virtual bool setKernelTraceCategories(const vector<string> & ids) = 0;
+    // virtual const vector<TracingCategory> & getCategories() const = 0;
     // Disable all /sys/ enable files.
-    virtual bool disableKernelTraceEvents() = 0;
+    // virtual bool disableKernelTraceEvents() = 0;
     // Enable or disable a kernel option by writing a "1" or a"0" into a /sys
     // file.
-    virtual bool isCategorySupported(const TracingCategory& category) const = 0;
+    // virtual bool isCategorySupported(const TracingCategory& category) const = 0;
 };
 
 #endif // LTTLWHWHT_KERNELSYSTEM_H

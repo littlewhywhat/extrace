@@ -1,0 +1,30 @@
+@startuml
+
+class KernelTraceSystem {
+  + supportsCategory(category: KernelTraceCategory): bool
+  + tryEnableCategory(category: KernelTraceCategory): bool
+  + tryDisableAllCategories(): bool
+  + trySetFunctions(funcs: set<string>): bool
+  + tryDisableAllFunctions(funcs: set<string>): bool
+}
+hide KernelTraceSystem fields
+
+class TraceBuffer {
+  + tryStreamUntil(signal: Signal): bool
+  + trySendTo(outFD: int): bool
+  + trySendCompressedTo(outFD: int): bool
+  + tryWriteSyncMarker(): bool
+  + trySetCircularMode(): bool
+  + trySetSize(size: int): bool
+  + tryClear(): bool
+}
+
+interface Trace {
+  + tryEnablePrintingTGID(): bool
+  + tryEnableGlobalClock(): bool
+  + tryDisableGlobalClock(): bool
+  + tryStart(): bool
+  + tryStop(): bool
+}
+
+@enduml

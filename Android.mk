@@ -48,7 +48,7 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_MODULE:= extrace
 
-LOCAL_CPPFLAGS := $(common_cflags)
+LOCAL_CPPFLAGS := $(common_cflags) -Wall -pedantic
 
 LOCAL_C_INCLUDES += external/zlib
 
@@ -123,6 +123,7 @@ LOCAL_SRC_FILES:= \
 			src/trace_impl.cpp \
 			src/ftrace.cpp \
 			src/android_impl.cpp \
+			src/kerneltracesystem.cpp \
 	    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment

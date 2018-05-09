@@ -51,17 +51,17 @@ class KernelSystemImpl : public KernelSystem {
     bool setGlobalClockEnable(bool enable) override;
     bool setPrintTgidEnableIfPresent(bool enable) override;
     // Set the comma separated list of functions that the kernel is to trace.
-    bool setKernelTraceFuncs(const vector<string> & funcs) override;
-    bool setKernelTraceCategories(const vector<string> & ids);
-    const vector<TracingCategory> & getCategories() const override;
+    // bool setKernelTraceFuncs(const vector<string> & funcs) override;
+    // bool setKernelTraceCategories(const vector<string> & ids);
+    // const vector<TracingCategory> & getCategories() const override;
     // Disable all /sys/ enable files.
-    bool disableKernelTraceEvents();
-    void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files);
-    bool isCategorySupported(const TracingCategory& category) const;
-    class Creator {
-      public:
-        KernelSystemImpl * createWithDefaultCategories() const;
-    };
+    //bool disableKernelTraceEvents();
+    // void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files);
+    // bool isCategorySupported(const TracingCategory& category) const;
+    // class Creator {
+    //   public:
+    //     KernelSystemImpl * createWithDefaultCategories() const;
+    // };
   private:
     const Wire & m_Wire;
     FileSystem * m_FileSystem = NULL;
