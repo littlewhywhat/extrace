@@ -172,16 +172,11 @@ bool KernelSystemImpl::writeClockSyncMarker()
   float now_in_seconds = m_SystemTime->get_monotonic();
   snprintf(buffer, 128, "trace_event_clock_sync: parent_ts=%f\n", now_in_seconds);
   bool ok = true;
-  ok &= writeMarker(buffer);
+  ok &= m_FTrace->tryWriteMarker(buffer);
   int64_t realtime_in_ms = m_SystemTime->get_realtime();
   snprintf(buffer, 128, "trace_event_clock_sync: realtime_ts=%" PRId64 "\n", realtime_in_ms);
-  ok &= writeMarker(buffer);
+  ok &= m_FTrace->tryWriteMarker(buffer);
   return ok;
-}
-
-bool KernelSystemImpl::writeMarker(const char * buffer)
-{
-  return m_FTrace->tryWriteMarker(buffer);
 }
 
 bool KernelSystemImpl::setTraceOverwriteEnable(bool enable)

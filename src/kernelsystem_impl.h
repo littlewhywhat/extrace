@@ -72,18 +72,9 @@ class KernelSystemImpl : public KernelSystem {
     map<string, TracingCategory> m_Categories;
     vector<TracingCategory> m_CategoriesList;
 
-    int getTracePipeFd();
-    int getTraceFd();
     bool try_send(int fd_from, int fd_to);
     bool try_sendfile(int fd_from, int fd_to);
     bool compress_trace_to(int traceFD, int outFd);
-    bool writeMarker(const char * buffer);
-    // Read the trace_clock sysfs file and return true if it matches the requested
-    // value.  The trace_clock file format is:
-    // local [global] counter uptime perf
-    bool isTraceClock(const char *mode);
-    bool setKernelOptionEnable(const char* filename, bool enable);
-    bool isPossibleSetKernelOption(const char* filename);
     bool verifyKernelTraceFuncs(const vector<string> & funcs) const;
     // Check whether the category is supported on the device with the current
     // rootness.  A category is supported only if all its required /sys/ files are
