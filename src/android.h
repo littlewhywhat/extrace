@@ -38,7 +38,7 @@ class Android : public Wired {
     virtual bool tryClearTraceAppsCntProperty() = 0;
     virtual bool tryPokeBinderServices() const = 0;
     virtual void logDumpingTrace() = 0;
-    virtual uint64_t getCategoryTraceTag(TraceCategory traceCategory) const = 0;
+    virtual uint64_t getCategoryTraceTag(const TraceCategory & traceCategory) const = 0;
     enum class TraceCategory {
       GRAPHICS,
       INPUT,

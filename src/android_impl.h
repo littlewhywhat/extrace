@@ -35,7 +35,7 @@ class AndroidImpl : public Android {
     bool tryClearTraceAppsCntProperty() override;
     bool tryPokeBinderServices() const override;
     void logDumpingTrace() override;
-    uint64_t getCategoryTraceTag(TraceCategory traceCategory) const override;
+    uint64_t getCategoryTraceTag(const TraceCategory & traceCategory) const override;
   private:
     map<Android::TraceCategory, uint64_t> m_TraceCategoriesTags;
     const char* m_TraceTagsPropertyKey = "debug.atrace.tags.enableflags";

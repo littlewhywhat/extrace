@@ -130,6 +130,6 @@ void AndroidImpl::logDumpingTrace() {
   ALOGI("Dumping trace");
 }
 
-uint64_t AndroidImpl::getCategoryTraceTag(TraceCategory traceCategory) const {
+uint64_t AndroidImpl::getCategoryTraceTag(const TraceCategory & traceCategory) const {
   return m_TraceCategoriesTags.at(traceCategory); 
 }

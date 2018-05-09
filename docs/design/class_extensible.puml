@@ -189,6 +189,7 @@ hide KernelSystemImpl fields
 
 KernelSystemImpl ..> KernelSystem
 KernelSystemImpl "-m_FileSystem" -- "1" FileSystem
+KernelSystemImpl "-m_FTrace" -- "1" FTrace
 
 interface AndroidSystem {
   + {abstract} has_core_services(): bool
@@ -213,7 +214,9 @@ class AndroidSystemImpl {
   - m_Categories: map<string, TracingCategory>
   - setTagsProperty(uint64_t tags): bool
 }
-AndroidSystem ..> AndroidSystemImpl
+AndroidSystemImpl ..> AndroidSystem
+
+AndroidSystemImpl "-m_Android" -- "1" Android
 
 interface Trace {
   + {abstract} addKernelCategory(categoryName: string): void
@@ -265,5 +268,50 @@ hide TraceAction methods
 
 TraceAction -|> Action
 TraceAction "-m_Trace" -- "1" Trace
+
+interface Android {
+  + {abstract} getTraceAppsMaxNum(): uint32_t
+  + {abstract} getTraceCoreServicesProperty(): string
+  + {abstract} trySetTraceTagsProperty(traceTags: int): bool
+  + {abstract} trySetTraceAppProperty(appName: string, id: int): bool
+  + {abstract} trySetTraceAppsCntProperty(cnt, int): bool
+  + {abstract} tryClearTraceAppsCntProperty(): bool
+  + {abstract} tryPokeBinderServices(): bool
+  + {abstract} logDumpingTrace(): void
+  + {abstract} getCategoryTraceTag(TraceCategory & traceCategory): int
+}
+hide Android fields
+
+Android --> "1..*" TraceCategory: supports
+
+class TraceCategory {
+  - id: int
+}
+hide TraceCategory methods
+
+interface FTrace {
+  + getTraceFd(): int
+  + getTracePipeFd(): int
+  + tryCleanTrace(): bool
+  + tryAddFunctionToFilter(function: string): bool
+  + tryGetFunctionsFromFilter(): set<string>
+  + tryClearFunctionFilter(): bool
+  + functionFilterAccessible(): bool
+  + trySetTracer(tracer: Tracer): bool
+  + trySetBufferSize(bufferSize: int): bool
+  + tryWriteMarker(marker: string): bool
+  + tracerChoiceAccessable(): bool
+  + tracePointAccessable(tracePoint: TracePoint): bool
+  + tracePointExists(tracePoint: TracePoint): bool
+  + tryEnableTracePoint(tracePoint: TracePoint): bool
+  + tryDisableTracePoint(tracePoint: TracePoint): bool
+  + hasTraceClockSetTo(clockType: ClockType): bool
+  + trySetClockType(clockType: ClockType): bool
+  + tryEnableOption(option: Option): bool
+  + tryDisableOption(option: Option): bool
+  + tryStartTrace(): bool
+  + tryStopTrace(): bool
+}
+hide FTrace fields
 
 @enduml
