@@ -228,14 +228,23 @@ bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
     if (funcs.empty()) {
         // Disable kernel function tracing.
         if (m_FTrace->tracerChoiceAccessable()) {
-            ok &= m_FTrace->trySetTracer(FTrace::Tracer::NOP);
+          ok &= m_FTrace->trySetTracer(FTrace::Tracer::NOP);
+          if (!ok) {
+            fprintf(m_Wire.getErrorStream(), "error KernelSystem can't set tracer to NOP\n");
+          }
         }
         if (m_FTrace->functionFilterAccessible()) {
-            ok &= m_FTrace->tryClearFunctionFilter();
+          ok &= m_FTrace->tryClearFunctionFilter();
+          if (!ok) {
+            fprintf(m_Wire.getErrorStream(), "error KernelSystem can't clear function filter\n");
+          }
         }
     } else {
         // Enable kernel function tracing.
         ok &= m_FTrace->trySetTracer(FTrace::Tracer::FUNCTION_GRAPH);
+        if (!ok) {
+          fprintf(m_Wire.getErrorStream(), "error KernelSystem can't set tracer to FUNCTION_GRAPH\n");
+        }
         ok &= m_FTrace->tryEnableOption(FTrace::Option::FUNCGRAPH_ABSTIME);
         ok &= m_FTrace->tryEnableOption(FTrace::Option::FUNCGRAPH_CPU);
         ok &= m_FTrace->tryEnableOption(FTrace::Option::FUNCGRAPH_PROC);
