@@ -29,27 +29,27 @@
 #define MAX_PACKAGES 16;
 
 AndroidImpl::AndroidImpl(const Wire & wire): Android(wire) {
-  m_TraceCategoriesTags[GRAPHICS]         = ATRACE_TAG_GRAPHICS;
-  m_TraceCategoriesTags[INPUT]            = ATRACE_TAG_INPUT;
-  m_TraceCategoriesTags[VIEW]             = ATRACE_TAG_VIEW;
-  m_TraceCategoriesTags[WEBVIEW]          = ATRACE_TAG_WEBVIEW;
-  m_TraceCategoriesTags[WINDOW_MANAGER]   = ATRACE_TAG_WINDOW_MANAGER;
-  m_TraceCategoriesTags[ACTIVITY_MANAGER] = ATRACE_TAG_ACTIVITY_MANAGER;
-  m_TraceCategoriesTags[SYNC_MANAGER]     = ATRACE_TAG_SYNC_MANAGER;
-  m_TraceCategoriesTags[AUDIO]            = ATRACE_TAG_AUDIO;
-  m_TraceCategoriesTags[VIDEO]            = ATRACE_TAG_VIDEO;
-  m_TraceCategoriesTags[CAMERA]           = ATRACE_TAG_CAMERA;
-  m_TraceCategoriesTags[HAL]              = ATRACE_TAG_HAL;
-  m_TraceCategoriesTags[APP]              = ATRACE_TAG_APP;
-  m_TraceCategoriesTags[RESOURCES]        = ATRACE_TAG_RESOURCES;
-  m_TraceCategoriesTags[DALVIK]           = ATRACE_TAG_DALVIK;
-  m_TraceCategoriesTags[RS]               = ATRACE_TAG_RS;
-  m_TraceCategoriesTags[BIONIC]           = ATRACE_TAG_BIONIC;
-  m_TraceCategoriesTags[POWER]            = ATRACE_TAG_POWER;
-  m_TraceCategoriesTags[PACKAGE_MANAGER]  = ATRACE_TAG_PACKAGE_MANAGER;
-  m_TraceCategoriesTags[SYSTEM_SERVER]    = ATRACE_TAG_SYSTEM_SERVER;
-  m_TraceCategoriesTags[DATABASE]         = ATRACE_TAG_DATABASE;
-  m_TraceCategoriesTags[NETWORK]          = ATRACE_TAG_NETWORK;
+  m_TraceCategoriesTags[TraceCategory::GRAPHICS]         = ATRACE_TAG_GRAPHICS;
+  m_TraceCategoriesTags[TraceCategory::INPUT]            = ATRACE_TAG_INPUT;
+  m_TraceCategoriesTags[TraceCategory::VIEW]             = ATRACE_TAG_VIEW;
+  m_TraceCategoriesTags[TraceCategory::WEBVIEW]          = ATRACE_TAG_WEBVIEW;
+  m_TraceCategoriesTags[TraceCategory::WINDOW_MANAGER]   = ATRACE_TAG_WINDOW_MANAGER;
+  m_TraceCategoriesTags[TraceCategory::ACTIVITY_MANAGER] = ATRACE_TAG_ACTIVITY_MANAGER;
+  m_TraceCategoriesTags[TraceCategory::SYNC_MANAGER]     = ATRACE_TAG_SYNC_MANAGER;
+  m_TraceCategoriesTags[TraceCategory::AUDIO]            = ATRACE_TAG_AUDIO;
+  m_TraceCategoriesTags[TraceCategory::VIDEO]            = ATRACE_TAG_VIDEO;
+  m_TraceCategoriesTags[TraceCategory::CAMERA]           = ATRACE_TAG_CAMERA;
+  m_TraceCategoriesTags[TraceCategory::HAL]              = ATRACE_TAG_HAL;
+  m_TraceCategoriesTags[TraceCategory::APP]              = ATRACE_TAG_APP;
+  m_TraceCategoriesTags[TraceCategory::RESOURCES]        = ATRACE_TAG_RESOURCES;
+  m_TraceCategoriesTags[TraceCategory::DALVIK]           = ATRACE_TAG_DALVIK;
+  m_TraceCategoriesTags[TraceCategory::RS]               = ATRACE_TAG_RS;
+  m_TraceCategoriesTags[TraceCategory::BIONIC]           = ATRACE_TAG_BIONIC;
+  m_TraceCategoriesTags[TraceCategory::POWER]            = ATRACE_TAG_POWER;
+  m_TraceCategoriesTags[TraceCategory::PACKAGE_MANAGER]  = ATRACE_TAG_PACKAGE_MANAGER;
+  m_TraceCategoriesTags[TraceCategory::SYSTEM_SERVER]    = ATRACE_TAG_SYSTEM_SERVER;
+  m_TraceCategoriesTags[TraceCategory::DATABASE]         = ATRACE_TAG_DATABASE;
+  m_TraceCategoriesTags[TraceCategory::NETWORK]          = ATRACE_TAG_NETWORK;
 }
 
 uint32_t AndroidImpl::getTraceAppsMaxNum() const {
@@ -131,8 +131,5 @@ void AndroidImpl::logDumpingTrace() {
 }
 
 uint64_t AndroidImpl::getCategoryTraceTag(TraceCategory traceCategory) const {
-  if (traceCategory == TRACE_CATEGORIES_NUM) {
-    return 0;
-  }
-  return m_TraceCategoriesTags[traceCategory]; 
+  return m_TraceCategoriesTags.at(traceCategory); 
 }

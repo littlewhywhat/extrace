@@ -18,13 +18,15 @@
 #ifndef LTTLWHWHT_ENABLE_H
 #define LTTLWHWHT_ENABLE_H
 
+#include "ftrace.h"
+
 class EnableFile {
   public:
     // Whether the file must be writable in order to enable the tracing
     // category.
     typedef enum { OPT, REQ } requiredness;
     requiredness required;
-    const char * path;
+    FTrace::TracePoint path;
 };
 
 #endif // LTTLWHWHT_ENABLE_H

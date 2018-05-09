@@ -23,6 +23,7 @@
 #include "toolbox.h"
 #include "systemtime.h"
 #include "wire.h"
+#include "ftrace.h"
 
 #include <map>
 
@@ -31,9 +32,9 @@ using namespace std;
 class KernelSystemImpl : public KernelSystem {
   public:
     KernelSystemImpl(const Wire & wire, FileSystem * fileSystem,
-                     ToolBox * toolBox, SystemTime * systemTime):
+                     ToolBox * toolBox, SystemTime * systemTime, FTrace * fTrace):
                      m_Wire(wire), m_FileSystem(fileSystem),
-                     m_ToolBox(toolBox), m_SystemTime(systemTime) {}
+                     m_ToolBox(toolBox), m_SystemTime(systemTime), m_FTrace(fTrace) {}
     ~KernelSystemImpl();
     bool tryStreamTrace(const Signal & signal) override;
     bool trySendTraceTo(int outFD) override;
@@ -66,6 +67,7 @@ class KernelSystemImpl : public KernelSystem {
     FileSystem * m_FileSystem = NULL;
     ToolBox * m_ToolBox = NULL;
     SystemTime * m_SystemTime = NULL;
+    FTrace * m_FTrace = NULL;
 
     map<string, TracingCategory> m_Categories;
     vector<TracingCategory> m_CategoriesList;
@@ -93,20 +95,7 @@ class KernelSystemImpl : public KernelSystem {
     // that exists.  It performs the same logic as isCategorySupported, but it
     // uses file existance rather than writability in the /sys/ file checks.
     bool isCategorySupportedForRoot(const TracingCategory& category) const;
-    const char * k_traceClockPath =  "/sys/kernel/debug/tracing/trace_clock";
-    const char * k_traceBufferSizePath =  "/sys/kernel/debug/tracing/buffer_size_kb";
-    const char * k_tracingOverwriteEnablePath =  "/sys/kernel/debug/tracing/options/overwrite";
-    const char * k_currentTracerPath =  "/sys/kernel/debug/tracing/current_tracer";
-    const char * k_printTgidPath =  "/sys/kernel/debug/tracing/options/print-tgid";
-    const char * k_funcgraphAbsTimePath =  "/sys/kernel/debug/tracing/options/funcgraph-abstime";
-    const char * k_funcgraphCpuPath =  "/sys/kernel/debug/tracing/options/funcgraph-cpu";
-    const char * k_funcgraphProcPath =  "/sys/kernel/debug/tracing/options/funcgraph-proc";
-    // const char * k_funcgraphFlatPath =  "/sys/kernel/debug/tracing/options/funcgraph-flat";
-    const char * k_ftraceFilterPath =  "/sys/kernel/debug/tracing/set_ftrace_filter";
-    const char * k_tracingOnPath =  "/sys/kernel/debug/tracing/tracing_on";
-    const char * k_tracePath =  "/sys/kernel/debug/tracing/trace";
-    const char * k_traceStreamPath =  "/sys/kernel/debug/tracing/trace_pipe";
-    const char * k_traceMarkerPath =  "/sys/kernel/debug/tracing/trace_marker";
+    
 };
 
 #endif // LTTLWHWHT_KERNELSYSTEM_IMPL_H

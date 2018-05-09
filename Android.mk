@@ -121,6 +121,8 @@ LOCAL_SRC_FILES:= \
 			src/kernelsystem_impl.cpp \
 			src/androidsystem_impl.cpp \
 			src/trace_impl.cpp \
+			src/ftrace.cpp \
+			src/android_impl.cpp \
 	    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment

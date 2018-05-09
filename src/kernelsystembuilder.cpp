@@ -19,95 +19,97 @@
 #include "androidtoolbox.h"
 #include "systemtime_impl.h"
 #include "enablefile.h"
+#include "ftrace.h"
 
 void KernelSystemBuilder::initDefaultCategories(KernelSystemImpl * kernelSystemImpl) const {
-  kernelSystemImpl->add_kernel_category("sched",         "CPU Scheduling",
+  kernelSystemImpl->add_kernel_category("sched", "CPU Scheduling",
   {
-     { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_switch/enable" },
-     { EnableFile::REQ, "/sys/kernel/debug/tracing/events/sched/sched_wakeup/enable" },
-     { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_blocked_reason/enable" },
-     { EnableFile::OPT, "/sys/kernel/debug/tracing/events/sched/sched_cpu_hotplug/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::SCHED_SWITCH },
+     { EnableFile::REQ, FTrace::TracePoint::SCHED_WAKEUP },
+     { EnableFile::OPT, FTrace::TracePoint::SCHED_BLOCKED_REASON },
+     { EnableFile::OPT, FTrace::TracePoint::SCHED_CPU_HOTPLUG },
   });
-  kernelSystemImpl->add_kernel_category("irq",           "IRQ Events",
+  kernelSystemImpl->add_kernel_category("irq", "IRQ Events",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/irq/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ipi/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::IRQ },
+     { EnableFile::OPT, FTrace::TracePoint::IPI },
   });
-  kernelSystemImpl->add_kernel_category("freq",          "CPU Frequency",
+  kernelSystemImpl->add_kernel_category("freq", "CPU Frequency",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_frequency/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/clock_set_rate/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/power/cpu_frequency_limits/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::CPU_FREQUENCY },
+     { EnableFile::OPT, FTrace::TracePoint::CLOCK_SET_RATE },
+     { EnableFile::OPT, FTrace::TracePoint::CPU_FREQUENCY_LIMITS },
   });
-  kernelSystemImpl->add_kernel_category("membus",        "Memory Bus Utilization",
+  kernelSystemImpl->add_kernel_category("membus", "Memory Bus Utilization",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/memory_bus/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::MEMORY_BUS },
   });
-  kernelSystemImpl->add_kernel_category("idle",          "CPU Idle",
+  kernelSystemImpl->add_kernel_category("idle", "CPU Idle",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/power/cpu_idle/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::CPU_IDLE },
   });
-  kernelSystemImpl->add_kernel_category("disk",          "Disk I/O",
+  kernelSystemImpl->add_kernel_category("disk", "Disk I/O",
   {
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_enter/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_sync_file_exit/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_write_begin/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/f2fs/f2fs_write_end/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_da_write_begin/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_da_write_end/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_sync_file_enter/enable" },
-     { EnableFile::OPT,      "/sys/kernel/debug/tracing/events/ext4/ext4_sync_file_exit/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_issue/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/block/block_rq_complete/enable" },
+     { EnableFile::OPT, FTrace::TracePoint::F2FS_SYNC_FILE_ENTER },
+     { EnableFile::OPT, FTrace::TracePoint::F2FS_SYNC_FILE_EXIT },
+     { EnableFile::OPT, FTrace::TracePoint::F2FS_WRITE_BEGIN },
+     { EnableFile::OPT, FTrace::TracePoint::F2FS_WRITE_END },
+     { EnableFile::OPT, FTrace::TracePoint::EXT4_DA_WRITE_BEGIN },
+     { EnableFile::OPT, FTrace::TracePoint::EXT4_DA_WRITE_END },
+     { EnableFile::OPT, FTrace::TracePoint::EXT4_SYNC_FILE_ENTER },
+     { EnableFile::OPT, FTrace::TracePoint::EXT4_SYNC_FILE_EXIT },
+     { EnableFile::REQ, FTrace::TracePoint::BLOCK_RQ_ISSUE },
+     { EnableFile::REQ, FTrace::TracePoint::BLOCK_RQ_COMPLETE },
   });
-  kernelSystemImpl->add_kernel_category("mmc",           "eMMC commands",
+  kernelSystemImpl->add_kernel_category("mmc", "eMMC commands",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/mmc/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::MMC },
   });
-  kernelSystemImpl->add_kernel_category("load",          "CPU Load",
+  kernelSystemImpl->add_kernel_category("load", "CPU Load",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/cpufreq_interactive/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::CPUFREQ_INTERACTIVE },
   });
-  kernelSystemImpl->add_kernel_category("sync",          "Synchronization",
+  kernelSystemImpl->add_kernel_category("sync", "Synchronization",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/sync/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::SYNC},
   });
-  kernelSystemImpl->add_kernel_category("workq",         "Kernel Workqueues",
+  kernelSystemImpl->add_kernel_category("workq", "Kernel Workqueues",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/workqueue/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::WORKQUEUE },
   });
-  kernelSystemImpl->add_kernel_category("memreclaim",    "Kernel Memory Reclaim",
+  kernelSystemImpl->add_kernel_category("memreclaim", "Kernel Memory Reclaim",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_begin/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_direct_reclaim_end/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_wake/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/vmscan/mm_vmscan_kswapd_sleep/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::MM_VMSCAN_DIRECT_RECLAIM_BEGIN },
+     { EnableFile::REQ, FTrace::TracePoint::MM_VMSCAN_DIRECT_RECLAIM_END },
+     { EnableFile::REQ, FTrace::TracePoint::MM_VMSCAN_KSWAPD_WAKE },
+     { EnableFile::REQ, FTrace::TracePoint::MM_VMSCAN_KSWAPD_SLEEP },
   });
-  kernelSystemImpl->add_kernel_category("regulators",    "Voltage and Current Regulators",
+  kernelSystemImpl->add_kernel_category("regulators", "Voltage and Current Regulators",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/regulator/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::REGULATOR },
   });
   kernelSystemImpl->add_kernel_category("binder_driver", "Binder Kernel driver",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_transaction_received/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::BINDER_TRANSACTION },
+     { EnableFile::REQ, FTrace::TracePoint::BINDER_TRANSACTION_RECEIVED },
   });
-  kernelSystemImpl->add_kernel_category("binder_lock",   "Binder global lock trace",
+  kernelSystemImpl->add_kernel_category("binder_lock", "Binder global lock trace",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_lock/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_locked/enable" },
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/binder/binder_unlock/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::BINDER_LOCK },
+     { EnableFile::REQ, FTrace::TracePoint::BINDER_LOCKED },
+     { EnableFile::REQ, FTrace::TracePoint::BINDER_UNLOCK },
   });
-  kernelSystemImpl->add_kernel_category("pagecache",     "Page cache",
+  kernelSystemImpl->add_kernel_category("pagecache", "Page cache",
   {
-     { EnableFile::REQ,      "/sys/kernel/debug/tracing/events/filemap/enable" },
+     { EnableFile::REQ, FTrace::TracePoint::FILEMAP },
   }); 
 }
 
 KernelSystem * KernelSystemBuilder::build(const Wire & wire, FileSystem * fileSystem) const {
   auto * kernelSystem = new KernelSystemImpl(wire, fileSystem,
                                              new AndroidToolBox(),
-                                             new SystemTimeImpl());
+                                             new SystemTimeImpl(),
+                                             new FTrace(wire, fileSystem, new AndroidToolBox()));
   initDefaultCategories(kernelSystem);
   return kernelSystem;
 }
