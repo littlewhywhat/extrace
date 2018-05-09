@@ -28,10 +28,14 @@
 #include <zlib.h>
 
 KernelSystemImpl::~KernelSystemImpl()
-{}
+{
+  delete m_ToolBox;
+  delete m_SystemTime;
+  delete m_FTrace;
+}
 
 bool KernelSystemImpl::trySendTraceTo(int outFD) {
-  int traceFD = getTraceFd();
+  int traceFD = m_FTrace->getTraceFd();
   if (traceFD == -1) {
     fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceTo\n");
     return false;
@@ -47,7 +51,7 @@ bool KernelSystemImpl::trySendTraceTo(int outFD) {
 }
 
 bool KernelSystemImpl::trySendTraceCompressedTo(int outFD) {
-  int traceFD = getTraceFd();
+  int traceFD = m_FTrace->getTraceFd();
   if (traceFD == -1) {
     fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceCompressedTo\n");
     return false;
@@ -64,7 +68,7 @@ bool KernelSystemImpl::trySendTraceCompressedTo(int outFD) {
 
 bool KernelSystemImpl::tryStreamTrace(const Signal & signal) {
   bool ok = true;
-  int traceStream = getTracePipeFd();
+  int traceStream = m_FTrace->getTracePipeFd();
   if (traceStream == -1) {
       fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::tryStreamTraceTo\n");
       return false;
@@ -105,16 +109,6 @@ bool KernelSystemImpl::try_send(int fd_from, int fd_to) {
     return false;
 }
 
-bool KernelSystemImpl::setKernelOptionEnable(const char* filename, bool enable)
-{
-    return m_FileSystem->writeStr(filename, enable ? "1" : "0");
-}
-
-bool KernelSystemImpl::isPossibleSetKernelOption(const char* filename)
-{
-    return filename != NULL && m_FileSystem->fileIsWritable(filename);
-}
-
 bool KernelSystemImpl::isCategorySupported(const TracingCategory& category) const
 {
     if (_isCategorySupported(category)) {
@@ -131,44 +125,41 @@ bool KernelSystemImpl::isCategorySupported(const TracingCategory& category) cons
     }
 }
 
+// TODO probably this method is not functional
 bool KernelSystemImpl::_isCategorySupported(const TracingCategory& category) const
 {
     bool ok = true;
     for (const auto & file : category.files) {
-        const char* path = file.path;
+        const FTrace::TracePoint & tracePoint = file.path;
         bool req = file.required == EnableFile::REQ;
-        if (path != NULL) {
-            if (req) {
-                if (!m_FileSystem->fileIsWritable(path)) {
-                    fprintf(m_Wire.getErrorStream(), "File %s is not writable\n", path);
-                    return false;
-                } else {
-                    ok = true;
-                }
+        if (req) {
+            if (!m_FTrace->tracePointAccessable(tracePoint)) {
+                return false;
             } else {
-                ok |= m_FileSystem->fileIsWritable(path);
+                ok = true;
             }
+        } else {
+            ok |= m_FTrace->tracePointExists(tracePoint);
         }
     }
     return ok;
 }
 
+// TODO refactor
 bool KernelSystemImpl::isCategorySupportedForRoot(const TracingCategory& category) const
 {
     bool ok = category.tags != 0;
     for (const auto & file : category.files) {
-        const char* path = file.path;
+        const FTrace::TracePoint & tracePoint = file.path;
         bool req = file.required == EnableFile::REQ;
-        if (path != NULL) {
-            if (req) {
-                if (!m_FileSystem->fileExists(path)) {
-                    return false;
-                } else {
-                    ok = true;
-                }
+        if (req) {
+            if (!m_FTrace->tracePointExists(tracePoint)) {
+                return false;
             } else {
-                ok |= m_FileSystem->fileExists(path);
+                ok = true;
             }
+        } else {
+            ok |= m_FTrace->tracePointExists(tracePoint);
         }
     }
     return ok;
@@ -190,71 +181,44 @@ bool KernelSystemImpl::writeClockSyncMarker()
 
 bool KernelSystemImpl::writeMarker(const char * buffer)
 {
-  return m_FileSystem->writeStr(k_traceMarkerPath, buffer);
+  return m_FTrace->tryWriteMarker(buffer);
 }
 
 bool KernelSystemImpl::setTraceOverwriteEnable(bool enable)
 {
-  return setKernelOptionEnable(k_tracingOverwriteEnablePath, enable);
+  return enable? m_FTrace->tryEnableOption(FTrace::Option::OVERWRITE):
+                 m_FTrace->tryDisableOption(FTrace::Option::OVERWRITE);
 }
 
 bool KernelSystemImpl::setTracingEnabled(bool enable)
 {
-    return setKernelOptionEnable(k_tracingOnPath, enable);
+  return enable? m_FTrace->tryStartTrace() : m_FTrace->tryStopTrace();
 }
 
 bool KernelSystemImpl::clearTrace()
 {
-    return m_FileSystem->truncateFile(k_tracePath);
-}
-
-int KernelSystemImpl::getTracePipeFd()
-{
-    int traceFD = open(k_traceStreamPath, O_RDWR);
-    if (traceFD == -1) {
-       fprintf(m_Wire.getErrorStream(), "error opening %s: %s (%d)\n", k_traceStreamPath,
-                strerror(errno), errno);
-    }
-    return traceFD;
-}
-
-int KernelSystemImpl::getTraceFd()
-{
-    int traceFD = open(k_tracePath, O_RDWR);
-    if (traceFD == -1) {
-       fprintf(m_Wire.getErrorStream(), "error opening %s: %s (%d)\n", k_tracePath,
-                strerror(errno), errno);
-    }
-    return traceFD;
+    return m_FTrace->tryCleanTrace();
 }
 
 bool KernelSystemImpl::setTraceBufferSizeKB(int size)
 {
-    char str[32] = "1";
-    if (size < 1) {
-        size = 1;
-    }
-    snprintf(str, 32, "%d", size);
-    return m_FileSystem->writeStr(k_traceBufferSizePath, str);
+    return m_FTrace->trySetBufferSize(size);
 }
 
 bool KernelSystemImpl::setGlobalClockEnable(bool enable)
 {
-    const char *clock = enable ? "global" : "local";
+    const FTrace::ClockType clockType = enable ? FTrace::ClockType::GLOBAL : FTrace::ClockType::LOCAL;
 
-    if (isTraceClock(clock)) {
-        return true;
+    if (m_FTrace->hasTraceClockSetTo(clockType)) {
+      return true;
     }
-
-    return m_FileSystem->writeStr(k_traceClockPath, clock);
+    return m_FTrace->trySetClockType(clockType);
 }
 
 bool KernelSystemImpl::setPrintTgidEnableIfPresent(bool enable)
 {
-    if (m_FileSystem->fileExists(k_printTgidPath)) {
-        return setKernelOptionEnable(k_printTgidPath, enable);
-    }
-    return true;
+  return enable? m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID):
+                 m_FTrace->tryDisableOption(FTrace::Option::PRINT_TGID);
 }
 
 bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
@@ -263,24 +227,23 @@ bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
 
     if (funcs.empty()) {
         // Disable kernel function tracing.
-        if (m_FileSystem->fileIsWritable(k_currentTracerPath)) {
-            ok &= m_FileSystem->writeStr(k_currentTracerPath, "nop");
+        if (m_FTrace->tracerChoiceAccessable()) {
+            ok &= m_FTrace->trySetTracer(FTrace::Tracer::NOP);
         }
-        if (m_FileSystem->fileIsWritable(k_ftraceFilterPath)) {
-            ok &= m_FileSystem->truncateFile(k_ftraceFilterPath);
+        if (m_FTrace->functionFilterAccessible()) {
+            ok &= m_FTrace->tryClearFunctionFilter();
         }
     } else {
         // Enable kernel function tracing.
-        ok &= m_FileSystem->writeStr(k_currentTracerPath, "function_graph");
-        ok &= setKernelOptionEnable(k_funcgraphAbsTimePath, true);
-        ok &= setKernelOptionEnable(k_funcgraphCpuPath, true);
-        ok &= setKernelOptionEnable(k_funcgraphProcPath, true);
-        // ok &= setKernelOptionEnable(k_funcgraphFlatPath, true);
+        ok &= m_FTrace->trySetTracer(FTrace::Tracer::FUNCTION_GRAPH);
+        ok &= m_FTrace->tryEnableOption(FTrace::Option::FUNCGRAPH_ABSTIME);
+        ok &= m_FTrace->tryEnableOption(FTrace::Option::FUNCGRAPH_CPU);
+        ok &= m_FTrace->tryEnableOption(FTrace::Option::FUNCGRAPH_PROC);
 
         // Set the requested filter functions.
-        ok &= m_FileSystem->truncateFile(k_ftraceFilterPath);
+        ok &= m_FTrace->tryClearFunctionFilter();
         for (const auto & func: funcs) {
-            ok &= m_FileSystem->appendStr(k_ftraceFilterPath, func.c_str());
+            ok &= m_FTrace->tryAddFunctionToFilter(func);
         }
 
         // Verify that the set functions are being traced.
@@ -292,49 +255,18 @@ bool KernelSystemImpl::setKernelTraceFuncs(const vector<string> & funcs)
     return ok;
 }
 
-bool KernelSystemImpl::isTraceClock(const char *mode)
-{
-    char buf[4097];    
-    if (!m_FileSystem->readStr(k_traceClockPath, buf, 4097)) {
-        return false;
-    }
-
-    char *start = strchr(buf, '[');
-    if (start == NULL) {
-        return false;
-    }
-    start++;
-
-    char *end = strchr(start, ']');
-    if (end == NULL) {
-        return false;
-    }
-    *end = '\0';
-
-    return strcmp(mode, start) == 0;
-}
-
 bool KernelSystemImpl::verifyKernelTraceFuncs(const vector<string> & funcs) const
 {
-    char buf[4097];    
-    if (!m_FileSystem->readStr(k_ftraceFilterPath, buf, 4097)) {
-        return false;
+  set<string> funcsTraced = m_FTrace->tryGetFunctionsFromFilter();
+  bool ok = true;
+  for (const auto & func : funcs) {
+    if (funcsTraced.find(func) == funcsTraced.end()) {
+      fprintf(m_Wire.getErrorStream(), "error: \"%s\" is not a valid kernel function to trace.\n",
+              func.c_str());
+      ok = false;
     }
-
-    std::set<std::string> funcs_traced;
-    m_ToolBox->parseToTokens(buf, "\n", funcs_traced);
-
-    bool ok = true;
-    for (const auto & func : funcs) {
-        // except wildcards
-        if (strchr(func.c_str(), '*') == NULL 
-            && funcs_traced.find(func) == funcs_traced.end()) {
-            fprintf(m_Wire.getErrorStream(), "error: \"%s\" is not a valid kernel function to trace.\n",
-                    func.c_str());
-            ok = false;
-        }
-    }
-    return ok;
+  }
+  return ok;
 }
 
 void KernelSystemImpl::add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files)
@@ -345,41 +277,41 @@ void KernelSystemImpl::add_kernel_category(const char * id, const char * name, c
 
 // Disable all /sys/ enable files.
 bool KernelSystemImpl::disableKernelTraceEvents() {
-    bool ok = true;
-    for (const auto & category : m_CategoriesList) {
-        for (const auto & file : category.files) {
-            const char* path = file.path;
-            if (isPossibleSetKernelOption(path)) {
-                ok &= setKernelOptionEnable(path, false);
-            }
-        }
+  bool ok = true;
+  for (const auto & category : m_CategoriesList) {
+    for (const auto & file : category.files) {
+      const FTrace::TracePoint & path = file.path;
+      if (m_FTrace->tracePointAccessable(path)) {
+        ok &= m_FTrace->tryDisableTracePoint(path);
+      }
     }
-    return ok;
+  }
+  return ok;
 }
 
 bool KernelSystemImpl::setKernelTraceCategories(const std::vector<string> & ids) {
-    bool ok = true;
-    for (const auto & id : ids) {
-        if (m_Categories.find(id) == m_Categories.end()) {
-            fprintf(m_Wire.getErrorStream(), "wrong kernel category id '%s'\n", id.c_str());
-            return false;
-        } else {
-            const auto & category = m_Categories[id];
-            for (const auto & file : category.files) {
-                const char* path = file.path;
-                bool required = file.required == EnableFile::REQ;
-                if (path != NULL) {
-                    if (isPossibleSetKernelOption(path)) {
-                        ok &= setKernelOptionEnable(path, true);
-                    } else if (required) {
-                        fprintf(m_Wire.getErrorStream(), "error writing file %s\n", path);
-                        ok = false;
-                    }
-                }
-            }
+  bool ok = true;
+  for (const auto & id : ids) {
+    if (m_Categories.find(id) == m_Categories.end()) {
+      fprintf(m_Wire.getErrorStream(), "wrong kernel category id '%s'\n", id.c_str());
+      return false;
+    } 
+    else {
+      const auto & category = m_Categories[id];
+      for (const auto & file : category.files) {
+        const FTrace::TracePoint & tracePoint = file.path;
+        bool required = file.required == EnableFile::REQ;
+        if (m_FTrace->tracePointAccessable(tracePoint)) {
+          ok &= m_FTrace->tryEnableTracePoint(tracePoint);
         }
+        else if (required) {
+          fprintf(m_Wire.getErrorStream(), "error enabling category %s\n", id.c_str());
+          ok = false;
+        }
+      }
     }
-    return ok;
+  }
+  return ok;
 }
 
 const vector<TracingCategory> & KernelSystemImpl::getCategories() const {

@@ -19,6 +19,8 @@
 
 #include "android.h"
 
+#include "map"
+
 using namespace std;
 
 class AndroidImpl : public Android {
@@ -35,7 +37,7 @@ class AndroidImpl : public Android {
     void logDumpingTrace() override;
     uint64_t getCategoryTraceTag(TraceCategory traceCategory) const override;
   private:
-    uint64_t m_TraceCategoriesTags[TRACE_CATEGORIES_NUM];
+    map<Android::TraceCategory, uint64_t> m_TraceCategoriesTags;
     const char* m_TraceTagsPropertyKey = "debug.atrace.tags.enableflags";
     const char* m_TraceCoreServicesPropertyKey = "ro.atrace.core.services";
     const char* m_TraceAppsCntProperty = "debug.atrace.app_number";

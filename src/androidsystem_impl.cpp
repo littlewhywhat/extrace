@@ -17,29 +17,31 @@
 
 #include "androidsystem_impl.h"
 
+#include "android.h"
+
 AndroidSystemImpl::AndroidSystemImpl(const Wire & wire, Android * android):
                                      m_Wire(wire), m_Android(android) {
-  add_category("gfx",        "Graphics",         android->getCategoryTraceTag(Android::GRAPHICS)         );
-  add_category("input",      "Input",            android->getCategoryTraceTag(Android::INPUT)            );
-  add_category("view",       "View System",      android->getCategoryTraceTag(Android::VIEW)             );
-  add_category("webview",    "WebView",          android->getCategoryTraceTag(Android::WEBVIEW)          );
-  add_category("wm",         "Window Manager",   android->getCategoryTraceTag(Android::WINDOW_MANAGER)   );
-  add_category("am",         "Activity Manager", android->getCategoryTraceTag(Android::ACTIVITY_MANAGER) );
-  add_category("sm",         "Sync Manager",     android->getCategoryTraceTag(Android::SYNC_MANAGER)     );
-  add_category("audio",      "Audio",            android->getCategoryTraceTag(Android::AUDIO)            );
-  add_category("video",      "Video",            android->getCategoryTraceTag(Android::VIDEO)            );
-  add_category("camera",     "Camera",           android->getCategoryTraceTag(Android::CAMERA)           );
-  add_category("hal",        "Hardware Modules", android->getCategoryTraceTag(Android::HAL)              );
-  add_category("app",        "Application",      android->getCategoryTraceTag(Android::APP)              );
-  add_category("res",        "Resource Loading", android->getCategoryTraceTag(Android::RESOURCES)        );
-  add_category("dalvik",     "Dalvik VM",        android->getCategoryTraceTag(Android::DALVIK)           );
-  add_category("rs",         "RenderScript",     android->getCategoryTraceTag(Android::RS)               );
-  add_category("bionic",     "Bionic C Library", android->getCategoryTraceTag(Android::BIONIC)           );
-  add_category("power",      "Power Management", android->getCategoryTraceTag(Android::POWER)            );
-  add_category("pm",         "Package Manager",  android->getCategoryTraceTag(Android::PACKAGE_MANAGER)  );
-  add_category("ss",         "System Server",    android->getCategoryTraceTag(Android::SYSTEM_SERVER)    );
-  add_category("database",   "Database",         android->getCategoryTraceTag(Android::DATABASE)         );
-  add_category("network",    "Network",          android->getCategoryTraceTag(Android::NETWORK)          );
+  add_category("gfx",        "Graphics",         android->getCategoryTraceTag(Android::TraceCategory::GRAPHICS)         );
+  add_category("input",      "Input",            android->getCategoryTraceTag(Android::TraceCategory::INPUT)            );
+  add_category("view",       "View System",      android->getCategoryTraceTag(Android::TraceCategory::VIEW)             );
+  add_category("webview",    "WebView",          android->getCategoryTraceTag(Android::TraceCategory::WEBVIEW)          );
+  add_category("wm",         "Window Manager",   android->getCategoryTraceTag(Android::TraceCategory::WINDOW_MANAGER)   );
+  add_category("am",         "Activity Manager", android->getCategoryTraceTag(Android::TraceCategory::ACTIVITY_MANAGER) );
+  add_category("sm",         "Sync Manager",     android->getCategoryTraceTag(Android::TraceCategory::SYNC_MANAGER)     );
+  add_category("audio",      "Audio",            android->getCategoryTraceTag(Android::TraceCategory::AUDIO)            );
+  add_category("video",      "Video",            android->getCategoryTraceTag(Android::TraceCategory::VIDEO)            );
+  add_category("camera",     "Camera",           android->getCategoryTraceTag(Android::TraceCategory::CAMERA)           );
+  add_category("hal",        "Hardware Modules", android->getCategoryTraceTag(Android::TraceCategory::HAL)              );
+  add_category("app",        "Application",      android->getCategoryTraceTag(Android::TraceCategory::APP)              );
+  add_category("res",        "Resource Loading", android->getCategoryTraceTag(Android::TraceCategory::RESOURCES)        );
+  add_category("dalvik",     "Dalvik VM",        android->getCategoryTraceTag(Android::TraceCategory::DALVIK)           );
+  add_category("rs",         "RenderScript",     android->getCategoryTraceTag(Android::TraceCategory::RS)               );
+  add_category("bionic",     "Bionic C Library", android->getCategoryTraceTag(Android::TraceCategory::BIONIC)           );
+  add_category("power",      "Power Management", android->getCategoryTraceTag(Android::TraceCategory::POWER)            );
+  add_category("pm",         "Package Manager",  android->getCategoryTraceTag(Android::TraceCategory::PACKAGE_MANAGER)  );
+  add_category("ss",         "System Server",    android->getCategoryTraceTag(Android::TraceCategory::SYSTEM_SERVER)    );
+  add_category("database",   "Database",         android->getCategoryTraceTag(Android::TraceCategory::DATABASE)         );
+  add_category("network",    "Network",          android->getCategoryTraceTag(Android::TraceCategory::NETWORK)          );
 }
 
 void AndroidSystemImpl::add_category(const char * id, const char * name, uint64_t atrace_tag) {

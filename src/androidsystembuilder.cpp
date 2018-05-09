@@ -16,8 +16,6 @@
 
 #include "androidsystembuilder.h"
 
-#include "utils/Trace.h"
-
 #include "android_impl.h"
 #include "androidsystem_impl.h"
 

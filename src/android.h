@@ -27,7 +27,19 @@
 
 class Android : public Wired {
   public:
-    typedef enum trace_category {
+    enum class TraceCategory;
+    Android(const Wire & wire): Wired(wire) {}
+    virtual ~Android() {}
+    virtual uint32_t getTraceAppsMaxNum() const = 0;
+    virtual const string getTraceCoreServicesProperty() = 0;
+    virtual bool trySetTraceTagsProperty(uint64_t traceTags) = 0;
+    virtual bool trySetTraceAppProperty(const char * appName, uint32_t id) = 0;
+    virtual bool trySetTraceAppsCntProperty(uint32_t cnt) = 0;
+    virtual bool tryClearTraceAppsCntProperty() = 0;
+    virtual bool tryPokeBinderServices() const = 0;
+    virtual void logDumpingTrace() = 0;
+    virtual uint64_t getCategoryTraceTag(TraceCategory traceCategory) const = 0;
+    enum class TraceCategory {
       GRAPHICS,
       INPUT,
       VIEW,
@@ -49,20 +61,7 @@ class Android : public Wired {
       SYSTEM_SERVER,
       DATABASE,
       NETWORK,
-      TRACE_CATEGORIES_NUM
-    } TraceCategory;
-
-    Android(const Wire & wire): Wired(wire) {}
-    virtual ~Android() {}
-    virtual uint32_t getTraceAppsMaxNum() const = 0;
-    virtual const string getTraceCoreServicesProperty() = 0;
-    virtual bool trySetTraceTagsProperty(uint64_t traceTags) = 0;
-    virtual bool trySetTraceAppProperty(const char * appName, uint32_t id) = 0;
-    virtual bool trySetTraceAppsCntProperty(uint32_t cnt) = 0;
-    virtual bool tryClearTraceAppsCntProperty() = 0;
-    virtual bool tryPokeBinderServices() const = 0;
-    virtual void logDumpingTrace() = 0;
-    virtual uint64_t getCategoryTraceTag(TraceCategory traceCategory) const = 0;
+    };
 };
 
 #endif // LTTLWHWHT_ANDROID_H
