@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_TRACEBUILDER_H
-#define LTTLWHWHT_TRACEBUILDER_H
+#include "simplefiledatamaker.h"
 
-#include "androidsystembuilder.h"
-#include "wire.h"
-#include "extracearguments.h"
-#include "trace.h"
+#include "simplefiledata.h"
 
-class TraceBuilder {
-  public:
-    TraceBuilder(AndroidSystemBuilder * androidSystemBuilder):
-                 m_AndroidSystemBuilder(androidSystemBuilder) {}
-    ~TraceBuilder();
-    Trace * build(const Wire & wire, const ExtraceArguments & traceArguments) const;
-  private:
-    AndroidSystemBuilder * m_AndroidSystemBuilder = NULL;
-};
-
-#endif // LTTLWHWHT_TRACEBUILDER_H
+FileData * SimpleFileDataMaker::tryMake(const Wire & wire, int fd) const {
+  return new SimpleFileData(wire, fd);
+}

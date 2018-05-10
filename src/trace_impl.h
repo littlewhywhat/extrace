@@ -19,11 +19,11 @@
 
 #include "trace.h"
 
-#include "kernelsystem.h"
 #include "androidsystem.h"
 #include "filesystem.h"
 #include "wire.h"
 #include "kerneltracesystem.h"
+#include "ftracebufferfile.h"
 
 #include <map>
 #include <vector>
@@ -37,8 +37,9 @@ using namespace std;
 class TraceImpl : public Trace {
   public:
     TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
-               KernelSystem * kernelSystem, FileSystem * fileSystem,
-               KernelTraceSystem * kernelTraceSystem);
+               FTrace * ftrace, FileSystem * fileSystem,
+               KernelTraceSystem * kernelTraceSystem,
+               FTraceBufferFile * ftraceBufferFile);
     ~TraceImpl();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
@@ -68,9 +69,10 @@ class TraceImpl : public Trace {
   private:
     const Wire & m_Wire;
     AndroidSystem * m_AndroidSystem;
-    KernelSystem * m_KernelSystem;
+    FTrace * m_FTrace;
     FileSystem * m_FileSystem;
     KernelTraceSystem * m_KernelTraceSystem = NULL;
+    FTraceBufferFile * m_FTraceBufferFile = NULL;
     bool m_TraceOverwriteSwitch = false;
     uint32_t m_TraceBufferSizeKB = 2048;
     vector<string> m_KernelCategories;
@@ -78,6 +80,7 @@ class TraceImpl : public Trace {
     vector<string> m_Apps;
     set<string> m_Functions;
     map<string, KernelTraceSystem::TraceCategory> m_KernelTraceCategories;
+    bool setGlobalClockEnable(bool enable);
 };
 
 #endif // LTTLWHWHT_TRACE_IMPL_H

@@ -19,19 +19,29 @@
 #include "filesystem_impl.h"
 #include "trace_impl.h"
 #include "androidtoolbox.h"
+#include "simplefiledatamaker.h"
+#include "compressedfiledatamaker.h"
 
 TraceBuilder::~TraceBuilder() {
-  delete m_KernelSystemBuilder;
   delete m_AndroidSystemBuilder;
 }
 
 Trace * TraceBuilder::build(const Wire & wire, const ExtraceArguments & traceArguments) const {
+  FileDataMaker * fileDataMaker;
+  if (traceArguments.compressionEnabled()) {
+    fileDataMaker = new CompressedFileDataMaker();
+  }
+  else {
+    fileDataMaker = new SimpleFileDataMaker();
+  }
   FileSystem * fileSystem = new FileSystemImpl(wire);
-  auto * kernelSystem  = m_KernelSystemBuilder->build(wire, fileSystem);
+  auto * ftraceBufferFile = new FTraceBufferFile(wire, new FTrace(wire, new FileSystemImpl(wire), new AndroidToolBox()),
+                                                 fileDataMaker);
   auto * androidSystem = m_AndroidSystemBuilder->build(wire);
   auto * kernelTraceSystem = new KernelTraceSystem(wire, new FTrace(wire, new FileSystemImpl(wire), 
                                                          new AndroidToolBox()));
-  auto * traceImpl = new TraceImpl(wire, androidSystem, kernelSystem, fileSystem, kernelTraceSystem);
+  auto * traceImpl = new TraceImpl(wire, androidSystem, new FTrace(wire, new FileSystemImpl(wire), 
+                                                         new AndroidToolBox()), fileSystem, kernelTraceSystem, ftraceBufferFile);
   if (traceArguments.circleBufferEnabled()) {
     traceImpl->enableTraceOverwrite();
   }

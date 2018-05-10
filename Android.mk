@@ -93,7 +93,6 @@ LOCAL_SRC_FILES:= \
 			src/signal.cpp \
 			src/cmdlineapp.cpp \
 			src/environment.cpp \
-			src/kernelsystembuilder.cpp \
 			src/androidsystembuilder.cpp \
 			src/tracebuilder.cpp \
 			src/listsupportedcategories.cpp \
@@ -118,7 +117,6 @@ LOCAL_SRC_FILES:= \
 			src/wire.cpp \
 			src/systemtime_impl.cpp \
 			src/filesystem_impl.cpp \
-			src/kernelsystem_impl.cpp \
 			src/androidsystem_impl.cpp \
 			src/trace_impl.cpp \
 			src/ftrace.cpp \
@@ -127,6 +125,9 @@ LOCAL_SRC_FILES:= \
 			src/simplefiledata.cpp \
 			src/compressedfiledata.cpp \
 			src/filedataslice.cpp \
+			src/ftracebufferfile.cpp \
+			src/simplefiledatamaker.cpp \
+			src/compressedfiledatamaker.cpp \
 	    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment

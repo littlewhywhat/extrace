@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_TRACEBUILDER_H
-#define LTTLWHWHT_TRACEBUILDER_H
+#ifndef LTTLWHWHT_SIMPLEFILEDATAMAKER_H
+#define LTTLWHWHT_SIMPLEFILEDATAMAKER_H
 
-#include "androidsystembuilder.h"
-#include "wire.h"
-#include "extracearguments.h"
-#include "trace.h"
+#include "filedatamaker.h"
 
-class TraceBuilder {
+//! I am a maker of simple file data
+class SimpleFileDataMaker : public FileDataMaker {
   public:
-    TraceBuilder(AndroidSystemBuilder * androidSystemBuilder):
-                 m_AndroidSystemBuilder(androidSystemBuilder) {}
-    ~TraceBuilder();
-    Trace * build(const Wire & wire, const ExtraceArguments & traceArguments) const;
-  private:
-    AndroidSystemBuilder * m_AndroidSystemBuilder = NULL;
+    //! Destroys me
+    virtual ~SimpleFileDataMaker() {}
+    //! Tries to make simple data from file descriptor 
+    FileData * tryMake(const Wire & wire, int fd) const override;
 };
 
-#endif // LTTLWHWHT_TRACEBUILDER_H
+#endif // LTTLWHWHT_SIMPLEFILEDATAMAKER_H
