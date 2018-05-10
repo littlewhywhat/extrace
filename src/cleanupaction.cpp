@@ -16,10 +16,9 @@
 #include "cleanupaction.h"
 
 bool CleanUpAction::tryRun() {
-  bool ok = true;
-  m_Trace->cleanUp();
-  if (!ok) {
+  if (!m_Environment->getTrace().cleanUp()) {
     fprintf(m_Wire.getErrorStream(), "error CleanUpAction::tryRun\n");
+    return false;
   }
-  return ok;
+  return true;
 }

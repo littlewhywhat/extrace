@@ -19,10 +19,11 @@
 
 #include "traceaction.h"
 
-class AddAndroidCoreToTrace : public TraceAction {
+//! I am an EnvironmentAction to add core services to trace
+class AddAndroidCoreToTrace : public EnvironmentAction {
   public:
-    AddAndroidCoreToTrace(const Wire & wire, const shared_ptr<Trace> & trace):
-                          TraceAction(wire, trace) {}
+    AddAndroidCoreToTrace(const Wire & wire, const shared_ptr<Environment> & environment):
+                          EnvironmentAction(wire, environment) {}
     bool tryRun() override;
 };
 

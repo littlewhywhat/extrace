@@ -21,33 +21,37 @@ void DumpAction::setOutputFile(const string & outputFile) {
   m_OutputFile = outputFile;
 }
 
-void DumpAction::enableCompression() {
-  m_Compress = true;
+bool DumpAction::tryDumpToOutput() {
+  auto & traceBuffer = m_Environment->getTraceBuffer();
+  return traceBuffer.trySendTo(fileno(m_Wire.getOutputStream()));
+}
+
+bool DumpAction::tryDumpToFile() {
+  auto & traceBuffer = m_Environment->getTraceBuffer();
+  auto & fileSystem  = m_Environment->getFileSystem();
+
+  int outFd = fileSystem.tryOpenFileToWriteOrCreate(m_OutputFile.c_str());
+  if (outFd == -1) {
+    fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
+    return false;
+  }
+  bool ok = traceBuffer.trySendTo(outFd);
+  close(outFd);
+  return ok;
 }
 
 bool DumpAction::tryRun() {
+  
   if (!m_OutputFile.empty()) {
-    if (m_Compress) {
-      return m_Trace->trySendCompressedTo(m_OutputFile);
-    } 
-    return m_Trace->trySendTo(m_OutputFile);
+    return tryDumpToFile();
   } 
-  else if (m_Compress) {
-    return m_Trace->trySendCompressedToOutput();
-  }
-  else {
-    return m_Trace->trySendToOutput();
-  }
+  return tryDumpToOutput();
 }
 
-TraceAction * DumpAction::Builder::buildFrom(const Wire & wire,
-                                             const shared_ptr<Trace> & trace,
+DumpAction * DumpAction::Builder::buildFrom(const Wire & wire,
+                                             const shared_ptr<Environment> & environment,
                                              const ExtraceArguments & arguments) const {
-  auto * dumpAction = new DumpAction(wire, trace);
-  if (arguments.compressionEnabled())
-  {
-    dumpAction->enableCompression();
-  }
+  auto * dumpAction = new DumpAction(wire, environment);
   if (arguments.hasOutputFilename())
   {
     dumpAction->setOutputFile(arguments.getOutputFilename());

@@ -35,8 +35,10 @@ class FTrace : public Wired {
     enum class TracePoint;
     enum class Option;
     enum class Tracer;
-    FTrace(const Wire & wire, FileSystem * fileSystem, ToolBox * toolBox);
-    ~FTrace();
+    FTrace(const Wire & wire,
+           shared_ptr<FileSystem> & fileSystem,
+           shared_ptr<ToolBox> toolBox);
+    ~FTrace() {};
     int getTraceFd();
     int getTracePipeFd();
     bool tryCleanTrace();
@@ -125,8 +127,8 @@ class FTrace : public Wired {
     map<Option, string> m_Options;
     map<ClockType, string> m_ClockTypes;
     map<Tracer, string> m_Tracers;
-    FileSystem * m_FileSystem = NULL;
-    ToolBox * m_ToolBox = NULL;
+    shared_ptr<FileSystem> m_FileSystem = NULL;
+    shared_ptr<ToolBox> m_ToolBox = NULL;
     bool tryConfigTracePoint(const TracePoint & tracePoint, bool enable);
     bool tryConfigFileSwitch(const char * filename, bool enable);
     // TODO transfer to FileSystem

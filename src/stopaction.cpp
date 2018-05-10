@@ -15,13 +15,10 @@
  */
 #include "stopaction.h"
 
-#include <cstdio>
-
 bool StopAction::tryRun() {
-  bool ok = true;
-  m_Trace->stop();
-  if (!ok) {
+  if (!m_Environment->getTrace().stop()) {
     fprintf(m_Wire.getErrorStream(), "error StopAction::tryRun\n");
+    return false;
   }
-  return ok;
+  return true;
 }

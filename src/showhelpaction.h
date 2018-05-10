@@ -19,16 +19,20 @@
 
 #include "action.h"
 
-#include "environment.h"
+#include <string>
 
+using namespace std;
+
+//! I am an Action that shows help message.
 class ShowHelpAction : public Action {
   public:
-    ShowHelpAction(const Wire & wire, const shared_ptr<Environment> & environment,
-                   const string & helpMessage): Action(wire), m_Environment(environment),
+    //! Constructs me with application name and help message
+    ShowHelpAction(const Wire & wire, const string & appName,
+                   const string & helpMessage): Action(wire), m_AppName(appName),
                    m_HelpMessage(helpMessage) {}
     bool tryRun() override;
   private:
-    shared_ptr<Environment> m_Environment; 
+    string m_AppName;
     string m_HelpMessage;
 };
 

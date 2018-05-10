@@ -19,10 +19,14 @@
 
 #include "wired.h"
 
+//! I am an action that can try to run. I am Wired.
 class Action : public Wired {
   public:
+    //! Constructs me
     Action(const Wired & wire): Wired(wire) {}
+    //! Destroys me
     virtual ~Action() {}
+    //! Tries to run me
     virtual bool tryRun() = 0;
 };
 

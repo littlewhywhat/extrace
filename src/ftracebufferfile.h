@@ -17,36 +17,40 @@
 #ifndef LTTLWHWHT_FTRACEBUFFERFILE_H
 #define LTTLWHWHT_FTRACEBUFFERFILE_H
 
-#include "wired.h"
+#include "tracebuffer.h"
 #include "ftrace.h"
 #include "filedatamaker.h"
 #include "signal.h"
+
+#include <memory>
 
 //! I am a buffer file of ftrace. I can support many operations with myself
 
 //! I can stream, send my data and write in myself. I can switch to circular mode,
 //! set my size or clear myself.
-class FTraceBufferFile : public Wired {
+class FTraceBufferFile : public TraceBuffer {
   public:
     //! Creates me from FTrace with my filedata maker
-    FTraceBufferFile(const Wire & wire, FTrace * ftrace,
-                    FileDataMaker * fileDataMaker):
-                    Wired(wire), m_FTrace(ftrace), m_FileDataMaker(fileDataMaker) {}
+    FTraceBufferFile(const Wire & wire, const shared_ptr<FTrace> & ftrace,
+                     FileDataMaker * fileDataMaker):
+                     TraceBuffer(wire), m_FTrace(ftrace), m_FileDataMaker(fileDataMaker) {}
+    //! Destroys me and my FileDataMaker
+    ~FTraceBufferFile();
     //! Streams me to Wire output until Signal fires 
-    bool tryStreamUntil(const Signal & signal);
+    bool tryStreamUntil(const Signal & signal) override;
     //! Sends me to file descriptor
-    bool trySendTo(int fd);
+    bool trySendTo(int fd) override;
     //! Writes into me sync marker
-    bool tryWriteSyncMarker();
+    bool tryWriteSyncMarker() override;
     //! Transforms me to circular
-    bool trySetCircularMode();
+    bool trySetCircularMode() override;
     //! Sets my size
-    bool trySetSize(uint32_t size_t);
+    bool trySetSize(uint32_t size_t) override;
     //! Clears me
-    bool tryClear();
+    bool tryClear() override;
   private:
     //! my ftrace
-    FTrace * m_FTrace = NULL;
+    shared_ptr<FTrace> m_FTrace;
     //! my data maker
     FileDataMaker * m_FileDataMaker = NULL;
 };

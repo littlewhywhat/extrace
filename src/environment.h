@@ -17,16 +17,54 @@
 #ifndef LTTLWHWHT_ENVIRONMENT_H
 #define LTTLWHWHT_ENVIRONMENT_H
 
-#include <string>
+#include "trace.h"
+#include "kerneltracesystem.h"
+#include "androidtracesystem.h"
+#include "tracebuffer.h"
+#include "filesystem.h"
+#include "toolbox.h"
+
+#include <memory>
 
 using namespace std;
 
+//! I am an environment that provides all necessary components for EnvironmentAction to run.
 class Environment {
   public:
-    Environment(const string & appName): m_AppName(appName) {}
-    const string & getAppName() const;
+    //! Creates me with new components
+    Environment(const shared_ptr<Trace> & trace,
+                const shared_ptr<KernelTraceSystem> & kernelTraceSystem,
+                const shared_ptr<AndroidTraceSystem> & androidTraceSystem, 
+                const shared_ptr<TraceBuffer> & traceBuffer,
+                const shared_ptr<FileSystem> & fileSystem,
+                const shared_ptr<ToolBox> & toolBox);
+    //! Destroys me and my components
+    ~Environment() {}
+    //! Gets my Trace
+    Trace & getTrace();
+    //! Gets my KernelTraceSystem
+    KernelTraceSystem & getKernelTraceSystem();
+    //! Gets my AndroidTraceSystem
+    AndroidTraceSystem & getAndroidTraceSystem();
+    //! Gets my TraceBuffer
+    TraceBuffer & getTraceBuffer();
+    //! Gets my FileSystem
+    FileSystem & getFileSystem();
+    //! Gets my ToolBox
+    ToolBox & getToolBox();
   private:
-    const string & m_AppName;
+    //! My trace
+    shared_ptr<Trace> m_Trace;
+    //! My trace system of kernel
+    shared_ptr<KernelTraceSystem> m_KernelTraceSystem;
+    //! My trace system of android
+    shared_ptr<AndroidTraceSystem> m_AndroidTraceSystem;
+    //! My trace buffer
+    shared_ptr<TraceBuffer> m_TraceBuffer;
+    //! My file system
+    shared_ptr<FileSystem> m_FileSystem;
+    //! My toolbox
+    shared_ptr<ToolBox> m_ToolBox;
 };
 
 #endif // LTTLWHWHT_ENVIRONMENT_H

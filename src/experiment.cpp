@@ -2,11 +2,10 @@
 #include "cmdlineargs.h"
 #include "signal.h"
 #include "extraceactioncmdlinebuilder.h"
-#include "extraceargumentsbuilder.h"
-#include "tracebuilder.h"
-#include "androidtracesystembuilder.h"
-#include "tracebuilder.h"
 #include "extraceactionsrunnerbuilder.h"
+#include "extraceargumentsbuilder.h"
+#include "androidtracesystembuilder.h"
+#include "environmentbuilder.h"
 
 #include <signal.h>
 
@@ -36,9 +35,7 @@ int main(int argc, const char ** argv) {
   cmdLineApp.setActionCmdLineBuilder(new ExtraceActionCmdLineBuilder(
                                          new ExtraceArgumentsBuilder(),
                                          new ExtraceActionsRunnerBuilder(
-                                             new TraceBuilder(
-                                                 new AndroidTraceSystemBuilder()
-                                             )
+                                             new EnvironmentBuilder()
                                          )
                                     ));
   registerSignalHandler();

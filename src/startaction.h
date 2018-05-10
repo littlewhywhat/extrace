@@ -19,10 +19,12 @@
 
 #include "traceaction.h"
 
-class StartAction : public TraceAction {
+//! I am an EnvironmentAction to start Trace
+class StartAction : public EnvironmentAction {
   public:
-    StartAction(const Wire & wire, const shared_ptr<Trace> trace):
-                TraceAction(wire, trace) {}
+    //! Constructs me
+    StartAction(const Wire & wire, const shared_ptr<Environment> environment):
+                EnvironmentAction(wire, environment) {}
     bool tryRun() override;
 };
 

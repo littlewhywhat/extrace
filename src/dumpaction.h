@@ -24,23 +24,30 @@
 
 #include "extracearguments.h"
 
-class DumpAction : public TraceAction {
+//! I am an EnvironmentAction that dumps trace buffer
+class DumpAction : public EnvironmentAction {
   public:
-    DumpAction(const Wire & wire, const shared_ptr<Trace> & trace):
-               TraceAction(wire, trace) {}
+    //! Constructs me
+    DumpAction(const Wire & wire, const shared_ptr<Environment> & environment):
+               EnvironmentAction(wire, environment) {}
     bool tryRun() override;
+    //! Sets output file to dump trace buffer. If not set I dump to Wire output
     void setOutputFile(const string & outputFile);
-    void enableCompression();
+    //! I am a builder of DumpAction from ExtraceArguments and Environment
     class Builder 
     {
       public:
-        TraceAction * buildFrom(const Wire & wire,
-                                const shared_ptr<Trace> & trace,
-                                const ExtraceArguments & traceArguments) const;
+        DumpAction * buildFrom(const Wire & wire,
+                               const shared_ptr<Environment> & environment,
+                               const ExtraceArguments & traceArguments) const;
     };
   private:
+    //! My output file to dump in. If it's empty I dump to output
     string m_OutputFile;
-    bool m_Compress = false;
+    //! Tries to dump my environment trace buffer to my outputfile
+    bool tryDumpToFile();
+    //! Tries to dump my environment trace buffer to Wire output
+    bool tryDumpToOutput();
 };
 
 #endif // LTTLWHWHT_DUMPACTION_H

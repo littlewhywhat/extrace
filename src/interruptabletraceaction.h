@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_INTERRUPTABLETRACEACTION_H
-#define LTTLWHWHT_INTERRUPTABLETRACEACTION_H
+#ifndef LTTLWHWHT_INTERRUPTABLEENVIRONMENTACTION_H
+#define LTTLWHWHT_INTERRUPTABLEENVIRONMENTACTION_H
 
 #include "traceaction.h"
 
 #include "signal.h"
 
-class InterruptableTraceAction : public TraceAction {
+//! I am an EnvironmentAction that can be interrupted by Signal
+class InterruptableEnvironmentAction : public EnvironmentAction {
   public:
-    InterruptableTraceAction(const Wire & wire, shared_ptr<Trace> trace,
-                             const Signal & signal):
-                             TraceAction(wire, trace), m_Signal(signal) {}
-    virtual ~InterruptableTraceAction() {}
+    //! Constructs me with Signal and Environment
+    InterruptableEnvironmentAction(const Wire & wire, shared_ptr<Environment> environment,
+                                   const Signal & signal):
+                             EnvironmentAction(wire, environment), m_Signal(signal) {}
+    virtual ~InterruptableEnvironmentAction() {}
   protected:
+    //! My signal
     const Signal & m_Signal;
 };
 
-#endif // LTTLWHWHT_INTERRUPTABLETRACEACTION_H
+#endif // LTTLWHWHT_INTERRUPTABLEENVIRONMENTACTION_H

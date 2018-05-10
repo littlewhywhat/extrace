@@ -23,6 +23,10 @@
 
 using namespace std;
 
+FTraceBufferFile::~FTraceBufferFile() {
+  delete m_FileDataMaker;
+}
+
 bool FTraceBufferFile::tryStreamUntil(const Signal & signal) {
   bool ok = true;
   int tracePipeFD = m_FTrace->getTracePipeFd();

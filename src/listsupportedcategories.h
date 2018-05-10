@@ -23,14 +23,19 @@
 #include "androidtracecategory.h"
 #include "kerneltracecategory.h"
 
-class ListSupportedCategories : public TraceAction {
+//! I am an environment action to list supported categories of Android and KernelTraceSystem
+class ListSupportedCategories : public EnvironmentAction {
   public:
+    //! Constructs me and initializes my dictionaries
     ListSupportedCategories(const Wire & wire, 
-                            const shared_ptr<Trace> & trace);
+                            const shared_ptr<Environment> & environment);
+    //! Destroys my dictionaries
     ~ListSupportedCategories();
     bool tryRun() override;
   private:
+    //! My dictionary for kernel trace categories
     map<KernelTraceSystem::TraceCategory, KernelTraceCategory *> m_KernelTraceCategories;
+    //! My dictionary for android trace categories
     map<Android::TraceCategory, AndroidTraceCategory *> m_AndroidTraceCategories;
 };
 

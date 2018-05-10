@@ -21,12 +21,16 @@
 
 #include "signal.h"
 
+//! I am an Action that can be interrupted with Signal
 class InterruptableAction : public Action {
   public:
+    //! Contructs me with Signal
     InterruptableAction(const Wire & wire, const Signal & signal):
                         Action(wire), m_Signal(signal) {}
+    //! Destroys me
     virtual ~InterruptableAction() {}
   protected:
+    //! My signal
     const Signal & m_Signal;
 };
 
