@@ -41,7 +41,13 @@ Environment * EnvironmentBuilder::build(const Wire & wire, const ExtraceArgument
   }
   auto traceBuffer = shared_ptr<TraceBuffer>(new FTraceBufferFile(wire, ftrace, fileDataMaker));
   auto kernelTraceSystem = shared_ptr<KernelTraceSystem>(new KernelTraceSystem(wire, ftrace));
+  for (const auto & category: traceArguments.getKernelCategories()) {
+    kernelTraceSystem->rememberToTrace(category);    
+  }
   auto androidTraceSystem = shared_ptr<AndroidTraceSystem>(new SimpleAndroidTraceSystem(wire, android));
+  for (const auto & category: traceArguments.getAndroidCategories()) {
+    androidTraceSystem->rememberToTrace(category);    
+  }
   auto * trace = new TraceImpl(wire, ftrace, androidTraceSystem, kernelTraceSystem);
   trace->setTraceBufferSizeKB(traceArguments.getBufferSize());
   if (traceArguments.circleBufferEnabled()) {

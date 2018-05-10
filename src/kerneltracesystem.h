@@ -46,6 +46,8 @@ class KernelTraceSystem : public Wired {
     bool tryDisableAllFunctions();
     //! Says if specified category is supported without root privelege
     bool supportsCategory(const TraceCategory & traceCategory) const;
+    void rememberToTrace(const TraceCategory & traceCategory);
+    bool tryToTrace();
   private:
     //! I am a member of trace category optional or required to enable it.
 
@@ -64,6 +66,7 @@ class KernelTraceSystem : public Wired {
     map<TraceCategory, vector<TraceCategoryMember>> m_TraceCategoryGroups;
     //! Pointer to FTrace
     shared_ptr<FTrace> m_FTrace;
+    set<TraceCategory> m_Categories;
     //! Tries to disable group of TraceCategoryMembers
     
     //! This method assumes that corresponding TraceCategory is supported.

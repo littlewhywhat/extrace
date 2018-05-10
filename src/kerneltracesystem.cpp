@@ -27,13 +27,17 @@ bool KernelTraceSystem::tryEnableCategoryGroup(const vector<TraceCategoryMember>
 }
 
 bool KernelTraceSystem::tryDisableCategoryGroup(const vector<TraceCategoryMember> & categoryGroup) {
+  bool ok = true;
   for (const auto & categoryMember: categoryGroup) {
     if (!m_FTrace->tryDisableTracePoint(categoryMember.getTracePoint())
         && categoryMember.isRequired()) {
-      return false;
+      ok = false;
     }
   }
-  return true;
+  if (!ok) {
+    fprintf(m_Wire.getErrorStream(), "Can't disable group");
+  }
+  return ok;
 }
 
 bool KernelTraceSystem::tryEnableCategory(const TraceCategory & traceCategory) {
@@ -55,14 +59,16 @@ bool KernelTraceSystem::tryEnableCategory(const TraceCategory & traceCategory) {
 }
 
 bool KernelTraceSystem::tryDisableAllCategories() {
-  bool ok = false;
+  bool ok = true;
   for (const auto & categoryAndGroup: m_TraceCategoryGroups) {
     const auto & category = categoryAndGroup.first;
     if (supportsCategory(category)) {
       ok &= tryDisableCategoryGroup(categoryAndGroup.second);
     }
   }
-  // TODO add log
+  if (!ok) {
+    fprintf(m_Wire.getErrorStream(), "can't disable all supported categories\n");
+  }
   return ok;
 }
 
@@ -141,6 +147,20 @@ bool KernelTraceSystem::supportsCategory(const TraceCategory & traceCategory) co
   return true;
 }
 
+bool KernelTraceSystem::tryToTrace() {
+  bool ok = true;
+  for (const auto & category : m_Categories) {
+    ok &= tryEnableCategory(category);
+  }
+  if (!ok) {
+    fprintf(m_Wire.getErrorStream(), "KernelTraceSystem - can't trace remembered categories\n");
+  }
+  return ok;
+}
+
+void KernelTraceSystem::rememberToTrace(const TraceCategory & traceCategory) {
+  m_Categories.insert(traceCategory);
+}
 
 KernelTraceSystem::KernelTraceSystem(const Wire & wire, const shared_ptr<FTrace> & ftrace): 
                                            Wired(wire), m_FTrace(ftrace) {

@@ -75,7 +75,12 @@ bool FTrace::tryEnableTracePoint(const FTrace::TracePoint & tracePoint)
 
 bool FTrace::tryDisableTracePoint(const FTrace::TracePoint & tracePoint)
 {
-  return tryConfigTracePoint(tracePoint, false);
+  if (!tryConfigTracePoint(tracePoint, false)) {
+    // fprintf(m_Wire.getErrorStream(), "Can't disable tracepoint: %s\n",
+    //                                   m_TracePoints.at(tracePoint).c_str());
+    return false;
+  }
+  return true;
 }
 
 bool FTrace::tryConfigTracePoint(const FTrace::TracePoint & tracePoint, bool enable)

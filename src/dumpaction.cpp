@@ -23,7 +23,11 @@ void DumpAction::setOutputFile(const string & outputFile) {
 
 bool DumpAction::tryDumpToOutput() {
   auto & traceBuffer = m_Environment->getTraceBuffer();
-  return traceBuffer.trySendTo(fileno(m_Wire.getOutputStream()));
+  if (!traceBuffer.trySendTo(fileno(m_Wire.getOutputStream()))) {
+    fprintf(m_Wire.getErrorStream(), "Can't send to output\n");
+    return false;
+  }
+  return true;
 }
 
 bool DumpAction::tryDumpToFile() {

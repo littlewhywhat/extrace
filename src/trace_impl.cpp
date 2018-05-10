@@ -43,12 +43,8 @@ bool TraceImpl::setUp() {
   ok &= m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID);
   // ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
   ok &= m_AndroidTraceSystem->tryToTrace();
-
   ok &= m_KernelTraceSystem->tryDisableAllCategories();
-
-  // for (const auto & category : m_KernelCategories) {
-  //   ok &= m_KernelTraceSystem->tryEnableCategory(category);
-  // }
+  ok &= m_KernelTraceSystem->tryToTrace();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::setUp\n");
   }

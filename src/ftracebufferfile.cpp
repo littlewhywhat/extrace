@@ -67,7 +67,6 @@ bool FTraceBufferFile::trySendTo(int fd) {
 }
 
 bool FTraceBufferFile::tryWriteSyncMarker() {
-  printf("writeClockSyncMarker\n");
   char buffer[128];
   SystemTimeImpl systemTime;
   float now_in_seconds = systemTime.get_monotonic();
