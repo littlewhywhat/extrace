@@ -60,9 +60,9 @@ class TraceImpl : public Trace {
     bool trySendCompressedToOutput() override;
     bool tryStream(const Signal & signal) override;
     bool tryEnableAndroidCoreServices() override;
-    void printSupportedCategories() override;
     bool tryClear() override;
     bool tryWriteClockSyncMarker() override;
+    KernelTraceSystem * getKernelTraceSystem() override;
     void enableTraceOverwrite();
     void setTraceBufferSizeKB(uint32_t size);
   private:

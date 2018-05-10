@@ -34,7 +34,6 @@ LOCAL_SRC_FILES:= \
 		src/kernelsystem_impl.cpp \
     src/trace_impl.cpp \
     src/listsupportedcategories.cpp \
-		src/addkernelcategoriesfromfiletotrace.cpp \
 		src/addandroidcoretotrace.cpp \
 		src/actionrunner_impl.cpp \
 		src/main.cpp \
@@ -97,7 +96,6 @@ LOCAL_SRC_FILES:= \
 			src/tracebuilder.cpp \
 			src/listsupportedcategories.cpp \
 			src/addandroidcoretotrace.cpp \
-			src/addkernelcategoriesfromfiletotrace.cpp \
 			src/sleepaction.cpp \
 			src/startaction.cpp \
 			src/streamaction.cpp \
@@ -128,6 +126,8 @@ LOCAL_SRC_FILES:= \
 			src/simplefiledatamaker.cpp \
 			src/compressedfiledatamaker.cpp \
 			src/simpleandroidtracesystem.cpp \
+			src/kerneltracecategory.cpp \
+			src/androidtracecategory.cpp \
 	    src/experiment.cpp \
 
 LOCAL_MODULE:= experiment

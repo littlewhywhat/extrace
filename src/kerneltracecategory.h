@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ANDROIDTRACECATEGORY_H
-#define LTTLWHWHT_ANDROIDTRACECATEGORY_H
-
-#include "android.h"
+#ifndef KERNEL_TRACECATEGORY_H
+#define KERNEL_TRACECATEGORY_H
 
 #include <string>
 
-using namespace std;
+#include "kerneltracesystem.h"
 
-class AndroidTraceCategory {
+class KernelTraceCategory {
   public:
-    AndroidTraceCategory(const string & name, const string & longName,
-                         const Android::TraceCategory & category):
-                         m_Name(name), m_LongName(longName), m_Category(category) {}
+    KernelTraceCategory(const string & name, const string & longName,
+                        const KernelTraceSystem::TraceCategory & category):
+                        m_Name(name), m_LongName(longName), m_Category(category) {}
     const string & getName() const;
     const string & getLongName() const;
-    const Android::TraceCategory & getCategory() const;
+    const KernelTraceSystem::TraceCategory & getCategory() const;
   private:
     string m_Name;
     string m_LongName;
-    Android::TraceCategory m_Category;
+    KernelTraceSystem::TraceCategory m_Category;
 };
 
-#endif // LTTLWHWHT_ANDROIDTRACECATEGORY_H
+#endif // KERNEL_TRACECATEGORY_H

@@ -19,45 +19,6 @@
 #include "androidtoolbox.h"
 #include "android.h"
 
-// TODO
- // "IRQ Events",
- // "CPU Frequency",
- // "Memory Bus Utilization",
- // "CPU Idle",
- // "Disk I/O",
- // "eMMC commands",
- // "CPU Load",
- // "Synchronization",
- // "Kernel Workqueues",
- // "Kernel Memory Reclaim",
- // "Voltage and Current Regulators",
- // "Binder Kernel driver",
- // "Binder global lock trace",
- // "Page cache",
-
-// TODO
-// "Graphics"
-// "Input"
-// "View System"
-// "WebView"
-// "Window Manager"
-// "Activity Manager"
-// "Sync Manager"
-// "Audio"
-// "Video"
-// "Camera"
-// "Hardware Modules"
-// "Application"
-// "Resource Loading"
-// "Dalvik VM"
-// "RenderScript"
-// "Bionic C Library"
-// "Power Management"
-// "Package Manager"
-// "System Server"
-// "Database"
-// "Network"
-
 TraceImpl::TraceImpl(const Wire & wire, AndroidTraceSystem * androidSystem, 
                FTrace * ftrace, FileSystem * fileSystem,
                KernelTraceSystem * kernelTraceSystem,
@@ -70,6 +31,10 @@ TraceImpl::TraceImpl(const Wire & wire, AndroidTraceSystem * androidSystem,
                m_FTraceBufferFile(ftraceBufferFile) {
   // TODO put in arguments
 
+}
+
+KernelTraceSystem * TraceImpl::getKernelTraceSystem() {
+  return m_KernelTraceSystem;
 }
 
 TraceImpl::~TraceImpl() {
@@ -218,25 +183,12 @@ bool TraceImpl::tryStream(const Signal & signal) {
 }
 
 bool TraceImpl::tryEnableAndroidCoreServices() {
-  set<string> tokens;
   if (m_AndroidTraceSystem->canTraceCoreServices()) {
     m_AndroidTraceSystem->rememberToTraceCoreServices();
     return true;
   }
   fprintf(m_Wire.getErrorStream(), "TraceImpl::tryEnableAndroidCoreServices - Can't enable core services - not supported\n");
   return false;
-}
-
-void TraceImpl::printSupportedCategories() {
-  // TODO put in ListSupportedCategories
-  // for (const auto & category : m_KernelTraceCategories) {
-  //   if (m_KernelTraceSystem->supportsCategory(category.second)) {
-  //     fprintf(m_Wire.getOutputStream(), "  %s\n", category.first.c_str());
-  //   }
-  // }
-  // for (const auto & categoryNameAndCategory : m_AndroidTraceCategories) {
-  //   fprintf(m_Wire.getOutputStream(), "  %s\n", categoryNameAndCategory.first.c_str());
-  // }
 }
 
 bool TraceImpl::tryClear() {

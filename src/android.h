@@ -19,11 +19,11 @@
 
 #include "wired.h"
 
-#include "androidtracecategory.h"
-
 #include <string>
 #include <vector>
 #include <stdint.h>
+
+using namespace std;
 
 class Android : public Wired {
   public:
