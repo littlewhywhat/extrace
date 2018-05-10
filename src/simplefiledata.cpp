@@ -24,7 +24,7 @@
 
 bool SimpleFileData::trySendTo(int fd) const {
   ssize_t sent = 0;
-  while ((sent = sendfile(m_Fd, fd, NULL, 64*1024*1024)) > 0);
+  while ((sent = sendfile(fd, m_Fd, NULL, 64*1024*1024)) > 0);
   if (sent == -1) {
       fprintf(m_Wire.getErrorStream(), "error sendfile: %s (%d)\n", strerror(errno),
               errno);
