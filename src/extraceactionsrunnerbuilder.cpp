@@ -22,7 +22,6 @@
 
 #include "listsupportedcategories.h"
 #include "addandroidcoretotrace.h"
-#include "addkernelcategoriesfromfiletotrace.h"
 #include "sleepaction.h"
 #include "startaction.h"
 #include "streamaction.h"
@@ -55,10 +54,6 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
   }
   if (extraceArguments.coreServicesEnabled()) {
     actionsRunner->addAction(new AddAndroidCoreToTrace(wire, trace));
-  }
-  if (extraceArguments.hasKernelCategoryFilename()) {
-    actionsRunner->addAction(new AddKernelCategoriesFromFileToTrace(wire, trace, 
-                                             extraceArguments.getKernelCategoryFilename()));
   }
   if (extraceArguments.hasInitSleepDuration()) {
     actionsRunner->addAction(new SleepAction(wire, signal,

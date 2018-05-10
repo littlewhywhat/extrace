@@ -60,10 +60,6 @@ void ExtraceArguments::enableCoreServices() {
   m_CoreServices = true;
 }
 
-void ExtraceArguments::setKernelCategoryFilename(const string & filename) {
-  m_KernelCategoryFilename = filename;
-}
-
 void ExtraceArguments::setOutputFilename(const string & filename) {
   m_OutputFilename = filename;
 }
@@ -84,12 +80,12 @@ void ExtraceArguments::setApps(const vector<string> & apps) {
   m_Apps = apps;
 }
 
-void ExtraceArguments::setAndroidCategories(const vector<string> & categories) {
-  m_AndroidCategories = categories;
+void ExtraceArguments::addAndroidCategory(const Android::TraceCategory & traceCategory) {
+  m_AndroidCategories.push_back(traceCategory);
 }
 
-void ExtraceArguments::setKernelCategories(const vector<string> & categories) {
-  m_KernelCategories = categories;
+void ExtraceArguments::addKernelCategory(const KernelTraceSystem::TraceCategory & traceCategory) {
+  m_KernelCategories.push_back(traceCategory);
 }
 
 void ExtraceArguments::setKernelFunctions(const vector<string> & functions) {
@@ -98,9 +94,6 @@ void ExtraceArguments::setKernelFunctions(const vector<string> & functions) {
 
 bool ExtraceArguments::hasHelpMessage() const {
   return !m_HelpMessage.empty();
-}
-bool ExtraceArguments::hasKernelCategoryFilename() const {
-  return !m_KernelCategoryFilename.empty();
 }
 bool ExtraceArguments::hasOutputFilename() const {
   return !m_OutputFilename.empty();
@@ -162,10 +155,6 @@ bool ExtraceArguments::coreServicesEnabled() const {
   return m_CoreServices;
 }
 
-const string & ExtraceArguments::getKernelCategoryFilename() const {
-  return m_KernelCategoryFilename;
-}
-
 const string & ExtraceArguments::getOutputFilename() const {
   return m_OutputFilename;
 }
@@ -190,11 +179,11 @@ const vector<string> & ExtraceArguments::getApps() const {
   return m_Apps;
 }
 
-const vector<string> & ExtraceArguments::getAndroidCategories() const {
+const vector<Android::TraceCategory> & ExtraceArguments::getAndroidCategories() const {
   return m_AndroidCategories;
 }
 
-const vector<string> & ExtraceArguments::getKernelCategories() const {
+const vector<KernelTraceSystem::TraceCategory> & ExtraceArguments::getKernelCategories() const {
   return m_KernelCategories;
 }
 

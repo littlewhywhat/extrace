@@ -65,6 +65,46 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "                    of outstream.\n"
          " --acore          add core services.\n";
 
+ExtraceArgumentsBuilder::ExtraceArgumentsBuilder() {
+  m_AndroidTraceCategories["gfx"]          = Android::TraceCategory::GRAPHICS         ;
+  m_AndroidTraceCategories["input"]        = Android::TraceCategory::INPUT            ;
+  m_AndroidTraceCategories["view"]         = Android::TraceCategory::VIEW             ;
+  m_AndroidTraceCategories["webview"]      = Android::TraceCategory::WEBVIEW          ;
+  m_AndroidTraceCategories["wm"]           = Android::TraceCategory::WINDOW_MANAGER   ;
+  m_AndroidTraceCategories["am"]           = Android::TraceCategory::ACTIVITY_MANAGER ;
+  m_AndroidTraceCategories["sm"]           = Android::TraceCategory::SYNC_MANAGER     ;
+  m_AndroidTraceCategories["audio"]        = Android::TraceCategory::AUDIO            ;
+  m_AndroidTraceCategories["video"]        = Android::TraceCategory::VIDEO            ;
+  m_AndroidTraceCategories["camera"]       = Android::TraceCategory::CAMERA           ;
+  m_AndroidTraceCategories["hal"]          = Android::TraceCategory::HAL              ;
+  m_AndroidTraceCategories["app"]          = Android::TraceCategory::APP              ;
+  m_AndroidTraceCategories["res"]          = Android::TraceCategory::RESOURCES        ;
+  m_AndroidTraceCategories["dalvik"]       = Android::TraceCategory::DALVIK           ;
+  m_AndroidTraceCategories["rs"]           = Android::TraceCategory::RS               ;
+  m_AndroidTraceCategories["bionic"]       = Android::TraceCategory::BIONIC           ;
+  m_AndroidTraceCategories["power"]        = Android::TraceCategory::POWER            ;
+  m_AndroidTraceCategories["pm"]           = Android::TraceCategory::PACKAGE_MANAGER  ;
+  m_AndroidTraceCategories["ss"]           = Android::TraceCategory::SYSTEM_SERVER    ;
+  m_AndroidTraceCategories["database"]     = Android::TraceCategory::DATABASE         ;
+  m_AndroidTraceCategories["network"]      = Android::TraceCategory::NETWORK          ;
+
+  m_KernelTraceCategories["sched"]         = KernelTraceSystem::TraceCategory::SCHED;
+  m_KernelTraceCategories["irq"]           = KernelTraceSystem::TraceCategory::IRQ;
+  m_KernelTraceCategories["freq"]          = KernelTraceSystem::TraceCategory::FREQ;
+  m_KernelTraceCategories["membus"]        = KernelTraceSystem::TraceCategory::MEMBUS;
+  m_KernelTraceCategories["idle"]          = KernelTraceSystem::TraceCategory::IDLE;
+  m_KernelTraceCategories["disk"]          = KernelTraceSystem::TraceCategory::DISK;
+  m_KernelTraceCategories["mmc"]           = KernelTraceSystem::TraceCategory::MMC;
+  m_KernelTraceCategories["load"]          = KernelTraceSystem::TraceCategory::LOAD;
+  m_KernelTraceCategories["sync"]          = KernelTraceSystem::TraceCategory::SYNC;
+  m_KernelTraceCategories["workqueue"]     = KernelTraceSystem::TraceCategory::WORKQUEUE;
+  m_KernelTraceCategories["memreclaim"]    = KernelTraceSystem::TraceCategory::MEMRECLAIM;
+  m_KernelTraceCategories["regulator"]     = KernelTraceSystem::TraceCategory::REGULATOR;
+  m_KernelTraceCategories["binder_driver"] = KernelTraceSystem::TraceCategory::BINDER_DRIVER;
+  m_KernelTraceCategories["binder_lock"]   = KernelTraceSystem::TraceCategory::BINDER_LOCK;
+  m_KernelTraceCategories["filemap"]       = KernelTraceSystem::TraceCategory::PAGECACHE;
+}
+
 void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsParser) const {
   cmdLineArgsParser.register_boolean("--help", HELP_OPTION_NAME);
   cmdLineArgsParser.register_boolean("-c", CIRCLE_BUFFER_OPTION_NAME);
@@ -91,6 +131,22 @@ ExtraceArguments * ExtraceArgumentsBuilder::createHelpExtraceArguments() const {
   ExtraceArguments * traceArguments = new ExtraceArguments();
   traceArguments->setHelpMessage(getHelpMessage());
   return traceArguments;
+}
+
+bool ExtraceArgumentsBuilder::tryPutCategoriesFromFile(ExtraceArguments * extraceArguments,
+                                                       const string & filename) const {
+  set<string> tokens;
+  if (!AndroidToolBox().parseFileToTokens(filename.c_str(), " ", tokens)) {
+    // TODO fprintf(m_Wire.getErrorStream(), "tryPutCategoriesFromFile - error parsing category file \"%s\"\n", filename.c_str());
+    return false;
+  }
+  for (const auto & token : tokens) {
+    if (m_AndroidTraceCategories.find(token) == m_AndroidTraceCategories.cend()) {
+      return false;
+    }
+    extraceArguments->addAndroidCategory(m_AndroidTraceCategories.at(token));
+  }
+  return true;
 }
 
 ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Arguments & arguments) const {
@@ -126,8 +182,11 @@ ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Argumen
     traceArguments->enableCoreServices();
   }
   if (arguments.has_string(KERNEL_CATEG_FILE_OPTION_NAME)) {
-    auto & filename = arguments.get_string(KERNEL_CATEG_FILE_OPTION_NAME);
-    traceArguments->setKernelCategoryFilename(filename);
+    if (!tryPutCategoriesFromFile(traceArguments,
+                                  arguments.get_string(KERNEL_CATEG_FILE_OPTION_NAME))) {
+      delete traceArguments;
+      return NULL;
+    }
   }
   if (arguments.has_string(OUT_FILE_OPTION_NAME)) {
     auto & filename = arguments.get_string(OUT_FILE_OPTION_NAME);
@@ -149,12 +208,29 @@ ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Argumen
     traceArguments->setApps(list);
   }
   if (arguments.hasStringList(ANDROID_CATEG_OPTION_NAME)) {
+    // TODO consider put list supported categories instead
     const auto & list = arguments.getStringList(ANDROID_CATEG_OPTION_NAME);
-    traceArguments->setAndroidCategories(list);
+    for (const auto & androidCategoryName : list) {
+      if (m_AndroidTraceCategories.find(androidCategoryName) != m_AndroidTraceCategories.cend()) {
+        traceArguments->addAndroidCategory(m_AndroidTraceCategories.at(androidCategoryName));
+      }
+      else {
+        delete traceArguments;
+        return NULL;
+      }
+    }
   }
   if (arguments.hasStringList(KERNEL_CATEG_OPTION_NAME)) {
     const auto & list = arguments.getStringList(KERNEL_CATEG_OPTION_NAME);
-    traceArguments->setKernelCategories(list);
+    for (const auto & kernelCategoryName : list) {
+      if (m_KernelTraceCategories.find(kernelCategoryName) != m_KernelTraceCategories.cend()) {
+        traceArguments->addKernelCategory(m_KernelTraceCategories.at(kernelCategoryName));
+      }
+      else {
+        delete traceArguments;
+        return NULL;
+      }
+    }
   }
   if (arguments.hasStringList(KERNEL_FUNC_OPTION_NAME)) {
     const auto & list = arguments.getStringList(KERNEL_FUNC_OPTION_NAME);
@@ -171,18 +247,19 @@ const ExtraceArguments * ExtraceArgumentsBuilder::build(const Wire & wire, const
     return createHelpExtraceArguments();
   }
   auto * traceArguments = createExtraceArguments(arguments);
+  if (!traceArguments) {
+    return createHelpExtraceArguments();
+  }
   traceArguments->setAppName(cmdLineArgs.getAppName());
   if (traceArguments->hasHelpMessage()
        || traceArguments->listCategoriesEnabled()
-       || traceArguments->hasKernelCategoryFilename()
        || traceArguments->hasKernelCategories()
        || traceArguments->hasAndroidCategories()
        || traceArguments->hasApps()
        || traceArguments->hasKernelFunctions()) {
     return traceArguments;
   }
-  traceArguments->setHelpMessage(getHelpMessage());
-  return traceArguments;
+  return createHelpExtraceArguments();
 }
 
 const string & ExtraceArgumentsBuilder::getHelpMessage() const {

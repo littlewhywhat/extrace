@@ -22,13 +22,19 @@
 #include "wire.h"
 #include "cmdlineargs.h"
 #include "cmdlineargsparser.h"
+#include "android.h"
+#include "kerneltracesystem.h"
 
 #include <string>
 
 class ExtraceArgumentsBuilder {
   public:
+    ExtraceArgumentsBuilder();
     const ExtraceArguments * build(const Wire & wire, const CmdLineArgs & cmdLineArgs) const;
   private:
+    map<string, Android::TraceCategory> m_AndroidTraceCategories;
+    map<string, KernelTraceSystem::TraceCategory> m_KernelTraceCategories;
+    bool tryPutCategoriesFromFile(ExtraceArguments * extraceArguments, const string & filename) const;
     void registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsParser) const;
     ExtraceArguments * createHelpExtraceArguments() const;
     ExtraceArguments * createExtraceArguments(const Arguments & arguments) const;
