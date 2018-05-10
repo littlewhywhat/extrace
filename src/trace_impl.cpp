@@ -35,11 +35,15 @@
  // "Page cache",
 
 TraceImpl::TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
-               KernelSystem * kernelSystem, FileSystem * fileSystem,
-               KernelTraceSystem * kernelTraceSystem):
-               m_Wire(wire), m_AndroidSystem(androidSystem),
-               m_KernelSystem(kernelSystem), m_FileSystem(fileSystem),
-               m_KernelTraceSystem(kernelTraceSystem) {
+               FTrace * ftrace, FileSystem * fileSystem,
+               KernelTraceSystem * kernelTraceSystem,
+               FTraceBufferFile * ftraceBufferFile):
+               m_Wire(wire),
+               m_AndroidSystem(androidSystem),
+               m_FTrace(ftrace),
+               m_FileSystem(fileSystem),
+               m_KernelTraceSystem(kernelTraceSystem),
+               m_FTraceBufferFile(ftraceBufferFile) {
   // TODO put in arguments
   m_KernelTraceCategories["sched"]         = KernelTraceSystem::TraceCategory::SCHED;
   m_KernelTraceCategories["irq"]           = KernelTraceSystem::TraceCategory::IRQ;
@@ -60,9 +64,10 @@ TraceImpl::TraceImpl(const Wire & wire, AndroidSystem * androidSystem,
 
 TraceImpl::~TraceImpl() {
   delete m_FileSystem;
-  delete m_KernelSystem;
+  delete m_FTrace;
   delete m_AndroidSystem;
   delete m_KernelTraceSystem;
+  delete m_FTraceBufferFile;
 }
 
 void TraceImpl::enableTraceOverwrite() {
@@ -93,10 +98,10 @@ bool TraceImpl::setUp() {
   bool ok = true;
 
   // Set up the tracing options.
-  ok &= m_KernelSystem->setTraceOverwriteEnable(m_TraceOverwriteSwitch);
-  ok &= m_KernelSystem->setTraceBufferSizeKB(m_TraceBufferSizeKB);
-  ok &= m_KernelSystem->setGlobalClockEnable(true);
-  ok &= m_KernelSystem->setPrintTgidEnableIfPresent(true);
+  ok &= m_FTraceBufferFile->trySetCircularMode();
+  ok &= m_FTraceBufferFile->trySetSize(m_TraceBufferSizeKB);
+  ok &= setGlobalClockEnable(true);
+  ok &= m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID);
   ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
 
   // Set up the tags property.
@@ -130,19 +135,29 @@ void TraceImpl::cleanUp() {
   ok &= m_AndroidSystem->pokeBinderServices();
 
   // Set the options back to their defaults.
-  ok &= m_KernelSystem->setTraceOverwriteEnable(true);
-  ok &= m_KernelSystem->setTraceBufferSizeKB(1);
-  ok &= m_KernelSystem->setGlobalClockEnable(false);
-  ok &= m_KernelSystem->setPrintTgidEnableIfPresent(false);
+  ok &= m_FTraceBufferFile->trySetCircularMode();
+  ok &= m_FTraceBufferFile->trySetSize(1);
+  ok &= setGlobalClockEnable(false);
+  ok &= m_FTrace->tryDisableOption(FTrace::Option::PRINT_TGID);
   ok &= m_KernelTraceSystem->tryDisableAllFunctions();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::cleanUp\n");
   }
 }
 
+bool TraceImpl::setGlobalClockEnable(bool enable)
+{
+    const FTrace::ClockType clockType = enable ? FTrace::ClockType::GLOBAL : FTrace::ClockType::LOCAL;
+
+    if (m_FTrace->hasTraceClockSetTo(clockType)) {
+      return true;
+    }
+    return m_FTrace->trySetClockType(clockType);
+}
+
 bool TraceImpl::start() {
   bool ok = true;
-  ok &= m_KernelSystem->setTracingEnabled(true);
+  ok &= m_FTrace->tryStartTrace();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::start\n");
   }
@@ -151,7 +166,7 @@ bool TraceImpl::start() {
 
 void TraceImpl::stop() {
   bool ok = true;
-  ok &= m_KernelSystem->setTracingEnabled(false);
+  ok &= m_FTrace->tryStopTrace();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::stop\n");
   }
@@ -163,7 +178,7 @@ bool TraceImpl::trySendTo(const string & filename) {
     fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
     return false;
   }
-  bool ok = m_KernelSystem->trySendTraceTo(outFd);
+  bool ok = m_FTraceBufferFile->trySendTo(outFd);
   close(outFd);
   return ok;
 }
@@ -174,21 +189,21 @@ bool TraceImpl::trySendCompressedTo(const string & filename) {
     fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
     return false;
   }
-  bool ok = m_KernelSystem->trySendTraceCompressedTo(outFd);
+  bool ok = m_FTraceBufferFile->trySendTo(outFd);
   close(outFd);
   return ok; 
 }
 
 bool TraceImpl::trySendToOutput() {
-  return m_KernelSystem->trySendTraceTo(fileno(m_Wire.getOutputStream()));
+  return m_FTraceBufferFile->trySendTo(fileno(m_Wire.getOutputStream()));
 }
 
 bool TraceImpl::trySendCompressedToOutput() {
-  return m_KernelSystem->trySendTraceCompressedTo(fileno(m_Wire.getOutputStream()));
+  return m_FTraceBufferFile->trySendTo(fileno(m_Wire.getOutputStream()));
 }
 
 bool TraceImpl::tryStream(const Signal & signal) {
-  return m_KernelSystem->tryStreamTrace(signal); 
+  return m_FTraceBufferFile->tryStreamUntil(signal);
 }
 
 bool TraceImpl::tryAddKernelCategoriesFromFile(const string & filename) {
@@ -232,9 +247,9 @@ void TraceImpl::printSupportedCategories() {
 }
 
 bool TraceImpl::tryClear() {
-  return m_KernelSystem->clearTrace();
+  return m_FTraceBufferFile->tryClear();
 }
 
 bool TraceImpl::tryWriteClockSyncMarker() {
-  return m_KernelSystem->writeClockSyncMarker();
+  return m_FTraceBufferFile->tryWriteSyncMarker();
 }

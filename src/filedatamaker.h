@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-#include "kernelsystembuilder.h"
+#ifndef LTTLWHWHT_FILEDATAMAKER_H
+#define LTTLWHWHT_FILEDATAMAKER_H
 
-#include "androidtoolbox.h"
-#include "systemtime_impl.h"
-#include "enablefile.h"
-#include "ftrace.h"
+#include "filedata.h"
+#include "wire.h"
 
-KernelSystem * KernelSystemBuilder::build(const Wire & wire, FileSystem * fileSystem) const {
-  auto * kernelSystem = new KernelSystemImpl(wire, fileSystem,
-                                             new AndroidToolBox(),
-                                             new SystemTimeImpl(),
-                                             new FTrace(wire, fileSystem, new AndroidToolBox()));
-  return kernelSystem;
-}
+//! I am a maker of file data
+class FileDataMaker {
+  public:
+    virtual ~FileDataMaker() {}
+    //! Tries to make data from file descriptor 
+    virtual FileData * tryMake(const Wire & wire, int fd) const = 0;
+};
+
+#endif // LTTLWHWHT_FILEDATAMAKER_H

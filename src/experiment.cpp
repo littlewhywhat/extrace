@@ -5,7 +5,6 @@
 #include "extraceargumentsbuilder.h"
 #include "tracebuilder.h"
 #include "androidsystembuilder.h"
-#include "kernelsystembuilder.h"
 #include "tracebuilder.h"
 #include "extraceactionsrunnerbuilder.h"
 
@@ -38,7 +37,6 @@ int main(int argc, const char ** argv) {
                                          new ExtraceArgumentsBuilder(),
                                          new ExtraceActionsRunnerBuilder(
                                              new TraceBuilder(
-                                                 new KernelSystemBuilder(),
                                                  new AndroidSystemBuilder()
                                              )
                                          )

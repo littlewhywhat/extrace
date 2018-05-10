@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_KERNELSYSTEMBUILDER_H
-#define LTTLWHWHT_KERNELSYSTEMBUILDER_H
+#ifndef LTTLWHWHT_COMPRESSEDFILEDATAMAKER_H
+#define LTTLWHWHT_COMPRESSEDFILEDATAMAKER_H
 
-#include "wire.h"
-#include "filesystem.h"
-#include "kernelsystem.h"
-#include "kernelsystem_impl.h"
+#include "filedatamaker.h"
 
-class KernelSystemBuilder {
+//! I am a maker of simple file data
+class CompressedFileDataMaker : public FileDataMaker {
   public:
-    KernelSystem * build(const Wire & wire, FileSystem * fileSystem) const;
+    //! Destroys me
+    virtual ~CompressedFileDataMaker() {}
+    //! Tries to make simple data from file descriptor 
+    FileData * tryMake(const Wire & wire, int fd) const override;
 };
 
-#endif // LTTLWHWHT_KERNELSYSTEMBUILDER_H
+#endif // LTTLWHWHT_COMPRESSEDFILEDATAMAKER_H
