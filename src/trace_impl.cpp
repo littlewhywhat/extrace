@@ -17,6 +17,7 @@
 #include "trace_impl.h"
 
 #include "androidtoolbox.h"
+#include "android.h"
 
 // TODO
  // "IRQ Events",
@@ -34,12 +35,35 @@
  // "Binder global lock trace",
  // "Page cache",
 
-TraceImpl::TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
+// TODO
+// "Graphics"
+// "Input"
+// "View System"
+// "WebView"
+// "Window Manager"
+// "Activity Manager"
+// "Sync Manager"
+// "Audio"
+// "Video"
+// "Camera"
+// "Hardware Modules"
+// "Application"
+// "Resource Loading"
+// "Dalvik VM"
+// "RenderScript"
+// "Bionic C Library"
+// "Power Management"
+// "Package Manager"
+// "System Server"
+// "Database"
+// "Network"
+
+TraceImpl::TraceImpl(const Wire & wire, AndroidTraceSystem * androidSystem, 
                FTrace * ftrace, FileSystem * fileSystem,
                KernelTraceSystem * kernelTraceSystem,
                FTraceBufferFile * ftraceBufferFile):
                m_Wire(wire),
-               m_AndroidSystem(androidSystem),
+               m_AndroidTraceSystem(androidSystem),
                m_FTrace(ftrace),
                m_FileSystem(fileSystem),
                m_KernelTraceSystem(kernelTraceSystem),
@@ -60,12 +84,35 @@ TraceImpl::TraceImpl(const Wire & wire, AndroidSystem * androidSystem,
   m_KernelTraceCategories["binder_driver"] = KernelTraceSystem::TraceCategory::BINDER_DRIVER;
   m_KernelTraceCategories["binder_lock"]   = KernelTraceSystem::TraceCategory::BINDER_LOCK;
   m_KernelTraceCategories["filemap"]       = KernelTraceSystem::TraceCategory::PAGECACHE;
+
+  //TODO put in arguments
+  m_AndroidTraceCategories["gfx"]          = Android::TraceCategory::GRAPHICS         ;
+  m_AndroidTraceCategories["input"]        = Android::TraceCategory::INPUT            ;
+  m_AndroidTraceCategories["view"]         = Android::TraceCategory::VIEW             ;
+  m_AndroidTraceCategories["webview"]      = Android::TraceCategory::WEBVIEW          ;
+  m_AndroidTraceCategories["wm"]           = Android::TraceCategory::WINDOW_MANAGER   ;
+  m_AndroidTraceCategories["am"]           = Android::TraceCategory::ACTIVITY_MANAGER ;
+  m_AndroidTraceCategories["sm"]           = Android::TraceCategory::SYNC_MANAGER     ;
+  m_AndroidTraceCategories["audio"]        = Android::TraceCategory::AUDIO            ;
+  m_AndroidTraceCategories["video"]        = Android::TraceCategory::VIDEO            ;
+  m_AndroidTraceCategories["camera"]       = Android::TraceCategory::CAMERA           ;
+  m_AndroidTraceCategories["hal"]          = Android::TraceCategory::HAL              ;
+  m_AndroidTraceCategories["app"]          = Android::TraceCategory::APP              ;
+  m_AndroidTraceCategories["res"]          = Android::TraceCategory::RESOURCES        ;
+  m_AndroidTraceCategories["dalvik"]       = Android::TraceCategory::DALVIK           ;
+  m_AndroidTraceCategories["rs"]           = Android::TraceCategory::RS               ;
+  m_AndroidTraceCategories["bionic"]       = Android::TraceCategory::BIONIC           ;
+  m_AndroidTraceCategories["power"]        = Android::TraceCategory::POWER            ;
+  m_AndroidTraceCategories["pm"]           = Android::TraceCategory::PACKAGE_MANAGER  ;
+  m_AndroidTraceCategories["ss"]           = Android::TraceCategory::SYSTEM_SERVER    ;
+  m_AndroidTraceCategories["database"]     = Android::TraceCategory::DATABASE         ;
+  m_AndroidTraceCategories["network"]      = Android::TraceCategory::NETWORK          ;
 }
 
 TraceImpl::~TraceImpl() {
   delete m_FileSystem;
   delete m_FTrace;
-  delete m_AndroidSystem;
+  delete m_AndroidTraceSystem;
   delete m_KernelTraceSystem;
   delete m_FTraceBufferFile;
 }
@@ -105,10 +152,13 @@ bool TraceImpl::setUp() {
   ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
 
   // Set up the tags property.
-  printf("hello\n");
-  ok &= m_AndroidSystem->tryEnableCategories(m_AndroidCategories);
-  ok &= m_AndroidSystem->setAppCmdlineProperty(m_Apps);
-  ok &= m_AndroidSystem->pokeBinderServices();
+  for (const auto & category : m_AndroidCategories) {
+    m_AndroidTraceSystem->rememberToTrace(m_AndroidTraceCategories[category]);
+  }
+  for (const auto & app : m_Apps) {
+    m_AndroidTraceSystem->rememberToTrace(app);
+  }
+  ok &= m_AndroidTraceSystem->tryToTrace();
 
   // Disable all the sysfs enables.  This is done as a separate loop from
   // the enables to allow the same enable to exist in multiple categories.
@@ -130,9 +180,7 @@ void TraceImpl::cleanUp() {
   ok &= m_KernelTraceSystem->tryDisableAllCategories();
 
   // Reset the system properties.
-  m_AndroidSystem->disableAllCategories();
-  m_AndroidSystem->clearAppProperties();
-  ok &= m_AndroidSystem->pokeBinderServices();
+  ok &= m_AndroidTraceSystem->tryNotToTrace();
 
   // Set the options back to their defaults.
   ok &= m_FTraceBufferFile->trySetCircularMode();
@@ -220,13 +268,14 @@ bool TraceImpl::tryAddKernelCategoriesFromFile(const string & filename) {
 
 bool TraceImpl::tryEnableAndroidCoreServices() {
   set<string> tokens;
-  if (m_AndroidSystem->has_core_services()) {
-    string value;
-    m_AndroidSystem->property_get_core_service_names(value);
-    AndroidToolBox().parseToTokens(value.c_str(), ",", tokens);
-    for (const auto & token : tokens) {
-      addApp(token.c_str());
-    }
+  if (m_AndroidTraceSystem->canTraceCoreServices()) {
+    m_AndroidTraceSystem->rememberToTraceCoreServices();
+    // string value;
+    // m_AndroidTraceSystem->property_get_core_service_names(value);
+    // AndroidToolBox().parseToTokens(value.c_str(), ",", tokens);
+    // for (const auto & token : tokens) {
+    //   addApp(token.c_str());
+    // }
     return true;
   }
   fprintf(m_Wire.getErrorStream(), "TraceImpl::tryEnableAndroidCoreServices - Can't enable core services - not supported\n");
@@ -239,10 +288,10 @@ void TraceImpl::printSupportedCategories() {
       fprintf(m_Wire.getOutputStream(), "  %s\n", category.first.c_str());
     }
   }
-  const auto & androidCategories = m_AndroidSystem->getCategories();
-  for (const auto & category : androidCategories) {
+  // const auto & androidCategories = m_AndroidTraceSystem->getCategories();
+  for (const auto & categoryNameAndCategory : m_AndroidTraceCategories) {
       // is there a way to check?
-      fprintf(m_Wire.getOutputStream(), "  %10s - %s\n", category.name, category.longname);
+      fprintf(m_Wire.getOutputStream(), "  %s\n", categoryNameAndCategory.first.c_str());
   }
 }
 

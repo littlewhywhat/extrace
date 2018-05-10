@@ -18,7 +18,7 @@
 
 #include "trace_impl.h"
 #include "mock_kernelsystem.h"
-#include "mock_androidsystem.h"
+#include "mock_androidtracesystem.h"
 
 #include <cstdio>
 
@@ -33,12 +33,12 @@ class TraceImplTest : public ::testing::Test {
     void SetUp() {
       defaultBufferSize = 2048;
       kernelSystem = new MockKernelSystem();
-      androidSystem = new MockAndroidSystem();
+      androidSystem = new MockAndroidTraceSystem();
       auto spKernelSystem = shared_ptr<KernelSystem>(kernelSystem);
-      auto spAndroidSystem = shared_ptr<AndroidSystem>(androidSystem);
+      auto spAndroidTraceSystem = shared_ptr<AndroidTraceSystem>(androidSystem);
       trace.setErrorStream(stdout);
       trace.setKernelSystem(spKernelSystem);
-      trace.setAndroidSystem(spAndroidSystem);
+      trace.setAndroidTraceSystem(spAndroidTraceSystem);
       CaptureStdout();
     }
 
@@ -180,7 +180,7 @@ class TraceImplTest : public ::testing::Test {
     }
   private:
     TraceImpl trace;
-    MockAndroidSystem * androidSystem;
+    MockAndroidTraceSystem * androidSystem;
     MockKernelSystem * kernelSystem;
     uint32_t defaultBufferSize;
 };
