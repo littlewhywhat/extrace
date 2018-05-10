@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-#include "androidtracecategory.h"
+#include "kerneltracecategory.h"
 
-const string & AndroidTraceCategory::getName() const {
+const string & KernelTraceCategory::getName() const {
   return m_Name; 
 }
 
-const string & AndroidTraceCategory::getLongName() const {
+const string & KernelTraceCategory::getLongName() const {
   return m_LongName; 
 }
 
-const Android::TraceCategory & AndroidTraceCategory::getCategory() const {
+const KernelTraceSystem::TraceCategory & KernelTraceCategory::getCategory() const {
   return m_Category; 
 }

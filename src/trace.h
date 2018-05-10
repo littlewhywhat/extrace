@@ -48,9 +48,9 @@ class Trace {
     virtual bool trySendCompressedToOutput() = 0;
     virtual bool tryStream(const Signal & signal) = 0;
     virtual bool tryEnableAndroidCoreServices() = 0;
-    virtual void printSupportedCategories() = 0;
     virtual bool tryClear() = 0;
     virtual bool tryWriteClockSyncMarker() = 0;
+    virtual KernelTraceSystem * getKernelTraceSystem() = 0;
 };
 
 #endif // LTTLWHWHT_TRACE_H
