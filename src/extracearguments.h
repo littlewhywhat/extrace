@@ -21,6 +21,9 @@
 #include <vector>
 #include <stdint.h>
 
+#include "android.h"
+#include "kerneltracesystem.h"
+
 using namespace std;
 
 class ExtraceArguments {
@@ -37,17 +40,15 @@ class ExtraceArguments {
     void enableStream();
     void enableListCategories();
     void enableCoreServices();
-    void setKernelCategoryFilename(const string & filename);
     void setOutputFilename(const string & filename);
     void setBufferSize(uint32_t size);
     void setInitSleepDuration(uint32_t duration);
     void setMidSleepDuration(uint32_t duration);
     void setApps(const vector<string> & apps);
-    void setAndroidCategories(const vector<string> & categories);
-    void setKernelCategories(const vector<string> & categories);
+    void addAndroidCategory(const Android::TraceCategory & traceCategory);
+    void addKernelCategory(const KernelTraceSystem::TraceCategory & traceCategory);
     void setKernelFunctions(const vector<string> & functions);
     bool hasHelpMessage() const;
-    bool hasKernelCategoryFilename() const;
     bool hasOutputFilename() const;
     bool hasApps() const;
     bool hasAndroidCategories() const;
@@ -65,15 +66,14 @@ class ExtraceArguments {
     bool listCategoriesEnabled() const;
     bool coreServicesEnabled() const;
     const string & getAppName() const;
-    const string & getKernelCategoryFilename() const;
     const string & getOutputFilename() const;
     const string & getHelpMessage() const;
     uint32_t getBufferSize() const;
     uint32_t getInitSleepDuration() const;
     uint32_t getMidSleepDuration() const;
     const vector<string> & getApps() const;
-    const vector<string> & getAndroidCategories() const;
-    const vector<string> & getKernelCategories() const;
+    const vector<Android::TraceCategory> & getAndroidCategories() const;
+    const vector<KernelTraceSystem::TraceCategory> & getKernelCategories() const;
     const vector<string> & getKernelFunctions() const;
   private:
     bool m_CircleBuffer = false;
@@ -93,8 +93,8 @@ class ExtraceArguments {
     uint32_t m_InitSleepDuration = 0;
     uint32_t m_MidSleepDuration = 5;
     vector<string> m_Apps;
-    vector<string> m_AndroidCategories;
-    vector<string> m_KernelCategories;
+    vector<Android::TraceCategory> m_AndroidCategories;
+    vector<KernelTraceSystem::TraceCategory> m_KernelCategories;
     vector<string> m_KernelFunctions;
 };
 

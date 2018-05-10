@@ -18,6 +18,8 @@
 #define LTTLWHWHT_TRACE_H
 
 #include "signal.h"
+#include "android.h"
+#include "kerneltracesystem.h"
 
 #include <string>
 
@@ -26,8 +28,8 @@ using namespace std;
 class Trace {
   public:
     virtual ~Trace() {}
-    virtual void addKernelCategory(const char* categoryName) = 0;
-    virtual void addAndroidCategory(const char * categoryName) = 0;
+    virtual void addKernelCategory(const KernelTraceSystem::TraceCategory & category) = 0;
+    virtual void addAndroidCategory(const Android::TraceCategory & categoryName) = 0;
     virtual void addApp(const char * appName) = 0;
     virtual void addFunction(const char * funcName) = 0;
     // Set all the kernel tracing settings to the desired state for this trace
@@ -45,7 +47,6 @@ class Trace {
     virtual bool trySendToOutput() = 0;
     virtual bool trySendCompressedToOutput() = 0;
     virtual bool tryStream(const Signal & signal) = 0;
-    virtual bool tryAddKernelCategoriesFromFile(const string & filename) = 0;
     virtual bool tryEnableAndroidCoreServices() = 0;
     virtual void printSupportedCategories() = 0;
     virtual bool tryClear() = 0;

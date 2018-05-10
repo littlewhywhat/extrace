@@ -50,8 +50,8 @@ class TraceImpl : public Trace {
     bool start() override;
     // Disable tracing in the kernel.
     void stop() override;
-    void addKernelCategory(const char* categoryName) override;
-    void addAndroidCategory(const char * categoryName) override;
+    void addKernelCategory(const KernelTraceSystem::TraceCategory & category) override;
+    void addAndroidCategory(const Android::TraceCategory & category) override;
     void addApp(const char * appName) override;
     void addFunction(const char * funcName) override;
     bool trySendTo(const string & filename) override;
@@ -59,7 +59,6 @@ class TraceImpl : public Trace {
     bool trySendToOutput() override;
     bool trySendCompressedToOutput() override;
     bool tryStream(const Signal & signal) override;
-    bool tryAddKernelCategoriesFromFile(const string & filename) override;
     bool tryEnableAndroidCoreServices() override;
     void printSupportedCategories() override;
     bool tryClear() override;
@@ -75,12 +74,10 @@ class TraceImpl : public Trace {
     FTraceBufferFile * m_FTraceBufferFile = NULL;
     bool m_TraceOverwriteSwitch = false;
     uint32_t m_TraceBufferSizeKB = 2048;
-    vector<string> m_KernelCategories;
-    vector<string> m_AndroidCategories;
     vector<string> m_Apps;
     set<string> m_Functions;
-    map<string, KernelTraceSystem::TraceCategory> m_KernelTraceCategories;
-    map<string, Android::TraceCategory> m_AndroidTraceCategories;
+    set<KernelTraceSystem::TraceCategory> m_KernelCategories;
+    set<Android::TraceCategory> m_AndroidCategories;
     bool setGlobalClockEnable(bool enable);
 };
 

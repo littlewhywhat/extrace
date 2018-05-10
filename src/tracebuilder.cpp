@@ -48,12 +48,12 @@ Trace * TraceBuilder::build(const Wire & wire, const ExtraceArguments & traceArg
   traceImpl->setTraceBufferSizeKB(traceArguments.getBufferSize());
   if (traceArguments.hasKernelCategories()) {
     for (auto & category : traceArguments.getKernelCategories()) {
-      traceImpl->addKernelCategory(category.c_str());
+      traceImpl->addKernelCategory(category);
     }
   }
   if (traceArguments.hasAndroidCategories()) {
     for (auto & category: traceArguments.getAndroidCategories()) {
-      traceImpl->addAndroidCategory(category.c_str());
+      traceImpl->addAndroidCategory(category);
     }
   }
   if (traceArguments.hasApps()) {
