@@ -31,7 +31,7 @@
 #include "actionrunner_impl.h"
 
 #include "mock_filesystem_impl.h"
-#include "mock_androidsystem_impl.h"
+#include "mock_simpleandroidtracesystem.h"
 
 #include <gtest/gtest.h>
 
@@ -84,7 +84,7 @@ class ExtraceAppTest : public ::testing::Test {
                   fileIsWritable(StrEq("/sys/kernel/debug/tracing/current_tracer")))
                   .WillOnce(Return(true));
       m_ExtraceApp.setFileSystemImpl(fileSystemImpl);
-      m_ExtraceApp.setAndroidSystemImpl(new MockAndroidSystemImpl());
+      m_ExtraceApp.setAndroidTraceSystemImpl(new MockAndroidTraceSystemImpl());
 
       int argc = 1;
       const char * argv[] = { "extrace" };

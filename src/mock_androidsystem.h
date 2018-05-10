@@ -19,9 +19,9 @@
 
 #include <gmock/gmock.h>
 
-#include "androidsystem.h"
+#include "androidtracesystem.h"
 
-class MockAndroidSystem : public AndroidSystem {
+class MockAndroidTraceSystem : public AndroidTraceSystem {
   public:
     MOCK_CONST_METHOD0(has_core_services, bool(void));
     MOCK_CONST_METHOD0(getCategories, const vector<TracingCategory> &(void));

@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ANDROIDSYSTEMBUILDER_H
-#define LTTLWHWHT_ANDROIDSYSTEMBUILDER_H
+#include "androidtracesystembuilder.h"
 
-#include "wire.h"
-#include "androidsystem.h"
-#include "androidsystem_impl.h"
+#include "android_impl.h"
+#include "simpleandroidtracesystem.h"
 
-class AndroidSystemBuilder {
-  public:
-    AndroidSystem * build(const Wire & wire) const;
-};
-
-#endif // LTTLWHWHT_ANDROIDSYSTEMBUILDER_H
+AndroidTraceSystem * AndroidTraceSystemBuilder::build(const Wire & wire) const {
+  return new SimpleAndroidTraceSystem(wire, new AndroidImpl(wire));
+}

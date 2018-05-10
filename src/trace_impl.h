@@ -19,7 +19,7 @@
 
 #include "trace.h"
 
-#include "androidsystem.h"
+#include "androidtracesystem.h"
 #include "filesystem.h"
 #include "wire.h"
 #include "kerneltracesystem.h"
@@ -36,7 +36,7 @@ using namespace std;
 
 class TraceImpl : public Trace {
   public:
-    TraceImpl(const Wire & wire, AndroidSystem * androidSystem, 
+    TraceImpl(const Wire & wire, AndroidTraceSystem * androidSystem, 
                FTrace * ftrace, FileSystem * fileSystem,
                KernelTraceSystem * kernelTraceSystem,
                FTraceBufferFile * ftraceBufferFile);
@@ -68,7 +68,7 @@ class TraceImpl : public Trace {
     void setTraceBufferSizeKB(uint32_t size);
   private:
     const Wire & m_Wire;
-    AndroidSystem * m_AndroidSystem;
+    AndroidTraceSystem * m_AndroidTraceSystem;
     FTrace * m_FTrace;
     FileSystem * m_FileSystem;
     KernelTraceSystem * m_KernelTraceSystem = NULL;
@@ -80,6 +80,7 @@ class TraceImpl : public Trace {
     vector<string> m_Apps;
     set<string> m_Functions;
     map<string, KernelTraceSystem::TraceCategory> m_KernelTraceCategories;
+    map<string, Android::TraceCategory> m_AndroidTraceCategories;
     bool setGlobalClockEnable(bool enable);
 };
 

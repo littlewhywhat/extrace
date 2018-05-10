@@ -23,7 +23,7 @@
 #include "compressedfiledatamaker.h"
 
 TraceBuilder::~TraceBuilder() {
-  delete m_AndroidSystemBuilder;
+  delete m_AndroidTraceSystemBuilder;
 }
 
 Trace * TraceBuilder::build(const Wire & wire, const ExtraceArguments & traceArguments) const {
@@ -37,7 +37,7 @@ Trace * TraceBuilder::build(const Wire & wire, const ExtraceArguments & traceArg
   FileSystem * fileSystem = new FileSystemImpl(wire);
   auto * ftraceBufferFile = new FTraceBufferFile(wire, new FTrace(wire, new FileSystemImpl(wire), new AndroidToolBox()),
                                                  fileDataMaker);
-  auto * androidSystem = m_AndroidSystemBuilder->build(wire);
+  auto * androidSystem = m_AndroidTraceSystemBuilder->build(wire);
   auto * kernelTraceSystem = new KernelTraceSystem(wire, new FTrace(wire, new FileSystemImpl(wire), 
                                                          new AndroidToolBox()));
   auto * traceImpl = new TraceImpl(wire, androidSystem, new FTrace(wire, new FileSystemImpl(wire), 
