@@ -50,18 +50,6 @@ class KernelSystemImpl : public KernelSystem {
     // update it if the requested value is not the current value.
     bool setGlobalClockEnable(bool enable) override;
     bool setPrintTgidEnableIfPresent(bool enable) override;
-    // Set the comma separated list of functions that the kernel is to trace.
-    // bool setKernelTraceFuncs(const vector<string> & funcs) override;
-    // bool setKernelTraceCategories(const vector<string> & ids);
-    // const vector<TracingCategory> & getCategories() const override;
-    // Disable all /sys/ enable files.
-    //bool disableKernelTraceEvents();
-    // void add_kernel_category(const char * id, const char * name, const std::vector<EnableFile> &files);
-    // bool isCategorySupported(const TracingCategory& category) const;
-    // class Creator {
-    //   public:
-    //     KernelSystemImpl * createWithDefaultCategories() const;
-    // };
   private:
     const Wire & m_Wire;
     FileSystem * m_FileSystem = NULL;
@@ -72,10 +60,6 @@ class KernelSystemImpl : public KernelSystem {
     map<string, TracingCategory> m_Categories;
     vector<TracingCategory> m_CategoriesList;
 
-    bool try_send(int fd_from, int fd_to);
-    bool try_sendfile(int fd_from, int fd_to);
-    bool compress_trace_to(int traceFD, int outFd);
-    bool verifyKernelTraceFuncs(const vector<string> & funcs) const;
     // Check whether the category is supported on the device with the current
     // rootness.  A category is supported only if all its required /sys/ files are
     // writable and if enabling the category will enable one or more tracing tags
