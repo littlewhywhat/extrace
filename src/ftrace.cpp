@@ -3,12 +3,9 @@
 #include <errno.h>  // errno
 #include <fcntl.h>  // creat, ope, O_WRONLY, O_CREAT
 
-FTrace::~FTrace()
-{
-  delete m_ToolBox;
-}
-
-FTrace::FTrace(const Wire & wire, FileSystem * fileSystem, ToolBox * toolBox):
+FTrace::FTrace(const Wire & wire,
+               shared_ptr<FileSystem> & fileSystem,
+               shared_ptr<ToolBox> toolBox):
                       Wired(wire), m_FileSystem(fileSystem), m_ToolBox(toolBox)
 {
   m_TracePoints[TracePoint::SCHED_SWITCH] = "/sys/kernel/debug/tracing/events/sched/sched_switch/enable";

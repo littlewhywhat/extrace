@@ -13,8 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "streamaction.h"
 
-bool StreamAction::tryRun() {
-  return m_Environment->getTraceBuffer().tryStreamUntil(m_Signal);
-}
+#ifndef LTTLWHWHT_ENVIRONMENTBUILDER_H
+#define LTTLWHWHT_ENVIRONMENTBUILDER_H
+
+#include "wire.h"
+#include "extracearguments.h"
+#include "environment.h"
+
+//! I am a builder of environment
+class EnvironmentBuilder {
+  public:
+    //! Builds new Environment
+    Environment * build(const Wire & wire, const ExtraceArguments & traceArguments) const;
+};
+
+#endif // LTTLWHWHT_ENVIRONMENTBUILDER_H

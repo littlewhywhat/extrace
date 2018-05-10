@@ -1,0 +1,46 @@
+@startuml
+
+class Android {
+  
+}
+Android "1" -- "*" AndroidTraceCategory
+Android "1" -- "*" Application
+
+class FTrace {
+  
+}
+
+ Function "1" -- "*" FTrace: has <
+ TracePoint "1" -- "*" FTrace: has <
+
+class Function {
+
+}
+
+class AndroidTraceCategory {
+  - tag: int
+}
+hide AndroidTraceCategory methods
+
+class Application {
+  - name: string
+}
+
+class KernelTraceCategory {
+  
+}
+hide KernelTraceCategory methods
+hide KernelTraceCategory fields
+
+KernelTraceCategory "1" -- "*" TracePoint: has
+
+class TracePoint {
+  
+}
+
+class FTrace {
+  
+}
+
+
+@enduml

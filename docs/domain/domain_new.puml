@@ -1,0 +1,98 @@
+@startuml
+
+' class Environment {
+' }
+' hide Environment circle
+' 
+ ' Environment "1" -- "1" KernelTraceSystem: has >
+ ' Environment "1" -- "1" AndroidTraceSystem: has >
+ ' Environment "1" -- "1" Trace: has >
+ ' Environment "1" -- "1" FileSystem: has >
+
+' class KernelTraceSystem {
+'   
+' }
+' hide KernelTraceSystem circle
+' 
+' KernelTraceSystem "1" -- "*" KernelTraceCategory: traces > 
+' KernelTraceSystem "1" -- "*" KernelTraceCategory: supports >
+' KernelTraceSystem "1" -- "*" KernelFunction: traces >
+' 
+class AndroidTraceSystem {
+  --
+}
+hide AndroidTraceSystem circle
+
+AndroidTraceSystem "1" -- "*" AndroidTraceCategory: traces
+AndroidTraceSystem "1" -- "*" AndroidApplication: traces
+
+class FileSystem {
+  + read(file)
+  + writeTo(file, string)
+}
+hide FileSystem circle
+
+class Action {
+}
+hide Action circle
+
+Action "*" -- "1" Environment: runs in >
+
+class StartAction {
+}
+hide StartAction circle
+
+Action <|-- StartAction
+StartAction "1" -- "1" FTrace: starts >
+
+class StopAction {
+}
+hide StopAction circle
+
+StopAction -|> Action
+StopAction "1" -- "1" FTrace: stops >
+
+class ListCategoriesAction {
+}
+hide ListCategoriesAction circle
+
+ListCategoriesAction -|> Action
+ListCategoriesAction "1" -- "*" KernelTraceCategory: lists supported >
+ListCategoriesAction "1" -- "*" AndroidTraceCategory: lists >
+
+class KernelTraceCategory {
+  
+}
+hide KernelTraceCategory circle
+
+KernelTraceCategory "1" -- "*" KernelTracePoint: has >
+
+class KernelFunction {
+  
+}
+hide KernelFunction circle
+
+class AndroidTraceCategory {
+  
+}
+hide AndroidTraceCategory circle
+
+class AndroidApplication {
+  
+}
+hide AndroidApplication circle
+
+class FTrace {
+  
+}
+hide FTrace circle
+
+KernelFunction "*" -- "1" FTrace: traces <
+KernelTracePoint "*" -- "1" FTrace: traces <
+
+class KernelTracePoint {
+  
+}
+hide KernelTracePoint circle
+
+@enduml

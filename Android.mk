@@ -92,8 +92,6 @@ LOCAL_SRC_FILES:= \
 			src/signal.cpp \
 			src/cmdlineapp.cpp \
 			src/environment.cpp \
-			src/androidtracesystembuilder.cpp \
-			src/tracebuilder.cpp \
 			src/listsupportedcategories.cpp \
 			src/addandroidcoretotrace.cpp \
 			src/sleepaction.cpp \
@@ -129,6 +127,7 @@ LOCAL_SRC_FILES:= \
 			src/kerneltracecategory.cpp \
 			src/androidtracecategory.cpp \
 	    src/experiment.cpp \
+	    src/environmentbuilder.cpp \
 
 LOCAL_MODULE:= experiment
 

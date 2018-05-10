@@ -28,29 +28,19 @@ using namespace std;
 class Trace {
   public:
     virtual ~Trace() {}
-    virtual void addKernelCategory(const KernelTraceSystem::TraceCategory & category) = 0;
-    virtual void addAndroidCategory(const Android::TraceCategory & categoryName) = 0;
-    virtual void addApp(const char * appName) = 0;
-    virtual void addFunction(const char * funcName) = 0;
+    // virtual void addKernelCategory(const KernelTraceSystem::TraceCategory & category) = 0;
+    // virtual void addAndroidCategory(const Android::TraceCategory & categoryName) = 0;
+    // virtual void addApp(const char * appName) = 0;
+    // virtual void addFunction(const char * funcName) = 0;
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     virtual bool setUp() = 0;
     // Reset all the kernel tracing settings to their default state.
-    virtual void cleanUp() = 0;
+    virtual bool cleanUp() = 0;
     // Enable tracing in the kernel.
     virtual bool start() = 0;
     // Disable tracing in the kernel.
-    virtual void stop() = 0;
-    // Read data from the tracing pipe and forward to outstream
-    virtual bool trySendTo(const string & filename) = 0;
-    virtual bool trySendCompressedTo(const string & filename) = 0;
-    virtual bool trySendToOutput() = 0;
-    virtual bool trySendCompressedToOutput() = 0;
-    virtual bool tryStream(const Signal & signal) = 0;
-    virtual bool tryEnableAndroidCoreServices() = 0;
-    virtual bool tryClear() = 0;
-    virtual bool tryWriteClockSyncMarker() = 0;
-    virtual KernelTraceSystem * getKernelTraceSystem() = 0;
+    virtual bool stop() = 0;
 };
 
 #endif // LTTLWHWHT_TRACE_H

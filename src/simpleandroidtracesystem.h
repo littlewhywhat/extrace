@@ -20,6 +20,7 @@
 #include "androidtracesystem.h"
 
 #include <set>
+#include <memory>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ using namespace std;
 class SimpleAndroidTraceSystem : public AndroidTraceSystem {
   public:
     //! Constructs me for Android
-    SimpleAndroidTraceSystem(const Wire & wire, Android * android):
+    SimpleAndroidTraceSystem(const Wire & wire, const shared_ptr<Android> & android):
                              AndroidTraceSystem(wire), m_Android(android) {}
     bool canTraceCoreServices() const override;
     void rememberToTrace(const string & appName) override;
@@ -39,7 +40,7 @@ class SimpleAndroidTraceSystem : public AndroidTraceSystem {
     void forgetAll() override;
     bool tryNotToTrace() override;
   private:
-    Android * m_Android = NULL;
+    shared_ptr<Android> m_Android = NULL;
     set<string> m_AppNames;
     set<Android::TraceCategory> m_Categories;
     void stopTraceAllApps();

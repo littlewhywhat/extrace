@@ -19,11 +19,12 @@
 
 #include "interruptabletraceaction.h"
 
-class StreamAction : public InterruptableTraceAction {
+//! I am an InterruptableEnvironmentAction that streams trace buffer
+class StreamAction : public InterruptableEnvironmentAction {
   public:
-    StreamAction(const Wire & wire, const shared_ptr<Trace> & trace,
+    StreamAction(const Wire & wire, const shared_ptr<Environment> & environment,
                  const Signal & signal):
-                 InterruptableTraceAction(wire, trace, signal) {}
+                 InterruptableEnvironmentAction(wire, environment, signal) {}
     bool tryRun() override;
 };
 

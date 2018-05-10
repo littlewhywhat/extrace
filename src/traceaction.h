@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_TRACEACTION_H
-#define LTTLWHWHT_TRACEACTION_H
+#ifndef LTTLWHWHT_ENVIRONMENTACTION_H
+#define LTTLWHWHT_ENVIRONMENTACTION_H
 
 #include "action.h"
 
 #include <memory>
 
-#include "trace.h"
+#include "environment.h"
 
-class TraceAction : public Action {
+//! I am an Action that has access to Environment
+class EnvironmentAction : public Action {
   public:
-    TraceAction(const Wire & wire, shared_ptr<Trace> trace):
-                Action(wire), m_Trace(trace) {}
-    virtual ~TraceAction() {}
+    //! Constructs me
+    EnvironmentAction(const Wire & wire, shared_ptr<Environment> environment):
+                Action(wire), m_Environment(environment) {}
+    //! Destroys only me (not environment)
+    virtual ~EnvironmentAction() {}
   protected:
-    shared_ptr<Trace> m_Trace;
+    //! My environment
+    shared_ptr<Environment> m_Environment;
 };
 
-#endif // LTTLWHWHT_TRACEACTION_H
+#endif // LTTLWHWHT_ENVIRONMENTACTION_H

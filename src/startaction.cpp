@@ -16,9 +16,13 @@
 #include "startaction.h"
 
 bool StartAction::tryRun() {
+  auto & trace = m_Environment->getTrace();
+  auto & traceBuffer = m_Environment->getTraceBuffer();
+
+
   bool ok = true;
-  ok &= m_Trace->setUp();
-  ok &= m_Trace->start();
+  ok &= trace.setUp();
+  ok &= trace.start();
 
   if (ok) {
     fprintf(m_Wire.getOutputStream(), "started trace...\n");
@@ -29,8 +33,8 @@ bool StartAction::tryRun() {
     // contain entries from only one CPU can cause "begin" entries without a
     // matching "end" entry to show up if a task gets migrated from one CPU to
     // another.
-    ok &= m_Trace->tryClear();
-    ok &= m_Trace->tryWriteClockSyncMarker();
+    ok &= traceBuffer.tryClear();
+    ok &= traceBuffer.tryWriteSyncMarker();
   } else {
     fprintf(m_Wire.getErrorStream(), "error StartAction::tryRun\n");
   }

@@ -20,6 +20,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "ftrace.h"
 
@@ -32,9 +33,9 @@ class KernelTraceSystem : public Wired {
   public:
     enum class TraceCategory;
     //! Initializes category groups
-    KernelTraceSystem(const Wire & wire, FTrace * ftrace);
-    //! Deletes m_FTrace
-    ~KernelTraceSystem();
+    KernelTraceSystem(const Wire & wire, const shared_ptr<FTrace> & ftrace);
+    //! Destroys me
+    ~KernelTraceSystem() {}
     //! Tries to enable trace category 
     bool tryEnableCategory(const TraceCategory & traceCategory); 
     //! Tries to disable all set categories
@@ -62,7 +63,7 @@ class KernelTraceSystem : public Wired {
     //! Definitions of each TraceCategory by groups of TraceCategoryMembers
     map<TraceCategory, vector<TraceCategoryMember>> m_TraceCategoryGroups;
     //! Pointer to FTrace
-    FTrace * m_FTrace = NULL;
+    shared_ptr<FTrace> m_FTrace;
     //! Tries to disable group of TraceCategoryMembers
     
     //! This method assumes that corresponding TraceCategory is supported.

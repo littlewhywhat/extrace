@@ -19,106 +19,57 @@
 #include "androidtoolbox.h"
 #include "android.h"
 
-TraceImpl::TraceImpl(const Wire & wire, AndroidTraceSystem * androidSystem, 
-               FTrace * ftrace, FileSystem * fileSystem,
-               KernelTraceSystem * kernelTraceSystem,
-               FTraceBufferFile * ftraceBufferFile):
+TraceImpl::TraceImpl(const Wire & wire,
+                     const shared_ptr<FTrace> & ftrace,
+                     const shared_ptr<AndroidTraceSystem> & androidSystem, 
+                     const shared_ptr<KernelTraceSystem> & kernelTraceSystem):
                m_Wire(wire),
-               m_AndroidTraceSystem(androidSystem),
                m_FTrace(ftrace),
-               m_FileSystem(fileSystem),
-               m_KernelTraceSystem(kernelTraceSystem),
-               m_FTraceBufferFile(ftraceBufferFile) {
-  // TODO put in arguments
-
+               m_AndroidTraceSystem(androidSystem),
+               m_KernelTraceSystem(kernelTraceSystem) {
 }
 
-KernelTraceSystem * TraceImpl::getKernelTraceSystem() {
-  return m_KernelTraceSystem;
-}
-
-TraceImpl::~TraceImpl() {
-  delete m_FileSystem;
-  delete m_FTrace;
-  delete m_AndroidTraceSystem;
-  delete m_KernelTraceSystem;
-  delete m_FTraceBufferFile;
-}
-
-void TraceImpl::enableTraceOverwrite() {
-  m_TraceOverwriteSwitch = true;
-}
-
-void TraceImpl::setTraceBufferSizeKB(uint32_t size) {
-  m_TraceBufferSizeKB = size;
-}
-
-void TraceImpl::addKernelCategory(const KernelTraceSystem::TraceCategory & category) {
-  m_KernelCategories.insert(category);
-}
-
-void TraceImpl::addAndroidCategory(const Android::TraceCategory & category) {
-  m_AndroidCategories.insert(category);
-}
-
-void TraceImpl::addApp(const char * appName) {
-  m_Apps.push_back(appName);
-}
-
-void TraceImpl::addFunction(const char * funcName) {
-  m_Functions.insert(funcName);
-}
+TraceImpl::~TraceImpl() {}
 
 bool TraceImpl::setUp() {
   bool ok = true;
 
   // Set up the tracing options.
-  ok &= m_FTraceBufferFile->trySetCircularMode();
-  ok &= m_FTraceBufferFile->trySetSize(m_TraceBufferSizeKB);
+  if (m_CircleBufferEnabled) {
+    ok &= m_FTrace->tryEnableOption(FTrace::Option::OVERWRITE);
+  }
+  ok &= m_FTrace->trySetBufferSize(m_TraceBufferSizeKB);
   ok &= setGlobalClockEnable(true);
   ok &= m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID);
-  ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
-
-  // Set up the tags property.
-  for (const auto & category : m_AndroidCategories) {
-    m_AndroidTraceSystem->rememberToTrace(category);
-  }
-  for (const auto & app : m_Apps) {
-    m_AndroidTraceSystem->rememberToTrace(app);
-  }
+  // ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
   ok &= m_AndroidTraceSystem->tryToTrace();
 
-  // Disable all the sysfs enables.  This is done as a separate loop from
-  // the enables to allow the same enable to exist in multiple categories.
   ok &= m_KernelTraceSystem->tryDisableAllCategories();
 
-  // Enable all the sysfs enables that are in an enabled category.
-  for (const auto & category : m_KernelCategories) {
-    ok &= m_KernelTraceSystem->tryEnableCategory(category);
-  }
+  // for (const auto & category : m_KernelCategories) {
+  //   ok &= m_KernelTraceSystem->tryEnableCategory(category);
+  // }
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::setUp\n");
   }
   return ok;
 }
 
-void TraceImpl::cleanUp() {
+bool TraceImpl::cleanUp() {
   bool ok = true;
-  // Disable all tracing that we're able to.
   ok &= m_KernelTraceSystem->tryDisableAllCategories();
-
-  // Reset the system properties.
   ok &= m_AndroidTraceSystem->tryNotToTrace();
 
-  // Set the options back to their defaults.
-  ok &= m_FTraceBufferFile->trySetCircularMode();
-  ok &= m_FTraceBufferFile->trySetSize(1);
+  ok &= m_FTrace->tryDisableOption(FTrace::Option::OVERWRITE);
+  ok &= m_FTrace->tryEnableOption(FTrace::Option::OVERWRITE);
+  ok &= m_FTrace->trySetBufferSize(1);
   ok &= setGlobalClockEnable(false);
   ok &= m_FTrace->tryDisableOption(FTrace::Option::PRINT_TGID);
   ok &= m_KernelTraceSystem->tryDisableAllFunctions();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::cleanUp\n");
   }
+  return ok;
 }
 
 bool TraceImpl::setGlobalClockEnable(bool enable)
@@ -140,61 +91,19 @@ bool TraceImpl::start() {
   return ok;
 }
 
-void TraceImpl::stop() {
+bool TraceImpl::stop() {
   bool ok = true;
   ok &= m_FTrace->tryStopTrace();
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error TraceImpl::stop\n");
   }
-}
-
-bool TraceImpl::trySendTo(const string & filename) {
-  int outFd = m_FileSystem->tryOpenFileToWriteOrCreate(filename.c_str());
-  if (outFd == -1) {
-    fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
-    return false;
-  }
-  bool ok = m_FTraceBufferFile->trySendTo(outFd);
-  close(outFd);
   return ok;
 }
 
-bool TraceImpl::trySendCompressedTo(const string & filename) {
-  int outFd = m_FileSystem->tryOpenFileToWriteOrCreate(filename.c_str());
-  if (outFd == -1) {
-    fprintf(m_Wire.getErrorStream(), "error DumpAction::tryRun\n");
-    return false;
-  }
-  bool ok = m_FTraceBufferFile->trySendTo(outFd);
-  close(outFd);
-  return ok; 
+void TraceImpl::setTraceBufferSizeKB(uint32_t size) {
+  m_TraceBufferSizeKB = size;
 }
 
-bool TraceImpl::trySendToOutput() {
-  return m_FTraceBufferFile->trySendTo(fileno(m_Wire.getOutputStream()));
-}
-
-bool TraceImpl::trySendCompressedToOutput() {
-  return m_FTraceBufferFile->trySendTo(fileno(m_Wire.getOutputStream()));
-}
-
-bool TraceImpl::tryStream(const Signal & signal) {
-  return m_FTraceBufferFile->tryStreamUntil(signal);
-}
-
-bool TraceImpl::tryEnableAndroidCoreServices() {
-  if (m_AndroidTraceSystem->canTraceCoreServices()) {
-    m_AndroidTraceSystem->rememberToTraceCoreServices();
-    return true;
-  }
-  fprintf(m_Wire.getErrorStream(), "TraceImpl::tryEnableAndroidCoreServices - Can't enable core services - not supported\n");
-  return false;
-}
-
-bool TraceImpl::tryClear() {
-  return m_FTraceBufferFile->tryClear();
-}
-
-bool TraceImpl::tryWriteClockSyncMarker() {
-  return m_FTraceBufferFile->tryWriteSyncMarker();
+void TraceImpl::enableCircleBuffer() {
+  m_CircleBufferEnabled = true;
 }

@@ -16,8 +16,12 @@
 
 #include "addandroidcoretotrace.h"
 
-#include "androidtoolbox.h"
-
 bool AddAndroidCoreToTrace::tryRun() {
-  return m_Trace->tryEnableAndroidCoreServices();
+  auto & androidTraceSystem = m_Environment->getAndroidTraceSystem();
+  if (androidTraceSystem.canTraceCoreServices()) {
+    androidTraceSystem.rememberToTraceCoreServices();
+    return true;
+  }
+  fprintf(m_Wire.getErrorStream(), "TraceImpl::tryEnableAndroidCoreServices - Can't enable core services - not supported\n");
+  return false;
 }

@@ -17,6 +17,6 @@
 #include "showhelpaction.h"
 
 bool ShowHelpAction::tryRun() {
-  fprintf(m_Wire.getErrorStream(), m_HelpMessage.c_str(), m_Environment->getAppName().c_str());
+  fprintf(m_Wire.getErrorStream(), m_HelpMessage.c_str(), m_AppName.c_str());
   return true;
 }

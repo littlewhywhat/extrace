@@ -16,6 +16,39 @@
 
 #include "environment.h"
 
-const string & Environment::getAppName() const {
-  return m_AppName;
+Environment::Environment(const shared_ptr<Trace> & trace,
+                         const shared_ptr<KernelTraceSystem> & kernelTraceSystem,
+                         const shared_ptr<AndroidTraceSystem> & androidTraceSystem, 
+                         const shared_ptr<TraceBuffer> & traceBuffer,
+                         const shared_ptr<FileSystem> & fileSystem,
+                         const shared_ptr<ToolBox> & toolBox):
+                         m_Trace(trace),
+                         m_KernelTraceSystem(kernelTraceSystem),
+                         m_AndroidTraceSystem(androidTraceSystem),
+                         m_TraceBuffer(traceBuffer),
+                         m_FileSystem(fileSystem),
+                         m_ToolBox(toolBox) {} 
+
+Trace & Environment::getTrace() {
+  return *m_Trace;
+}
+
+KernelTraceSystem & Environment::getKernelTraceSystem() {
+  return *m_KernelTraceSystem;
+} 
+
+AndroidTraceSystem & Environment::getAndroidTraceSystem() {
+  return *m_AndroidTraceSystem;
+}
+ 
+TraceBuffer & Environment::getTraceBuffer() {
+  return *m_TraceBuffer;
+}
+
+FileSystem & Environment::getFileSystem() {
+  return *m_FileSystem;
+}
+
+ToolBox & Environment::getToolBox() {
+  return *m_ToolBox;
 }

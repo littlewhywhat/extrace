@@ -142,7 +142,7 @@ bool KernelTraceSystem::supportsCategory(const TraceCategory & traceCategory) co
 }
 
 
-KernelTraceSystem::KernelTraceSystem(const Wire & wire, FTrace * ftrace): 
+KernelTraceSystem::KernelTraceSystem(const Wire & wire, const shared_ptr<FTrace> & ftrace): 
                                            Wired(wire), m_FTrace(ftrace) {
   m_TraceCategoryGroups[TraceCategory::SCHED] = 
   {
@@ -225,8 +225,4 @@ KernelTraceSystem::KernelTraceSystem(const Wire & wire, FTrace * ftrace):
   {
     { FTrace::TracePoint::FILEMAP, true },
   }; 
-}
-
-KernelTraceSystem::~KernelTraceSystem() {
-  delete m_FTrace;
 }

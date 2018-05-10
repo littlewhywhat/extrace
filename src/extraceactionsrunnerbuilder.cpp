@@ -31,65 +31,64 @@
 #include "showhelpaction.h"
 
 ExtraceActionsRunnerBuilder::~ExtraceActionsRunnerBuilder() {
-  delete m_TraceBuilder;
+  delete m_EnvironmentBuilder;
 }
 
 ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
                                                    Signal & signal,
                                                    const ExtraceArguments & extraceArguments) const{
-  auto trace = shared_ptr<Trace>(m_TraceBuilder->build(wire, extraceArguments));
-  auto environment = shared_ptr<Environment>(new Environment(extraceArguments.getAppName()));  
+  auto environment = shared_ptr<Environment>(m_EnvironmentBuilder->build(wire, extraceArguments));  
   auto * actionsRunner = new ActionsRunner(wire);
   if (extraceArguments.hasHelpMessage()) {
-    actionsRunner->addAction(new ShowHelpAction(wire, environment,
+    actionsRunner->addAction(new ShowHelpAction(wire, extraceArguments.getAppName(),
                                                 extraceArguments.getHelpMessage()));
     return actionsRunner;
   }
   if (extraceArguments.listCategoriesEnabled()) {
-    actionsRunner->addAction(new ListSupportedCategories(wire, trace));
+    actionsRunner->addAction(new ListSupportedCategories(wire, environment));
     return actionsRunner;
   } 
   if (extraceArguments.ignoreSignalsEnabled()) {
     signal.turnOff();
   }
   if (extraceArguments.coreServicesEnabled()) {
-    actionsRunner->addAction(new AddAndroidCoreToTrace(wire, trace));
+    actionsRunner->addAction(new AddAndroidCoreToTrace(wire, environment));
   }
   if (extraceArguments.hasInitSleepDuration()) {
     actionsRunner->addAction(new SleepAction(wire, signal,
                                              extraceArguments.getInitSleepDuration()));
   }
   if (extraceArguments.asyncStartEnabled()) {
-    actionsRunner->addAction(new StartAction(wire, trace));
+    actionsRunner->addAction(new StartAction(wire, environment));
     if (extraceArguments.streamEnabled()) {
-      actionsRunner->addAction(new StreamAction(wire, trace, signal));
+      actionsRunner->addAction(new StreamAction(wire, environment, signal));
       signal.turnOn();
     }
   }
   else if (extraceArguments.asyncStopEnabled()) {
-    actionsRunner->addAction(new StopAction(wire, trace));
+    actionsRunner->addAction(new StopAction(wire, environment));
     actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, trace, extraceArguments));
-    actionsRunner->addAction(new CleanUpAction(wire, trace));
+                               .buildFrom(wire, environment, extraceArguments));
+    actionsRunner->addAction(new CleanUpAction(wire, environment));
   }
   else if (extraceArguments.asyncDumpEnabled()) {
     actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, trace, extraceArguments));
+                               .buildFrom(wire, environment, extraceArguments));
   }
   else {
-    actionsRunner->addAction(new StartAction(wire, trace));
+    actionsRunner->addAction(new StartAction(wire, environment));
     actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getInitSleepDuration()));
     if (extraceArguments.streamEnabled()) {
-      actionsRunner->addAction(new StreamAction(wire, trace, signal));
+      actionsRunner->addAction(new StreamAction(wire, environment, signal));
       signal.turnOn();
     }
     actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getMidSleepDuration()));
-    actionsRunner->addAction(new StopAction(wire, trace));
+    actionsRunner->addAction(new StopAction(wire, environment));
     actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, trace, extraceArguments));
-    actionsRunner->addAction(new CleanUpAction(wire, trace));
+                               .buildFrom(wire, environment, extraceArguments));
+    actionsRunner->addAction(new CleanUpAction(wire, environment));
   }
   return actionsRunner;
 }

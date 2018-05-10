@@ -25,8 +25,8 @@ ListSupportedCategories::~ListSupportedCategories() {
 }
 
 ListSupportedCategories::ListSupportedCategories(const Wire & wire, 
-                                                 const shared_ptr<Trace> & trace):
-                                                 TraceAction(wire, trace) {
+                                                 const shared_ptr<Environment> & environment):
+                                                 EnvironmentAction(wire, environment) {
   m_KernelTraceCategories[KernelTraceSystem::TraceCategory::SCHED] = 
    new KernelTraceCategory("sched", "Scheduling", KernelTraceSystem::TraceCategory::SCHED);
   m_KernelTraceCategories[KernelTraceSystem::TraceCategory::IRQ] =
@@ -105,12 +105,13 @@ ListSupportedCategories::ListSupportedCategories(const Wire & wire,
 bool ListSupportedCategories::tryRun() {
   for (const auto & entry : m_KernelTraceCategories) {
     const auto & category = entry.second;
-    if (m_Trace->getKernelTraceSystem()->supportsCategory(category->getCategory())) {
+    if (m_Environment->getKernelTraceSystem().supportsCategory(category->getCategory())) {
       fprintf(m_Wire.getOutputStream(), "  %10s  %s\n", category->getName().c_str(),
                                                         category->getLongName().c_str());
     }
   }
   for (const auto & entry : m_AndroidTraceCategories) {
+    // there is no way to check if category is supported, is there?
     const auto & category = entry.second;
     fprintf(m_Wire.getOutputStream(), "  %10s  %s\n", category->getName().c_str(),
                                                       category->getLongName().c_str());

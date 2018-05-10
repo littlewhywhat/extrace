@@ -19,14 +19,11 @@
 
 #include "trace.h"
 
-#include "androidtracesystem.h"
-#include "filesystem.h"
 #include "wire.h"
+#include "ftrace.h"
+#include "androidtracesystem.h"
 #include "kerneltracesystem.h"
-#include "ftracebufferfile.h"
 
-#include <map>
-#include <vector>
 #include <string>
 #include <memory>
 #include <cstdio>
@@ -36,48 +33,29 @@ using namespace std;
 
 class TraceImpl : public Trace {
   public:
-    TraceImpl(const Wire & wire, AndroidTraceSystem * androidSystem, 
-               FTrace * ftrace, FileSystem * fileSystem,
-               KernelTraceSystem * kernelTraceSystem,
-               FTraceBufferFile * ftraceBufferFile);
+    TraceImpl(const Wire & wire,
+              const shared_ptr<FTrace> & ftrace,
+              const shared_ptr<AndroidTraceSystem> & androidSystem, 
+              const shared_ptr<KernelTraceSystem> & kernelTraceSystem);
     ~TraceImpl();
     // Set all the kernel tracing settings to the desired state for this trace
     // capture.
     bool setUp() override;
     // Reset all the kernel tracing settings to their default state.
-    void cleanUp() override;
+    bool cleanUp() override;
     // Enable tracing in the kernel.
     bool start() override;
     // Disable tracing in the kernel.
-    void stop() override;
-    void addKernelCategory(const KernelTraceSystem::TraceCategory & category) override;
-    void addAndroidCategory(const Android::TraceCategory & category) override;
-    void addApp(const char * appName) override;
-    void addFunction(const char * funcName) override;
-    bool trySendTo(const string & filename) override;
-    bool trySendCompressedTo(const string & filename) override;
-    bool trySendToOutput() override;
-    bool trySendCompressedToOutput() override;
-    bool tryStream(const Signal & signal) override;
-    bool tryEnableAndroidCoreServices() override;
-    bool tryClear() override;
-    bool tryWriteClockSyncMarker() override;
-    KernelTraceSystem * getKernelTraceSystem() override;
-    void enableTraceOverwrite();
+    bool stop() override;
+    void enableCircleBuffer();
     void setTraceBufferSizeKB(uint32_t size);
   private:
     const Wire & m_Wire;
-    AndroidTraceSystem * m_AndroidTraceSystem;
-    FTrace * m_FTrace;
-    FileSystem * m_FileSystem;
-    KernelTraceSystem * m_KernelTraceSystem = NULL;
-    FTraceBufferFile * m_FTraceBufferFile = NULL;
-    bool m_TraceOverwriteSwitch = false;
-    uint32_t m_TraceBufferSizeKB = 2048;
-    vector<string> m_Apps;
-    set<string> m_Functions;
-    set<KernelTraceSystem::TraceCategory> m_KernelCategories;
-    set<Android::TraceCategory> m_AndroidCategories;
+    shared_ptr<FTrace> m_FTrace;
+    shared_ptr<AndroidTraceSystem> m_AndroidTraceSystem;
+    shared_ptr<KernelTraceSystem> m_KernelTraceSystem;
+    uint32_t m_TraceBufferSizeKB = 1024;
+    bool m_CircleBufferEnabled = false;
     bool setGlobalClockEnable(bool enable);
 };
 
