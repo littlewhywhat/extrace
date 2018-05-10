@@ -17,15 +17,11 @@
 
 #include "kernelsystem_impl.h"
 
-#include <errno.h>  // errno
-#include <string.h> // strerror
-#include <fcntl.h>  // creat, ope, O_WRONLY, O_CREAT
-#include <stdlib.h> // free
 #include <unistd.h> // read, close
-#include <stdio.h>  // FILE
-#include <set>
-#include <sys/sendfile.h>
-#include <zlib.h>
+
+#include "compressedfiledata.h"
+#include "simplefiledata.h"
+#include "filedataslice.h"
 
 KernelSystemImpl::~KernelSystemImpl()
 {
@@ -41,7 +37,7 @@ bool KernelSystemImpl::trySendTraceTo(int outFD) {
     return false;
   }
   dprintf(outFD, "TRACE:\n");
-  bool ok = try_sendfile(traceFD, outFD);
+  bool ok = SimpleFileData(m_Wire, traceFD).trySendTo(outFD);
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceTo\n");
   }
@@ -57,7 +53,7 @@ bool KernelSystemImpl::trySendTraceCompressedTo(int outFD) {
     return false;
   }
   dprintf(outFD, "TRACE:\n");
-  bool ok = compress_trace_to(traceFD, outFD);
+  bool ok = CompressedFileData(m_Wire, traceFD).trySendTo(outFD);
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::trySendTraceCompressedTo\n");
   }
@@ -68,14 +64,15 @@ bool KernelSystemImpl::trySendTraceCompressedTo(int outFD) {
 
 bool KernelSystemImpl::tryStreamTrace(const Signal & signal) {
   bool ok = true;
-  int traceStream = m_FTrace->getTracePipeFd();
-  if (traceStream == -1) {
+  int tracePipeFD = m_FTrace->getTracePipeFd();
+  if (tracePipeFD == -1) {
       fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::tryStreamTraceTo\n");
       return false;
   }
   FILE * outputStream = m_Wire.getOutputStream();
+  FileDataSlice fileDataSlice(m_Wire, tracePipeFD);
   while (!signal.isFired()) {
-      if (!try_send(traceStream, fileno(outputStream))) {
+      if (!fileDataSlice.trySendTo(fileno(outputStream))) {
           if (!signal.isFired()) {
             fprintf(m_Wire.getErrorStream(), "error KernelSystemImpl::tryStreamTraceTo - stream aborted\n");
             ok = false;
@@ -86,29 +83,6 @@ bool KernelSystemImpl::tryStreamTrace(const Signal & signal) {
   }
   return ok;
 }
-
-bool KernelSystemImpl::try_sendfile(int fd_from, int fd_to)
-{
-    ssize_t sent = 0;
-    while ((sent = sendfile(fd_to, fd_from, NULL, 64*1024*1024)) > 0);
-    if (sent == -1) {
-        fprintf(m_Wire.getErrorStream(), "error sendfile: %s (%d)\n", strerror(errno),
-                errno);
-        return false;
-    }
-    return true;
-}
-
-bool KernelSystemImpl::try_send(int fd_from, int fd_to) {
-    char trace_data[4096];
-    ssize_t bytes_read = read(fd_from, trace_data, 4096);
-    if (bytes_read > 0) {
-        write(fd_to, trace_data, bytes_read);
-        return true;
-    }
-    return false;
-}
-
 
 bool KernelSystemImpl::writeClockSyncMarker()
 {
@@ -159,88 +133,4 @@ bool KernelSystemImpl::setPrintTgidEnableIfPresent(bool enable)
 {
   return enable? m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID):
                  m_FTrace->tryDisableOption(FTrace::Option::PRINT_TGID);
-}
-
-bool KernelSystemImpl::compress_trace_to(int traceFD, int outFd) {
-    z_stream zs;
-    uint8_t *in, *out;
-    int result, flush;
-
-    memset(&zs, 0, sizeof(zs));
-    result = deflateInit(&zs, Z_DEFAULT_COMPRESSION);
-    if (result != Z_OK) {
-        fprintf(m_Wire.getErrorStream(), "error initializing zlib: %d\n", result);
-        close(traceFD);
-        return false;
-    }
-
-    bool ok = true;
-    const size_t bufSize = 64*1024;
-    in = (uint8_t*)malloc(bufSize);
-    out = (uint8_t*)malloc(bufSize);
-    flush = Z_NO_FLUSH;
-
-    zs.next_out = out;
-    zs.avail_out = bufSize;
-
-    do {
-
-        if (zs.avail_in == 0) {
-            // More input is needed.
-            result = read(traceFD, in, bufSize);
-            if (result < 0) {
-                fprintf(m_Wire.getErrorStream(), "error reading trace: %s (%d)\n",
-                        strerror(errno), errno);
-                result = Z_STREAM_END;
-                ok = false;
-                break;
-            } else if (result == 0) {
-                flush = Z_FINISH;
-            } else {
-                zs.next_in = in;
-                zs.avail_in = result;
-            }
-        }
-
-        if (zs.avail_out == 0) {
-            // Need to write the output.
-            result = write(outFd, out, bufSize);
-            if ((size_t)result < bufSize) {
-                fprintf(m_Wire.getErrorStream(), "error writing deflated trace: %s (%d)\n",
-                        strerror(errno), errno);
-                result = Z_STREAM_END; // skip deflate error message
-                zs.avail_out = bufSize; // skip the final write
-                ok = false;
-                break;
-            }
-            zs.next_out = out;
-            zs.avail_out = bufSize;
-        }
-
-    } while ((result = deflate(&zs, flush)) == Z_OK);
-
-    if (result != Z_STREAM_END) {
-        fprintf(m_Wire.getErrorStream(), "error deflating trace: %s\n", zs.msg);
-        ok = false;
-    }
-
-    if (zs.avail_out < bufSize) {
-        size_t bytes = bufSize - zs.avail_out;
-        result = write(outFd, out, bytes);
-        if ((size_t)result < bytes) {
-            fprintf(m_Wire.getErrorStream(), "error writing deflated trace: %s (%d)\n",
-                    strerror(errno), errno);
-            ok = false;
-        }
-    }
-
-    result = deflateEnd(&zs);
-    if (result != Z_OK) {
-        fprintf(m_Wire.getErrorStream(), "error cleaning up zlib: %d\n", result);
-        ok = false;
-    }
-
-    free(in);
-    free(out);
-    return ok;
 }
