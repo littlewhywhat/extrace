@@ -29,6 +29,12 @@ using namespace std;
 class ExtraceArguments {
   public:
     ExtraceArguments();
+    void setPeriod(uint32_t period);
+    uint32_t getPeriod() const;
+    bool hasPeriod() const;
+    void setTimes(uint32_t period);
+    uint32_t getTimes() const;
+    bool hasTimes() const;
     void setAppName(const string & appName);
     void setHelpMessage(const string & message);
     void enableCircleBuffer();
@@ -92,6 +98,8 @@ class ExtraceArguments {
     uint32_t m_BufferSize = 1024;
     uint32_t m_InitSleepDuration = 0;
     uint32_t m_MidSleepDuration = 5;
+    uint32_t m_Period = 0;
+    uint32_t m_Times = 0;
     vector<string> m_Apps;
     vector<Android::TraceCategory> m_AndroidCategories;
     vector<KernelTraceSystem::TraceCategory> m_KernelCategories;

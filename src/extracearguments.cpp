@@ -16,6 +16,30 @@
 
 #include "extracearguments.h"
 
+void ExtraceArguments::setPeriod(uint32_t period) {
+  m_Period = period;
+}
+
+bool ExtraceArguments::hasPeriod() const {
+  return m_Period != 0;
+}
+
+uint32_t ExtraceArguments::getPeriod() const {
+  return m_Period;
+}
+
+void ExtraceArguments::setTimes(uint32_t times) {
+  m_Times = times;
+}
+
+bool ExtraceArguments::hasTimes() const {
+  return m_Times != 0;
+}
+
+uint32_t ExtraceArguments::getTimes() const {
+  return m_Times;
+}
+
 void ExtraceArguments::setAppName(const string & appName) {
   m_AppName = appName;
 }

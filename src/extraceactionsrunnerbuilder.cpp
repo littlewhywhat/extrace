@@ -29,6 +29,7 @@
 #include "stopaction.h"
 #include "cleanupaction.h"
 #include "showhelpaction.h"
+#include "memorysampleaction.h"
 
 ExtraceActionsRunnerBuilder::~ExtraceActionsRunnerBuilder() {
   delete m_EnvironmentBuilder;
@@ -82,9 +83,17 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
     if (extraceArguments.streamEnabled()) {
       actionsRunner->addAction(new StreamAction(wire, environment, signal));
       signal.turnOn();
+    } 
+    else if (extraceArguments.hasPeriod() && extraceArguments.hasTimes()) {
+      actionsRunner->addAction(new MemorySampleAction(wire, environment,
+                                                      signal,
+                                                      extraceArguments.getPeriod(),
+                                                      extraceArguments.getTimes()));
     }
-    actionsRunner->addAction(new SleepAction(wire, signal,
+    else {
+      actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getMidSleepDuration()));
+    }
     actionsRunner->addAction(new StopAction(wire, environment));
     actionsRunner->addAction(DumpAction::Builder()
                                .buildFrom(wire, environment, extraceArguments));
