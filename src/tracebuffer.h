@@ -36,6 +36,8 @@ class TraceBuffer : public Wired {
     virtual bool trySendTo(int fd) = 0;
     //! Writes into me sync marker
     virtual bool tryWriteSyncMarker() = 0;
+    //! Writes into me a string
+    virtual bool tryWriteString(const char * string) = 0;
     //! Transforms me to circular
     virtual bool trySetCircularMode() = 0;
     //! Sets my size

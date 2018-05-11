@@ -79,6 +79,10 @@ bool FTraceBufferFile::tryWriteSyncMarker() {
   return ok;
 }
 
+bool FTraceBufferFile::tryWriteString(const char * string) {
+  return m_FTrace->tryWriteMarker(string);
+}
+
 bool FTraceBufferFile::trySetCircularMode() {
   return m_FTrace->tryEnableOption(FTrace::Option::OVERWRITE);
 }

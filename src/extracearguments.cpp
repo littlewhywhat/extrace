@@ -16,6 +16,18 @@
 
 #include "extracearguments.h"
 
+void ExtraceArguments::setPID(uint32_t pid) {
+  m_PID = pid;
+}
+
+bool ExtraceArguments::hasPID() const {
+  return m_PID != 0;
+}
+
+uint32_t ExtraceArguments::getPID() const {
+  return m_PID;
+}
+
 void ExtraceArguments::setPeriod(uint32_t period) {
   m_Period = period;
 }
