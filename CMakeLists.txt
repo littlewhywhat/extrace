@@ -2,18 +2,18 @@ cmake_minimum_required(VERSION 3.1)
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
+# execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+#   RESULT_VARIABLE result
+#   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+# if(result)
+#   message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+# endif()
+# execute_process(COMMAND ${CMAKE_COMMAND} --build .
+#   RESULT_VARIABLE result
+#   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+# if(result)
+#   message(FATAL_ERROR "Build step for googletest failed: ${result}")
+# endif()
 
 # Prevent overriding the parent project's compiler/linker
 # settings on Windows
@@ -64,7 +64,7 @@ list(REMOVE_ITEM TEST_SOURCES
 set (SOURCES ${OBJ_SOURCES} ${MAIN})
 # add_executable(main ${SOURCES})
 
-add_executable(experiment ${EXPERIMENT} ${OBJ_SOURCES})
+# add_executable(experiment ${EXPERIMENT} ${OBJ_SOURCES})
 
 # create experimental
 set (SOURCES ${OBJ_SOURCES} ${EXPERIMENT})
@@ -75,3 +75,18 @@ set (SOURCES ${OBJ_SOURCES} ${TEST_SOURCES})
 # add_executable(main_test ${SOURCES})
 # target_link_libraries(main_test gtest_main)
 # target_link_libraries(main_test gmock_main)
+
+set (PARSER_TEST_SRC "src/parser/parser_test.cpp")
+add_executable(parser_test ${PARSER_TEST_SRC})
+target_link_libraries(parser_test gtest_main)
+target_link_libraries(parser_test gmock_main)
+
+set (ENTRYFILE_TEST "src/parser/entryfile_test.cpp")
+add_executable(entryfile_test ${ENTRYFILE_TEST})
+target_link_libraries(entryfile_test gtest_main)
+target_link_libraries(entryfile_test gmock_main)
+
+set (SCHEDSWITCH_TEST "src/parser/schedswitchentrycreator_test.cpp")
+add_executable(schedswitch_test ${SCHEDSWITCH_TEST})
+target_link_libraries(schedswitch_test gtest_main)
+target_link_libraries(schedswitch_test gmock_main)
