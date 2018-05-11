@@ -84,11 +84,13 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
       actionsRunner->addAction(new StreamAction(wire, environment, signal));
       signal.turnOn();
     } 
-    else if (extraceArguments.hasPeriod() && extraceArguments.hasTimes()) {
+    else if (extraceArguments.hasPeriod() && extraceArguments.hasTimes()
+             && extraceArguments.hasPID()) {
       actionsRunner->addAction(new MemorySampleAction(wire, environment,
                                                       signal,
                                                       extraceArguments.getPeriod(),
-                                                      extraceArguments.getTimes()));
+                                                      extraceArguments.getTimes(),
+                                                      extraceArguments.getPID()));
     }
     else {
       actionsRunner->addAction(new SleepAction(wire, signal,

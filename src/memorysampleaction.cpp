@@ -18,16 +18,54 @@
 #include <time.h> // nanosleep, struct timespec
 #include <errno.h>
 
-bool MemorySampleAction::tryRun() {
-  auto & m_TraceBuffer = m_Environment->getTraceBuffer();
+#include "pm_kernelbuilder.h"
 
+bool MemorySampleAction::tryRun() {
+  auto & traceBuffer = m_Environment->getTraceBuffer();
   bool ok = true;
+
+  auto * kernel = PM_KernelBuilder().tryCreate();
+  if (!kernel) {
+    delete kernel;
+    return false;
+  }
+  auto * process = kernel->tryCreateProcess(m_PID);
+  if (!process) {
+    delete process;
+    delete kernel;
+    return false;
+  }
+  auto * memoryUsage = process->tryCreateMemoryUsage();
+  if (!memoryUsage) {
+    delete memoryUsage;
+    delete process;
+    delete kernel;
+    return false;
+  }
+  
+  char buffer[128];
+
   struct timespec timeLeft;
   timeLeft.tv_sec = 0;
   timeLeft.tv_nsec = m_Period;
   for (uint32_t i = 0; i < m_Times; i++) {
     do {
-      m_TraceBuffer.tryWriteSyncMarker();
+      if (!memoryUsage->tryUpdate()) {
+        delete memoryUsage;
+        delete process;
+        delete kernel;
+        return false;
+      }
+      if (snprintf(buffer, 128, "VSS=%7ld  RSS=%7ld PSS=%7ld USS=%7ld PID=%d", 
+               memoryUsage->getVSS(), memoryUsage->getRSS(), memoryUsage->getPSS(), memoryUsage->getUSS(),
+               m_PID) == 128) {
+        fprintf(m_Wire.getErrorStream(), "can't create string for buffer\n");
+        delete memoryUsage;
+        delete process;
+        delete kernel;
+        return false;
+      }
+      traceBuffer.tryWriteString(buffer);
       if (m_Signal.isFired()) {
         ok = false;
         break;

@@ -129,6 +129,12 @@ LOCAL_SRC_FILES:= \
 	    src/experiment.cpp \
 	    src/memorysampleaction.cpp \
 	    src/environmentbuilder.cpp \
+			src/pm_kernelbuilder.cpp \
+			src/pm_kernel.cpp \
+			src/pm_process.cpp \
+			src/pm_abstractmemoryusage.cpp \
+			src/pm_memoryusage.cpp \
+			src/pm_workingset.cpp \
 
 LOCAL_MODULE:= experiment
 
@@ -143,6 +149,7 @@ LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libutils \
     libz \
+    libpagemap \
 
 include $(BUILD_EXECUTABLE)
 
@@ -191,6 +198,19 @@ LOCAL_SHARED_LIBRARIES := \
 include $(BUILD_EXECUTABLE)
 
 LOCAL_INIT_RC := atrace_ref.rc
+
+# memeater
+ 
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := memeater
+
+LOCAL_CPPFLAGS := $(common_cflags)
+
+LOCAL_SRC_FILES := \
+						src/memeater.cpp \
+
+include $(BUILD_EXECUTABLE)
 
 # extrace_test target
 # ===================

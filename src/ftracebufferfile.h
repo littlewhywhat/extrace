@@ -42,6 +42,7 @@ class FTraceBufferFile : public TraceBuffer {
     bool trySendTo(int fd) override;
     //! Writes into me sync marker
     bool tryWriteSyncMarker() override;
+    bool tryWriteString(const char * string) override;
     //! Transforms me to circular
     bool trySetCircularMode() override;
     //! Sets my size

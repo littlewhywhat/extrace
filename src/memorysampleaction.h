@@ -24,14 +24,16 @@
 class MemorySampleAction : public InterruptableEnvironmentAction {
   public:
     MemorySampleAction(const Wire & wire, const shared_ptr<Environment> & environment,
-                       const Signal & signal, uint32_t period, uint32_t times):
+                       const Signal & signal, uint32_t period, uint32_t times, uint32_t pid):
                   InterruptableEnvironmentAction(wire, environment, signal),
                   m_Period(period),
-                  m_Times(times) {}
+                  m_Times(times),
+                  m_PID(pid) {}
     bool tryRun() override;
   private:
     uint32_t m_Period = 0;
     uint32_t m_Times = 0;
+    uint32_t m_PID = 0;
 };
 
 #endif // LTTLWHWHT_MEMORYSAMPLEACTION_H

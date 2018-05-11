@@ -38,6 +38,7 @@ static const char * KERNEL_CATEG_OPTION_NAME = "KernelCategories";
 static const char * KERNEL_FUNC_OPTION_NAME = "KernelFunctions";
 static const char * PERIOD_OPTION_NAME = "Period";
 static const char * TIMES_OPTION_NAME = "Times";
+static const char * PID_OPTION_NAME = "PID";
 static const string HELP_MESSAGE = "usage: %s [options]\n"
          "options include:\n"
          "  -a appname      enable app-level tracing for a comma\n"
@@ -51,6 +52,7 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "  -k fname,...    trace the listed kernel functions\n"
          "  -p N            period of memory measurement\n"
          "  -m N            number of periods to pass\n"
+         "  -pid N          PID to take memory measurement of\n"
          "  -n              ignore signals\n"
          "  -s N            sleep for N seconds before tracing [default 0]\n"
          "  -t N            trace for N seconds [defualt 5]\n"
@@ -127,6 +129,7 @@ void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArg
   cmdLineArgsParser.register_integer("-t", MID_SLEEP_OPTION_NAME);
   cmdLineArgsParser.register_integer("-p", PERIOD_OPTION_NAME);
   cmdLineArgsParser.register_integer("-m", TIMES_OPTION_NAME);
+  cmdLineArgsParser.register_integer("-pid", PID_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-a", APPS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-d", ANDROID_CATEG_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-e", KERNEL_CATEG_OPTION_NAME);
@@ -162,6 +165,9 @@ ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Argumen
   }
   if (arguments.has_integer(TIMES_OPTION_NAME)) {
     traceArguments->setTimes(arguments.get_integer(TIMES_OPTION_NAME));
+  }
+  if (arguments.has_integer(PID_OPTION_NAME)) {
+    traceArguments->setPID(arguments.get_integer(PID_OPTION_NAME));
   }
   if (arguments.is_enabled(HELP_OPTION_NAME)) {
     traceArguments->setHelpMessage(getHelpMessage());
