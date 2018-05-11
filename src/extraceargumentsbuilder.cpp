@@ -36,6 +36,8 @@ static const char * APPS_OPTION_NAME = "Apps";
 static const char * ANDROID_CATEG_OPTION_NAME = "AndroidCategories";
 static const char * KERNEL_CATEG_OPTION_NAME = "KernelCategories";
 static const char * KERNEL_FUNC_OPTION_NAME = "KernelFunctions";
+static const char * PERIOD_OPTION_NAME = "Period";
+static const char * TIMES_OPTION_NAME = "Times";
 static const string HELP_MESSAGE = "usage: %s [options]\n"
          "options include:\n"
          "  -a appname      enable app-level tracing for a comma\n"
@@ -47,6 +49,8 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "  -f filename     use the categories written in a file as space-separated\n"
          "                    values in a line\n"
          "  -k fname,...    trace the listed kernel functions\n"
+         "  -p N            period of memory measurement\n"
+         "  -m N            number of periods to pass\n"
          "  -n              ignore signals\n"
          "  -s N            sleep for N seconds before tracing [default 0]\n"
          "  -t N            trace for N seconds [defualt 5]\n"
@@ -121,6 +125,8 @@ void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArg
   cmdLineArgsParser.register_integer("-b", BUFFER_SIZE_OPTION_NAME);
   cmdLineArgsParser.register_integer("-s", INIT_SLEEP_OPTION_NAME);
   cmdLineArgsParser.register_integer("-t", MID_SLEEP_OPTION_NAME);
+  cmdLineArgsParser.register_integer("-p", PERIOD_OPTION_NAME);
+  cmdLineArgsParser.register_integer("-m", TIMES_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-a", APPS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-d", ANDROID_CATEG_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-e", KERNEL_CATEG_OPTION_NAME);
@@ -151,6 +157,12 @@ bool ExtraceArgumentsBuilder::tryPutCategoriesFromFile(ExtraceArguments * extrac
 
 ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Arguments & arguments) const {
   ExtraceArguments * traceArguments = new ExtraceArguments();
+  if (arguments.has_integer(PERIOD_OPTION_NAME)) {
+    traceArguments->setPeriod(arguments.get_integer(PERIOD_OPTION_NAME));
+  }
+  if (arguments.has_integer(TIMES_OPTION_NAME)) {
+    traceArguments->setTimes(arguments.get_integer(TIMES_OPTION_NAME));
+  }
   if (arguments.is_enabled(HELP_OPTION_NAME)) {
     traceArguments->setHelpMessage(getHelpMessage());
   }

@@ -127,6 +127,7 @@ LOCAL_SRC_FILES:= \
 			src/kerneltracecategory.cpp \
 			src/androidtracecategory.cpp \
 	    src/experiment.cpp \
+	    src/memorysampleaction.cpp \
 	    src/environmentbuilder.cpp \
 
 LOCAL_MODULE:= experiment
