@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
-#define LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
+#ifndef LTTLWHWHT_EXTRACE_FILE_H
+#define LTTLWHWHT_EXTRACE_FILE_H
 
-#include "entrycreator.h"
+#include "entryfilecreator.h"
 
-//! I am an EntryCreator from sched_wakeup content
-class SchedWakeUpEntryCreator {
+#include <string>
+
+//! I am an extrace trace file. I can be parsed to vector of ProcessStat.
+class ExtraceFile {
   public:
-    ~SchedWakeUpEntryCreator() {}
-    Entry * create(int pid, long timeLow, long timeHigh, const char * content) const;
+    ExtraceFile(const string & filename,
+                EntryFileCreator * fileCreator):
+                myFilename(filename),
+                myEntryFileCreator(fileCreator) {}
+    // TODO destructor
+    bool tryParseTo(vector<ProcessStat> & procStats) const;
+  private:
+    const string & myFilename;
+    EntryFileCreator * myEntryFileCreator = NULL;
 };
 
-Entry * SchedWakeUpEntryCreator::create(int pid, long timeLow, long timeHigh,
-                                        const char * content) const {
-  return nullptr;
-}
-
-#endif // LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
+#endif // PARSER_H

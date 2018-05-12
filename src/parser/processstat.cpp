@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_ENTRY_CREATOR_H
-#define LTTLWHWHT_ENTRY_CREATOR_H
+#include "processstat.h"
 
 #include "entry.h"
 
-//! I am an Entry creator. I create Entry from specified content
-class EntryCreator {
-  public:
-    virtual ~EntryCreator() {}
-    virtual Entry * create(int pid, long timeLow, long timeHigh,
-                           const char * content) const = 0;  
-};
+#include <cstdio>
 
-#endif // LTTLWHWHT_ENTRY_CREATOR_H
+bool ProcessStat::isReady() const {
+  return myPID    != -1
+         && myCpuUsage != -1
+         && myVss   != -1
+         && myRss   != -1
+         && myPss   != -1
+         && myUss   != -1;
+}
+
+void ProcessStat::updateWith(const Entry & entry) {
+  fprintf(stderr, "error: not supported entry type\n");
+}
+
+void ProcessStat::updateWith(const MemoryEntry & entry) {
+  myVss   = entry.getVss();
+  myRss   = entry.getRss();
+  myPss   = entry.getPss();
+  myUss   = entry.getUss();
+}
+
+void ProcessStat::updateWith(const CpuUsageEntry & entry) {
+  myCpuUsage = entry.getCpuUsage();
+}

@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-#include "parser.h"
-#include "mockentriesfilecreator.h"
+#include "entry.h"
+#include "processstat.h"
+#include "extracefile.h"
+#include "mock_entryfile.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -28,8 +30,8 @@ using ::testing::_;
 using ::testing::StrEq;
 using ::testing::SetArgReferee;
   
-//! Tests
-class ParserTest : public ::testing::Test {
+//! I test ExtraceFile.
+class ExtraceFileTest : public ::testing::Test {
   public:
     void SetUp() {
       myMockEntryFile = new MockEntryFile();
@@ -140,14 +142,14 @@ class ParserTest : public ::testing::Test {
     vector<Entry*> myMockEntryFileReturn;
 };
 
-TEST_F(ParserTest, testParseOneMemoryOneCpuUsage) {
+TEST_F(ExtraceFileTest, testParseOneMemoryOneCpuUsage) {
   testParseOneMemoryOneCpuUsage();
 }
 
-TEST_F(ParserTest, parseToOnlyMemoryEntries) {
+TEST_F(ExtraceFileTest, parseToOnlyMemoryEntries) {
   testParseToOnlyMemoryEntries();
 }
 
-TEST_F(ParserTest, testParseMultiplePIDs) {
+TEST_F(ExtraceFileTest, testParseMultiplePIDs) {
   testParseMultiplePIDs();
 }

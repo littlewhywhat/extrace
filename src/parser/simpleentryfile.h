@@ -1,16 +1,15 @@
 #ifndef LTTLWHWHT_SIMPLE_ENTRY_FILE_H
 #define LTTLWHWHT_SIMPLE_ENTRY_FILE_H
 
-#include "parser.h"
-
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include "entryfile.h"
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
 #include <unistd.h> // access
 #include <fcntl.h>  // creat, open
+#include <cstdio>
+
+#include <string>
 
 using namespace std;
 
@@ -40,7 +39,6 @@ class SimpleEntryFile : public EntryFile {
 void SimpleEntryFile::parseTo(vector<Entry*> & entries) const {
   FILE * file = fopen(myFilename.c_str(), "r+");
   if (!file) {
-    cout << "hello" << endl;
     fprintf(stderr, "error opening %s: %s (%d)\n", myFilename.c_str(),
               strerror(errno), errno);
   }

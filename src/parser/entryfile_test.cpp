@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "parser.h"
+#include "entry.h"
+#include "entryfile.h"
 #include "simpleentryfile.h"
 #include "fakeentrycreator.h"
 
