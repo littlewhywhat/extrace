@@ -31,7 +31,8 @@ class FTraceEntry {
     FTraceEntry * setPID(int pid)       { myPID = pid;       return this; }
     FTraceEntry * setTimeHigh(int time) { myTimeHigh = time; return this; }
     FTraceEntry * setTimeLow(int time)  { myTimeLow = time;  return this; }
-  protected:
+  private:
+    long myTime() const;
     int myPID;
     int myTimeLow;
     int myTimeHigh;
