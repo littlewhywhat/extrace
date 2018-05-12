@@ -28,7 +28,6 @@ using namespace std;
 class ProcessRecord {
   public:
     ProcessRecord() {}
-    ProcessRecord(const Process * process);
     int getPID()    const { return myPID;    }
     int getCpuUse() const { return myCpuUsage; }
     long getVss()   const { return myVss;    }

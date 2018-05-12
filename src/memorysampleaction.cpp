@@ -20,6 +20,7 @@
 
 #include "pm_kernelbuilder.h"
 
+//TODO refactor
 bool MemorySampleAction::tryRun() {
   auto & traceBuffer = m_Environment->getTraceBuffer();
   bool ok = true;
