@@ -36,6 +36,7 @@ class ProcessRecord {
     long getPss()   const { return myPss;    }
     long getUss()   const { return myUss;    }
     uint64_t getTimeStamp() const { return myTimeStamp; }
+    ProcessState getState() const { return myState; }
     ProcessRecord * setPID(int pid)       { myPID    = pid;    return this; }
     ProcessRecord * setCpuUsage(int cpuUse) { myCpuUsage = cpuUse; return this; }
     ProcessRecord * setVss(long vss)      { myVss    = vss;    return this; }
@@ -117,7 +118,7 @@ class ProcessRecord {
           break;
       }
       return os;
-    }    
+    }   
   private:
     int myPID    = -1;
     int myCpuUsage = -1;
@@ -129,5 +130,16 @@ class ProcessRecord {
     uint64_t myTimeStamp = UINT64_MAX;
     ProcessState myState = ProcessState::UNKNOWN;
 };
+
+inline bool operator==(const ProcessRecord & lhs, const ProcessRecord & rhs) {
+  return lhs.getPID() == rhs.getPID()    
+         && lhs.getCpuUse() == rhs.getCpuUse() 
+         && lhs.getVss() == rhs.getVss()   
+         && lhs.getRss() == rhs.getRss()   
+         && lhs.getPss() == rhs.getPss()   
+         && lhs.getUss() == rhs.getUss()   
+         && lhs.getTimeStamp() == rhs.getTimeStamp() 
+         && lhs.getState() == rhs.getState();
+}
 
 #endif // LTTLWHWHT_PROCESSRECORD_H

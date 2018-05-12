@@ -20,6 +20,10 @@
 
 #include <map>
 
+SimpleProcessRecordFile::~SimpleProcessRecordFile() {
+  delete myProcessChangeFileCreator;
+}
+
 void SimpleProcessRecordFile::parseTo(vector<ProcessRecord*> & records) {
   ProcessChangeFile * file = myProcessChangeFileCreator->create(myFilename);
   vector<ProcessChange *> changes;
