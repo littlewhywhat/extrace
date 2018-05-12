@@ -30,35 +30,28 @@ enum ProcessState {
 //! I update my total by provided time
 class Process {
   public:
-    long getTotalRun() { return myTotalRun; }
+    virtual ~Process() {}
+    virtual long getTotalRun() const = 0;
 
-    long getVSS() const { return myVSS; }
-    long getRSS() const { return myRSS; }
-    long getPSS() const { return myPSS; }
-    long getUSS() const { return myUSS; }
+    virtual long getVSS() const = 0;
+    virtual long getRSS() const = 0;
+    virtual long getPSS() const = 0;
+    virtual long getUSS() const = 0;
 
     // TODO this should be accessed only via ProcessChange
-    Process * setVSS(long vss) { myVSS = vss; return this; }
-    Process * setRSS(long rss) { myRSS = rss; return this; }
-    Process * setPSS(long pss) { myPSS = pss; return this; }
-    Process * setUSS(long uss) { myUSS = uss; return this; }
+    virtual Process * setVSS(long vss) = 0;
+    virtual Process * setRSS(long rss) = 0;
+    virtual Process * setPSS(long pss) = 0;
+    virtual Process * setUSS(long uss) = 0;
 
-    Process * setState(const ProcessState & state) { myState = state; return this; }
-    const ProcessState & getState() const { return myState; }
+    virtual Process * setState(const ProcessState & state) = 0;
+    virtual const ProcessState & getState() const = 0;
     //! Updates my time statistics
 
     //! Updates my total run if myLastUpdateTime
     //! is defined and I am ProcessState::RUNNING.
     //! Sets myLastUpdateTime to specified time.
-    void updateTo(long time);
-  private:
-    ProcessState myState = ProcessState::UNKNOWN;
-    long myTotalRun = 0;
-    long myLastUpdateTime = -1;
-    long myVSS = -1;
-    long myRSS = -1;
-    long myPSS = -1;
-    long myUSS = -1;
+    virtual void updateTo(long time) = 0;
 };
 
 #endif // LTTLWHWHT_PROCESS_H

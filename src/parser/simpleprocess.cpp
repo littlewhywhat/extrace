@@ -1,6 +1,6 @@
-#include "process.h"
+#include "simpleprocess.h"
 
-void Process::updateTo(long time) {
+void SimpleProcess::updateTo(long time) {
   if (myState == ProcessState::RUNNING) {
     myTotalRun += time - myLastUpdateTime;
   }

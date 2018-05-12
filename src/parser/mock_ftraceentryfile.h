@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-#include "processchange.h"
+#ifndef LTTLWHWHT_MOCK_FTRACEENTRY_FILE_H
+#define LTTLWHWHT_MOCK_FTRACEENTRY_FILE_H
 
-void ProcessChange::applyTo(Process & process) const {
-  process.updateTo(myTimeStamp);
-  applyFurtherTo(process);
-}
+#include <gmock/gmock.h>
 
-void MemoryChange::applyFurtherTo(Process & process) const {
-  process.setVSS(myVSS)
-         ->setRSS(myRSS)
-         ->setPSS(myPSS)
-         ->setUSS(myUSS);
-}
+#include "ftraceentryfile.h"
+#include "ftraceentryfilecreator.h"
 
-void StateChange::applyFurtherTo(Process & process) const {
-  process.setState(myState);
-}
+class MockFTraceEntryFile : public FTraceEntryFile {
+  public:
+    MOCK_CONST_METHOD1(parseTo, void(vector<FTraceEntry*> & entries));
+};
+
+class MockFTraceEntryFileCreator : public FTraceEntryFileCreator {
+  public:
+    MOCK_CONST_METHOD1(create, FTraceEntryFile*(const string & filename));
+};
+
+#endif // LTTLWHWHT_MOCK_FTRACEENTRY_FILE_H
