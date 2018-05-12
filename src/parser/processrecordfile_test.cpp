@@ -16,6 +16,7 @@
  */
 
 #include "processrecordfile.h"
+#include "mock_processchangefile.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -31,15 +32,68 @@ using ::testing::SetArgReferee;
 class SimpleProcessRecordFileTest : public ::testing::Test {
   public:
     void SetUp() {
+      myProcessChangeFileCreator = new MockProcessChangeFileCreator();
+      myProcessChangeFile = new MockProcessChangeFile();
+      myProcessRecordFile = new SimpleProcessRecordFile(myFilename,
+                                                        myProcessChangeFileCreator);   
     }
 
     void TearDown() {
+      delete myProcessRecordFile;
+      delete myProcessChangeFile;
     }
 
     void testParseTo() {
-    }
-  private:
+      vector<ProcessChange*> processChanges = {
+        (new StateChange(0,0))->setState(ProcessState::RUNNING),
+        (new StateChange(1,0))->setState(ProcessState::SLEEPING),
+        (new MemoryChange(0,2))->setVSS(1)->setUSS(1)->setRSS(1)->setPSS(1),
+        (new MemoryChange(0,3))->setVSS(2)->setUSS(2)->setRSS(2)->setPSS(2),
+        (new StateChange(1,4))->setState(ProcessState::RUNNING),
+        (new StateChange(0,4))->setState(ProcessState::SLEEPING),
+        (new MemoryChange(1,5))->setVSS(1)->setUSS(1)->setRSS(1)->setPSS(1),
+        (new MemoryChange(1,6))->setVSS(2)->setUSS(2)->setRSS(2)->setPSS(2),
+      };
+      vector<ProcessRecord*> procRecordsExpect = {
+        (new ProcessRecord())->setPID(0)->setTimeStamp(0)->setState(ProcessState::RUNNING),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(0)->setState(ProcessState::SLEEPING),
+        (new ProcessRecord())->setPID(0)->setTimeStamp(2)->setState(ProcessState::RUNNING)
+                             ->setVss(1)->setUss(1)->setRss(1)->setPss(1)
+                             ->setCpuUsage(100),
+        (new ProcessRecord())->setPID(0)->setTimeStamp(3)->setState(ProcessState::RUNNING)
+                             ->setVss(2)->setUss(2)->setRss(2)->setPss(2)
+                             ->setCpuUsage(100),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(4)->setState(ProcessState::RUNNING)
+                             ->setCpuUsage(0),
+        (new ProcessRecord())->setPID(0)->setTimeStamp(4)->setState(ProcessState::SLEEPING)
+                             ->setVss(2)->setUss(2)->setRss(2)->setPss(2)
+                             ->setCpuUsage(100),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(5)->setState(ProcessState::RUNNING)
+                             ->setVss(1)->setUss(1)->setRss(1)->setPss(1)
+                             ->setCpuUsage(20),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(6)->setState(ProcessState::RUNNING)
+                             ->setVss(2)->setUss(2)->setRss(2)->setPss(2)
+                             ->setCpuUsage(33),
+      };
+      // TODO better to switch to long long
+      EXPECT_CALL(*myProcessChangeFileCreator, create(StrEq(myFilename)))
+                                    .WillOnce(Return(myProcessChangeFile));
+      EXPECT_CALL(*myProcessChangeFile, parseTo(_))
+                                    .WillOnce(SetArgReferee<0>(processChanges));
 
+      vector<ProcessRecord*> procRecords;
+      myProcessRecordFile->parseTo(procRecords);
+      EXPECT_EQ(procRecords.size(), processChanges.size());
+      for (size_t i = 0; i < procRecords.size(); i++) {
+        EXPECT_EQ(*(procRecords[i]), *(procRecordsExpect[i]));
+      }
+    }
+      
+  private:
+    string myFilename = "examplefile";
+    ProcessRecordFile * myProcessRecordFile = NULL;
+    MockProcessChangeFile * myProcessChangeFile = NULL;
+    MockProcessChangeFileCreator * myProcessChangeFileCreator = NULL;
 };
 
 TEST_F(SimpleProcessRecordFileTest, testParseTo) {

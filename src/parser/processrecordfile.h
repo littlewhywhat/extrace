@@ -27,7 +27,7 @@ using namespace std;
 
 class ProcessRecordFile {
   public:
-    ~ProcessRecordFile() {}
+    virtual ~ProcessRecordFile() {}
     virtual void parseTo(vector<ProcessRecord*> & records) = 0;
 };
 
@@ -42,6 +42,7 @@ class SimpleProcessRecordFile : public ProcessRecordFile {
                             ProcessChangeFileCreator * processChangeFileCreator):
                             myFilename(filename),
                             myProcessChangeFileCreator(processChangeFileCreator) {}
+    ~SimpleProcessRecordFile();
     void parseTo(vector<ProcessRecord*> & records) override;
   private:
     const string & myFilename;
