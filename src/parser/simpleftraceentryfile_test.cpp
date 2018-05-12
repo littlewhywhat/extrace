@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-#include "entry.h"
-#include "entryfile.h"
-#include "simpleentryfile.h"
-#include "fakeentrycreator.h"
+#include "ftraceentry.h"
+#include "simpleftraceentryfile.h"
+#include "mock_ftraceentrycreator.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -36,16 +35,15 @@ using ::testing::StrEq;
 using ::testing::SetArgReferee;
   
 //! Tests
-class SimpleEntryFileTest : public ::testing::Test {
+class SimpleFTraceEntryFileTest : public ::testing::Test {
   public:
     void SetUp() {
-      myMockEntryCreator = new MockEntryCreator();
-      mySimpleEntryFile = new SimpleEntryFile(myTestFilename, myMockEntryCreator);
+      myMockEntryCreator = new MockFTraceEntryCreator();
+      mySimpleEntryFile = new SimpleFTraceEntryFile(myTestFilename, myMockEntryCreator);
     }
 
     void TearDown() {
       clear();
-      delete myMockEntryCreator;
       delete mySimpleEntryFile;
       mySimpleEntryFile = NULL;
     }
@@ -60,39 +58,27 @@ class SimpleEntryFileTest : public ::testing::Test {
       appendStr("          <idle>-0     (-----) [000] d..3  4751.149653:"
                 " sched_switch: prev_comm=swapper prev_pid=0 prev_prio=120 prev_state=R ==>"
                 " next_comm=memeater next_pid=2231 next_prio=120\n");
-      MemoryEntry * memoryEntry = (new MemoryEntry(2231, 80764, 4751))
-                                      ->setVss(102588416)
-                                      ->setRss(3674112)
-                                      ->setPss(2631237)
-                                      ->setUss(2592768);
+      SchedSwitchEntry entry(1, 2, 3); 
       EXPECT_CALL(*myMockEntryCreator, create(2232, 80764, 4751, 
                                               StrEq("tracing_mark_write"),
                                               StrEq("VSS=102588416  RSS=3674112"
                                               " PSS=2631237 USS=2592768 PID=2231")))
-                  .WillOnce(Return(memoryEntry));
+                  .WillOnce(Return(&entry));
       EXPECT_CALL(*myMockEntryCreator, create(0, 160159, 4751,
                                               StrEq("sched_wakeup"),
                                               StrEq("comm=memeater pid=2231 prio=120"
                                               " success=1 target_cpu=000")))
-                  .WillOnce(Return(memoryEntry));
+                  .WillOnce(Return(&entry));
       EXPECT_CALL(*myMockEntryCreator, create(0, 149653, 4751,
                                               StrEq("sched_switch"),
                                               StrEq("prev_comm=swapper prev_pid=0"
                                               " prev_prio=120 prev_state=R ==>"
                                               " next_comm=memeater next_pid=2231 next_prio=120")))
-                  .WillOnce(Return(memoryEntry));
-      ProcessStat procStatExpected;
-      memoryEntry->update(procStatExpected);
+                  .WillOnce(Return(&entry));
 
-      vector<Entry*> entries;
+      vector<FTraceEntry*> entries;
       mySimpleEntryFile->parseTo(entries);
       ASSERT_EQ(entries.size(), 3);
-
-      for (size_t i = 0; i < entries.size(); i++) {
-        ProcessStat procStat;
-        entries[i]->update(procStat);
-        ASSERT_EQ(procStat, procStatExpected);
-      }
 
       //TODO check errors
     }
@@ -115,20 +101,19 @@ class SimpleEntryFileTest : public ::testing::Test {
 
     //! Clears content of my test file 
     void clear() {
-      int fd = creat(myTestFilename.c_str(), 0);
-      if (fd == -1) {
-          fprintf(stderr, "error truncating %s: %s (%d)\n", myTestFilename.c_str(),
+      int err = remove(myTestFilename.c_str());
+      if (err) {
+          fprintf(stderr, "error removing %s: %s (%d)\n", myTestFilename.c_str(),
                   strerror(errno), errno);
       }
-      close(fd);
     }
 
     //! Path to my test file
     string myTestFilename = "test_example";
-    SimpleEntryFile * mySimpleEntryFile = NULL;
-    MockEntryCreator * myMockEntryCreator = NULL;
+    SimpleFTraceEntryFile * mySimpleEntryFile = NULL;
+    MockFTraceEntryCreator * myMockEntryCreator = NULL;
 };
 
-TEST_F(SimpleEntryFileTest, testParseToMemoryEntry) {
+TEST_F(SimpleFTraceEntryFileTest, testParseToMemoryEntry) {
   testParseToMemoryEntry();
 }

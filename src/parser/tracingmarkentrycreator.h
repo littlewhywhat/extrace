@@ -17,18 +17,14 @@
 #ifndef LTTLWHWHT_TRACING_MARK_ENTRY_CREATOR_H
 #define LTTLWHWHT_TRACING_MARK_ENTRY_CREATOR_H
 
-#include "entrycreator.h"
+#include "ftraceentry.h"
+#include "ftraceentrycreator.h"
 
 //! I am an EntryCreator from tracing_mark_write content
-class TracingMarkEntryCreator {
+class TracingMarkEntryCreator : public FTraceEntryCreator {
   public:
     ~TracingMarkEntryCreator() {}
-    Entry * create(int pid, long timeLow, long timeHigh, const char * content) const;
+    TracingMarkEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
 };
-
-Entry * TracingMarkEntryCreator::create(int pid, long timeLow, long timeHigh,
-                                        const char * content) const {
-  return nullptr;
-}
 
 #endif // LTTLWHWHT_TRACING_MARK_ENTRY_CREATOR_H

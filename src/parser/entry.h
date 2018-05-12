@@ -75,7 +75,7 @@ class CpuUsageEntry: public Entry {
   public:
     CpuUsageEntry(int pid, int timeLow, int timeHigh): Entry(pid, timeLow, timeHigh) {}
     int getCpuUsage() const { return myCpuUsage; }
-    CpuUsageEntry * setCpuUsage(long cpuUsage) { myCpuUsage = cpuUsage; return this; }
+    CpuUsageEntry * setCpuUsage(int cpuUsage) { myCpuUsage = cpuUsage; return this; }
   protected:
     void updateFurther(ProcessStat & procStat) const override;
   private:

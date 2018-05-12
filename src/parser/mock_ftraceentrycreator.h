@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
-#define LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
+#ifndef LTTLWHWHT_MOCK_FTRACE_ENTRY_CREATOR_H
+#define LTTLWHWHT_MOCK_FTRACE_ENTRY_CREATOR_H
 
-#include "ftraceentry.h"
-#include "ftraceentrycreator.h"
+#include <gmock/gmock.h>
 
-//! I am an EntryCreator from sched_switch content
-class SchedSwitchEntryCreator : public FTraceEntryCreator {
+#include "ftraceentrybynamecreator.h"
+
+//! I am a fake Entry creator. I don't really create Entry but just pass mine  
+class MockFTraceEntryCreator : public FTraceEntryByNameCreator {
   public:
-    ~SchedSwitchEntryCreator() {}
-    SchedSwitchEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
+    MOCK_CONST_METHOD5(create, FTraceEntry*(int pid, long timeLow, long timeHigh,
+                                            const char * entryName,
+                                            const char * content));
 };
 
-#endif // LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
+#endif // LTTLWHWHT_MOCK_FTRACE_ENTRY_CREATOR_H

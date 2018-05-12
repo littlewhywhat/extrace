@@ -38,10 +38,19 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
     }
 
     void testCreateFromCorrectContent() {
-      ASSERT_TRUE(mySchedSwitchEntryCreator.create(0, 0, 0, "prev_comm=swapper prev_pid=0"
-                                                             " prev_prio=120 prev_state=R ==>"
-                                                             " next_comm=memeater next_pid=2231"
-                                                             " next_prio=120"));
+      auto * entry = mySchedSwitchEntryCreator.create(1, 2, 3, "prev_comm=swapper prev_pid=0"
+                                                               " prev_prio=120 prev_state=R ==>"
+                                                               " next_comm=memeater next_pid=2231"
+                                                               " next_prio=120");
+      EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getTimeLow(), 2);
+      EXPECT_EQ(entry->getTimeHigh(), 3);
+      EXPECT_EQ(entry->getPrevCommandName(), "swapper");
+      EXPECT_EQ(entry->getPrevPriority(), 120);
+      EXPECT_EQ(entry->getPrevPID(), 0);
+      EXPECT_EQ(entry->getNextCommandName(), "memeater");
+      EXPECT_EQ(entry->getNextPriority(), 120);
+      EXPECT_EQ(entry->getNextPID(), 2231);
     }
   private:
     //! My SchedSwitchEntryCreator that I test
