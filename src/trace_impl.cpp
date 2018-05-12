@@ -40,7 +40,8 @@ bool TraceImpl::setUp() {
   }
   ok &= m_FTrace->trySetBufferSize(m_TraceBufferSizeKB);
   ok &= setGlobalClockEnable(true);
-  ok &= m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID);
+  // on some machines file is not present
+  m_FTrace->tryEnableOption(FTrace::Option::PRINT_TGID);
   // ok &= m_KernelTraceSystem->trySetFunctions(m_Functions);
   ok &= m_AndroidTraceSystem->tryToTrace();
   ok &= m_KernelTraceSystem->tryDisableAllCategories();

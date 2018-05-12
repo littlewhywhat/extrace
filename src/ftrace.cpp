@@ -90,7 +90,11 @@ bool FTrace::tryConfigTracePoint(const FTrace::TracePoint & tracePoint, bool ena
 
 bool FTrace::tryEnableOption(const FTrace::Option & option)
 {
-  return tryConfigFileSwitch(m_Options.at(option).c_str(), true);
+  if (!tryConfigFileSwitch(m_Options.at(option).c_str(), true)) {
+    fprintf(m_Wire.getErrorStream(), "can't enable property\n");
+    return false;
+  }
+  return true;
 }
 
 bool FTrace::tryDisableOption(const FTrace::Option & option)
@@ -100,8 +104,11 @@ bool FTrace::tryDisableOption(const FTrace::Option & option)
 
 bool FTrace::tryConfigFileSwitch(const char * filename, bool enable)
 {
-  return m_FileSystem->fileIsWritable(filename)
-         && m_FileSystem->writeStr(filename, enable? "1" : "0");
+  if (!m_FileSystem->fileIsWritable(filename)) {
+    fprintf(m_Wire.getErrorStream(), "file is not writable %s\n", filename);
+    return false;
+  }
+  return m_FileSystem->writeStr(filename, enable? "1" : "0");
 }
 
 int FTrace::getTracePipeFd()
@@ -136,7 +143,11 @@ bool FTrace::trySetBufferSize(uint32_t bufferSize)
   }
   char str[32];
   snprintf(str, 32, "%u", bufferSize);
-  return m_FileSystem->writeStr(m_TraceBufferSizePath, str);
+  if (!m_FileSystem->writeStr(m_TraceBufferSizePath, str)) {
+    fprintf(m_Wire.getErrorStream(), "can't set buffer size\n");
+    return false;
+  }
+  return true;
 }
 
 bool FTrace::trySetClockType(const ClockType & clockType)

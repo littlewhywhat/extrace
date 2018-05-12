@@ -212,6 +212,32 @@ LOCAL_SRC_FILES := \
 
 include $(BUILD_EXECUTABLE)
 
+# extrace_file
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := extrace_file
+
+LOCAL_CPPFLAGS := $(common_cflags)
+
+LOCAL_SRC_FILES := \
+						src/parser/extrace_file.cpp                  \
+						src/parser/ftraceentry.cpp                   \
+						src/parser/processchange.cpp                 \
+						src/parser/schedswitchentrycreator.cpp       \
+						src/parser/schedwakeupentrycreator.cpp       \
+						src/parser/simpleftraceentrybynamecreator.cpp\
+						src/parser/simpleftraceentryfile.cpp               \
+						src/parser/simpleprocesschangefile.cpp      \
+						src/parser/simpleprocess.cpp      \
+						src/parser/simpleprocessrecordfile.cpp      \
+						src/parser/tracingmarkentrycreator.cpp      \
+
+LOCAL_STATIC_LIBRARIES := \
+    libgmock \
+
+include $(BUILD_EXECUTABLE)
+
 # extrace_test target
 # ===================
 

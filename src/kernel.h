@@ -1,7 +1,7 @@
 #ifndef LTTLWHWHT_KERNEL_H
 #define LTTLWHWHT_KERNEL_H
 
-#include "process.h"
+#include "process_mem.h"
 
 class Kernel {
   public:

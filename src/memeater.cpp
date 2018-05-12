@@ -4,7 +4,7 @@
 #include <unistd.h> // sleep
 
 #define size 100000
-#define period 100
+#define period 10000000
 
 bool signaled = false;
 
