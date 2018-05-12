@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "schedswitchentrycreator.h"
+#include "tracingmarkentrycreator.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -26,8 +26,8 @@ using ::testing::_;
 using ::testing::StrEq;
 using ::testing::SetArgReferee;
   
-//! I am a test. I test my SchedSwitchEntryCreator
-class SchedSwitchEntryCreatorTest : public ::testing::Test {
+//! I am a test. I test my TracingMarkEntryCreator
+class TracingMarkEntryCreatorTest : public ::testing::Test {
   public:
     void SetUp() {
 
@@ -38,16 +38,14 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
     }
 
     void testCreateFromCorrectContent() {
-      ASSERT_TRUE(mySchedSwitchEntryCreator.create(0, 0, 0, "prev_comm=swapper prev_pid=0"
-                                                             " prev_prio=120 prev_state=R ==>"
-                                                             " next_comm=memeater next_pid=2231"
-                                                             " next_prio=120"));
+      ASSERT_TRUE(myTracingMarkEntryCreator.create(0, 0, 0, "VSS=102588416  RSS=3674112"
+                                                            " PSS=2631237 USS=2592768 PID=2231"));
     }
   private:
-    //! My SchedSwitchEntryCreator that I test
-    SchedSwitchEntryCreator mySchedSwitchEntryCreator;
+    //! My TracingMarkEntryCreator that I test
+    TracingMarkEntryCreator myTracingMarkEntryCreator;
 };
 
-TEST_F(SchedSwitchEntryCreatorTest, testCreateFromCorrectContent) {
+TEST_F(TracingMarkEntryCreatorTest, testCreateFromCorrectContent) {
   testCreateFromCorrectContent();
 }

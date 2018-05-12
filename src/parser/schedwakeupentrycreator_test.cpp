@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "schedswitchentrycreator.h"
+#include "schedwakeupentrycreator.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -26,8 +26,8 @@ using ::testing::_;
 using ::testing::StrEq;
 using ::testing::SetArgReferee;
   
-//! I am a test. I test my SchedSwitchEntryCreator
-class SchedSwitchEntryCreatorTest : public ::testing::Test {
+//! I am a test. I test my SchedWakeUpEntryCreator
+class SchedWakeUpEntryCreatorTest : public ::testing::Test {
   public:
     void SetUp() {
 
@@ -38,16 +38,14 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
     }
 
     void testCreateFromCorrectContent() {
-      ASSERT_TRUE(mySchedSwitchEntryCreator.create(0, 0, 0, "prev_comm=swapper prev_pid=0"
-                                                             " prev_prio=120 prev_state=R ==>"
-                                                             " next_comm=memeater next_pid=2231"
-                                                             " next_prio=120"));
+      ASSERT_TRUE(mySchedWakeUpEntryCreator.create(0, 0, 0, "comm=memeater pid=2231 prio=120"
+                                                            " success=1 target_cpu=000"));
     }
   private:
-    //! My SchedSwitchEntryCreator that I test
-    SchedSwitchEntryCreator mySchedSwitchEntryCreator;
+    //! My SchedWakeUpEntryCreator that I test
+    SchedWakeUpEntryCreator mySchedWakeUpEntryCreator;
 };
 
-TEST_F(SchedSwitchEntryCreatorTest, testCreateFromCorrectContent) {
+TEST_F(SchedWakeUpEntryCreatorTest, testCreateFromCorrectContent) {
   testCreateFromCorrectContent();
 }

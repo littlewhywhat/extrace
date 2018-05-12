@@ -76,17 +76,23 @@ set (SOURCES ${OBJ_SOURCES} ${TEST_SOURCES})
 # target_link_libraries(main_test gtest_main)
 # target_link_libraries(main_test gmock_main)
 
-set (PARSER_TEST_SRC "src/parser/parser_test.cpp")
-add_executable(parser_test ${PARSER_TEST_SRC})
-target_link_libraries(parser_test gtest_main)
-target_link_libraries(parser_test gmock_main)
+file (GLOB OBJ_SOURCES "src/parser/*.cpp")
 
-set (ENTRYFILE_TEST "src/parser/entryfile_test.cpp")
-add_executable(entryfile_test ${ENTRYFILE_TEST})
-target_link_libraries(entryfile_test gtest_main)
-target_link_libraries(entryfile_test gmock_main)
+add_executable(extracefile_test ${OBJ_SOURCES})
+target_link_libraries(extracefile_test gtest_main)
+target_link_libraries(extracefile_test gmock_main)
 
-set (SCHEDSWITCH_TEST "src/parser/schedswitchentrycreator_test.cpp")
-add_executable(schedswitch_test ${SCHEDSWITCH_TEST})
-target_link_libraries(schedswitch_test gtest_main)
-target_link_libraries(schedswitch_test gmock_main)
+# set (ENTRYFILE_TEST "src/parser/entryfile_test.cpp")
+# add_executable(entryfile_test ${ENTRYFILE_TEST})
+# target_link_libraries(entryfile_test gtest_main)
+# target_link_libraries(entryfile_test gmock_main)
+
+# set (ENTRYCREATOR_TEST 
+#      "src/parser/schedswitchentrycreator_test.cpp"
+#      "src/parser/schedwakeupentrycreator_test.cpp"
+#      "src/parser/tracingmarkentrycreator_test.cpp"
+#      )
+
+# add_executable(entrycreator_test ${ENTRYCREATOR_TEST})
+# target_link_libraries(entrycreator_test gtest_main)
+# target_link_libraries(entrycreator_test gmock_main)

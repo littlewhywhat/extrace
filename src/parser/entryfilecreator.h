@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
-#define LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
+#ifndef LTTLWHWHT_ENTRY_FILE_CREATOR_H
+#define LTTLWHWHT_ENTRY_FILE_CREATOR_H
 
-#include "entrycreator.h"
+#include "entryfile.h"
 
-//! I am an EntryCreator from sched_wakeup content
-class SchedWakeUpEntryCreator {
+#include <string>
+
+using namespace std;
+
+//! I am EntryFile creator
+class EntryFileCreator {
   public:
-    ~SchedWakeUpEntryCreator() {}
-    Entry * create(int pid, long timeLow, long timeHigh, const char * content) const;
+    virtual ~EntryFileCreator() {}
+    virtual EntryFile * create(const string & filename) const = 0;
 };
 
-Entry * SchedWakeUpEntryCreator::create(int pid, long timeLow, long timeHigh,
-                                        const char * content) const {
-  return nullptr;
-}
-
-#endif // LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
+#endif // LTTLWHWHT_ENTRY_FILE_CREATOR_H

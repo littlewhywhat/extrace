@@ -28,7 +28,7 @@ class TracingMarkEntryCreator {
 
 Entry * TracingMarkEntryCreator::create(int pid, long timeLow, long timeHigh,
                                         const char * content) const {
-  return NULL;
+  return nullptr;
 }
 
 #endif // LTTLWHWHT_TRACING_MARK_ENTRY_CREATOR_H

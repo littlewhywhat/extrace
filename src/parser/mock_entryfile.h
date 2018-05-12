@@ -19,7 +19,7 @@
 
 #include <gmock/gmock.h>
 
-#include "parser.h"
+#include "entryfile.h"
 
 class MockEntryFile : public EntryFile {
   public:

@@ -28,7 +28,7 @@ class SchedSwitchEntryCreator {
 
 Entry * SchedSwitchEntryCreator::create(int pid, long timeLow, long timeHigh,
                                         const char * content) const {
-  return NULL;
+  return nullptr;
 }
 
 #endif // LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
