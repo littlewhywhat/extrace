@@ -37,18 +37,18 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
     void SetUp() {
       myMockProcess = new MockProcess();
       myFTraceEntryFileCreator = new MockFTraceEntryFileCreator();
-      myFTraceEntryFile = new MockFTraceEntryFile();      
+      myFTraceEntryFile = new MockFTraceEntryFile();
+      myProcessChangeFile = new SimpleProcessChangeFile(myFilename,
+                                                        myFTraceEntryFileCreator);   
     }
 
     void TearDown() {
+      delete myProcessChangeFile;
       delete myFTraceEntryFile;
       delete myMockProcess;
     }
 
     void testParseTo() {
-      myProcessChangeFile = new SimpleProcessChangeFile(myFilename,
-                                                        myFTraceEntryFileCreator);
-
       vector<FTraceEntry*> ftraceEntries = {
         (new SchedSwitchEntry(0,1,0))->setPrevPID(0)->setNextPID(1),
         (new TracingMarkEntry(0,2,0))->setTracedPID(1)->setVSS(1)->setUSS(2)->setRSS(3)->setPSS(4),
@@ -62,27 +62,34 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
                                     .WillOnce(SetArgReferee<0>(ftraceEntries));
       Sequence processOne, uss, vss, pss, rss;
       EXPECT_CALL(*myMockProcess, updateTo(1)).Times(1)
-                                  .InSequence(processOne, uss, vss, pss, rss);
-      EXPECT_CALL(*myMockProcess, setState(ProcessState::RUNNING)).Times(1)
-                                  .InSequence(processOne, uss, vss, pss, rss);
+                                  .InSequence(processOne);
+      EXPECT_CALL(*myMockProcess, setState(ProcessState::RUNNING))
+                                  .InSequence(processOne)
+                                  .WillOnce(Return(myMockProcess));
       EXPECT_CALL(*myMockProcess, updateTo(2)).Times(1)
                                   .InSequence(processOne, uss, vss, pss, rss);
-      EXPECT_CALL(*myMockProcess, setVSS(1)).Times(1)
-                                  .InSequence(processOne, vss);
-      EXPECT_CALL(*myMockProcess, setUSS(2)).Times(1)
-                                  .InSequence(processOne, uss);
-      EXPECT_CALL(*myMockProcess, setRSS(3)).Times(1)
-                                  .InSequence(processOne, rss);
-      EXPECT_CALL(*myMockProcess, setPSS(4)).Times(1)
-                                  .InSequence(processOne, pss);
+      EXPECT_CALL(*myMockProcess, setVSS(1))
+                                  .InSequence(vss)
+                                  .WillOnce(Return(myMockProcess));
+      EXPECT_CALL(*myMockProcess, setUSS(2))
+                                  .InSequence(uss)
+                                  .WillOnce(Return(myMockProcess));
+      EXPECT_CALL(*myMockProcess, setRSS(3))
+                                  .InSequence(rss)
+                                  .WillOnce(Return(myMockProcess));
+      EXPECT_CALL(*myMockProcess, setPSS(4))
+                                  .InSequence(pss)
+                                  .WillOnce(Return(myMockProcess));
       EXPECT_CALL(*myMockProcess, updateTo(4)).Times(1)
                                   .InSequence(processOne, uss, vss, pss, rss);
-      EXPECT_CALL(*myMockProcess, setState(ProcessState::SLEEPING)).Times(1)
-                                  .InSequence(processOne, uss, vss, pss, rss);
+      EXPECT_CALL(*myMockProcess, setState(ProcessState::SLEEPING))
+                                  .InSequence(processOne)
+                                  .WillOnce(Return(myMockProcess));
       EXPECT_CALL(*myMockProcess, updateTo(5)).Times(1)
-                                  .InSequence(processOne, uss, vss, pss, rss);
-      EXPECT_CALL(*myMockProcess, setState(ProcessState::AWAKE)).Times(1)
-                                  .InSequence(processOne, uss, vss, pss, rss);
+                                  .InSequence(processOne);
+      EXPECT_CALL(*myMockProcess, setState(ProcessState::AWAKE))
+                                  .InSequence(processOne)
+                                  .WillOnce(Return(myMockProcess));
 
       vector<ProcessChange*> procChanges;
       myProcessChangeFile->parseTo(procChanges);

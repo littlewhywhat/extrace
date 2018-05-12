@@ -23,17 +23,25 @@
 
 #include <string>
 
+using namespace std;
+
 class SimpleProcessChangeFile : public ProcessChangeFile {
   public:
     SimpleProcessChangeFile(const string & filename,
                             FTraceEntryFileCreator * ftraceEntryFileCreator):
                             myFilename(filename),
                             myFTraceEntryFileCreator(ftraceEntryFileCreator) {}
-    ~SimpleProcessChangeFile() {}
+    ~SimpleProcessChangeFile();
     void parseTo(vector<ProcessChange*> & procChanges) const override;
   private:
     string myFilename;
     FTraceEntryFileCreator * myFTraceEntryFileCreator;
+};
+
+class SimpleProcessChangeFileCreator : public ProcessChangeFileCreator {
+  public:
+    ~SimpleProcessChangeFileCreator() {}
+    SimpleProcessChangeFile * create(const string & filename) const override;    
 };
 
 #endif // LTTLWHWHT_SIMPLEPROCESSCHANGEFILE_H

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012 The Android Open Source Project
  * Copyright (C) 2018 Roman Vaivod
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +15,33 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_PROCESS_CHANGE_FILE_H
-#define LTTLWHWHT_PROCESS_CHANGE_FILE_H
+#include "processrecordfile.h"
 
-#include "processchange.h"
-
-#include <vector>
-#include <string>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 using namespace std;
 
-class ProcessChangeFile {
+using ::testing::Return;
+using ::testing::_;
+using ::testing::StrEq;
+using ::testing::SetArgReferee;
+  
+//! Tests
+class SimpleProcessRecordFileTest : public ::testing::Test {
   public:
-    virtual ~ProcessChangeFile() {}
-    virtual void parseTo(vector<ProcessChange*> & procChanges) const = 0;
+    void SetUp() {
+    }
+
+    void TearDown() {
+    }
+
+    void testParseTo() {
+    }
+  private:
+
 };
 
-class ProcessChangeFileCreator {
-  public:
-    virtual ~ProcessChangeFileCreator() {}
-    virtual ProcessChangeFile * create(const string & filename) const = 0;    
-};
-
-#endif // LTTLWHWHT_PROCESS_CHANGE_FILE_H
+TEST_F(SimpleProcessRecordFileTest, testParseTo) {
+  testParseTo();
+}

@@ -19,17 +19,19 @@
 
 #include "process.h"
 
+#include <cstdint>
+
 //! I am a change of Process. You can apply me to Process.
 class ProcessChange {
   public:
-    ProcessChange(int pid, long timestamp):
+    ProcessChange(int pid, uint64_t timestamp):
                   myPID(pid), myTimeStamp(timestamp) {}
     virtual ~ProcessChange() {}
     int getPID()        const { return myPID; }
-    long getTimeStamp() const { return myTimeStamp; }
+    uint64_t getTimeStamp() const { return myTimeStamp; }
 
     ProcessChange * setPID(int pid)        { myPID = pid;       return this; }
-    ProcessChange * setTimeStamp(long time) { myTimeStamp = time; return this; }
+    ProcessChange * setTimeStamp(uint64_t time) { myTimeStamp = time; return this; }
 
     //! Applies me to process
     void applyTo(Process & process) const;
@@ -37,7 +39,7 @@ class ProcessChange {
     virtual void applyFurtherTo(Process & process) const = 0;
   private:
     int myPID;
-    long myTimeStamp;
+    uint64_t myTimeStamp;
 };
 
 #endif // LTTLWHWHT_PROCESS_CHANGE_H
@@ -47,7 +49,7 @@ class ProcessChange {
 
 class MemoryChange : public ProcessChange {
   public:
-    MemoryChange(int pid, long timestamp):
+    MemoryChange(int pid, uint64_t timestamp):
                  ProcessChange(pid, timestamp) {}
     ~MemoryChange() {}
 
@@ -79,7 +81,7 @@ class MemoryChange : public ProcessChange {
 
 class StateChange : public ProcessChange {
   public:
-    StateChange(int pid, long timestamp):
+    StateChange(int pid, uint64_t timestamp):
                 ProcessChange(pid, timestamp) {}
     ~StateChange() {}
 
