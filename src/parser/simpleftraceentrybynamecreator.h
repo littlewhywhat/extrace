@@ -40,26 +40,4 @@ class SimpleFTraceEntryByNameCreator : public FTraceEntryByNameCreator {
     map<string, FTraceEntryCreator *> myFTraceEntryCreators;
 };
 
-SimpleFTraceEntryByNameCreator::SimpleFTraceEntryByNameCreator() {
-  myFTraceEntryCreators["sched_switch"] = new SchedSwitchEntryCreator();
-  myFTraceEntryCreators["sched_wakeup"] = new SchedWakeUpEntryCreator();
-  myFTraceEntryCreators["tracing_mark_write"] = new TracingMarkEntryCreator();
-}
-
-SimpleFTraceEntryByNameCreator::~SimpleFTraceEntryByNameCreator() {
-  for (const auto & creator : myFTraceEntryCreators) {
-    delete creator.second;
-  }
-}
-
-FTraceEntry * SimpleFTraceEntryByNameCreator::create(int pid,
-                                   long timeLow, long timeHigh,
-                                   const char * entryName,
-                                   const char * content) const {
-  if (myFTraceEntryCreators.find(entryName) == myFTraceEntryCreators.end()) {
-    return nullptr;
-  }
-  return myFTraceEntryCreators.at(entryName)->create(pid, timeLow, timeHigh, content);
-}
-
 #endif // LTTLWHWHT_SIMPLE_FTRACE_ENTRY_BY_NAME_CREATOR_H
