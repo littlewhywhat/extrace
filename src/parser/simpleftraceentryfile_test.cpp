@@ -49,6 +49,10 @@ class SimpleFTraceEntryFileTest : public ::testing::Test {
     }
 
     void testParseToMemoryEntry() {
+      appendStr("      experiment-975   [002] d..3  2113.393234: sched_switch:"
+                " prev_comm=experiment prev_pid=975 prev_prio=120 prev_state=S"
+                " ==> next_comm=swapper/2 next_pid=0 next_prio=120\n");
+
       appendStr("      experiment-2232  ( 2232) [000] ...1  4751.080764:"
                 " tracing_mark_write: VSS=102588416  RSS=3674112"
                 " PSS=2631237 USS=2592768 PID=2231\n");
@@ -58,7 +62,12 @@ class SimpleFTraceEntryFileTest : public ::testing::Test {
       appendStr("          <idle>-0     (-----) [000] d..3  4751.149653:"
                 " sched_switch: prev_comm=swapper prev_pid=0 prev_prio=120 prev_state=R ==>"
                 " next_comm=memeater next_pid=2231 next_prio=120\n");
-      SchedSwitchEntry entry(1, 2, 3); 
+      SchedSwitchEntry entry(1, 2, 3);
+      EXPECT_CALL(*myMockEntryCreator, create(975, 393234, 2113,
+                                              StrEq("sched_switch"),
+                                              StrEq("prev_comm=experiment prev_pid=975 prev_prio=120 prev_state=S"
+                                              " ==> next_comm=swapper/2 next_pid=0 next_prio=120")))
+                  .WillOnce(Return(&entry));
       EXPECT_CALL(*myMockEntryCreator, create(2232, 80764, 4751, 
                                               StrEq("tracing_mark_write"),
                                               StrEq("VSS=102588416  RSS=3674112"
@@ -78,7 +87,7 @@ class SimpleFTraceEntryFileTest : public ::testing::Test {
 
       vector<FTraceEntry*> entries;
       mySimpleEntryFile->parseTo(entries);
-      ASSERT_EQ(entries.size(), 3);
+      ASSERT_EQ(entries.size(), 4);
 
       //TODO check errors
     }

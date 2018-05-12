@@ -29,7 +29,7 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
   char line[256];
   char name[17];
   int pid;
-  char tgid[6];
+  char tgid[20];
   char skip1[4];
   char skip2[5];
   int timeHigh;
@@ -38,10 +38,10 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
   char content[128];
   int readArgs, readChars;
   while (fgets(line, 256, file)) {
-    readArgs = sscanf(line, "%16[^-]-%5d (%5[^)]) [%3s] %4s %5d.%6d: %[^:]: %n",
-                name, &pid, tgid, skip1, skip2, &timeHigh, &timeLow,
+    readArgs = sscanf(line, "%16[^-]-%5d%*[^[][%3s] %4s %5d.%6d: %[^:]: %n",
+                name, &pid, skip1, skip2, &timeHigh, &timeLow,
                 entryName, &readChars);
-    if (readArgs != 8) {
+    if (readArgs != 7) {
       fprintf(stderr, "error format read %d\n", readArgs);
       continue;
     }
