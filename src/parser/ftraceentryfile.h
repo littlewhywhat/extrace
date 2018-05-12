@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012 The Android Open Source Project
  * Copyright (C) 2018 Roman Vaivod
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +15,18 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_FAKE_ENTRY_CREATOR_H
-#define LTTLWHWHT_FAKE_ENTRY_CREATOR_H
+#ifndef LTTLWHWHT_FTRACE_ENTRY_FILE_H
+#define LTTLWHWHT_FTRACE_ENTRY_FILE_H
 
-#include <gmock/gmock.h>
+#include <string>
+#include <vector>
 
-#include "simpleentryfile.h"
+#include "ftraceentrybynamecreator.h"
 
-//! I am a fake Entry creator. I don't really create Entry but just pass mine  
-class MockEntryCreator : public EntryByNameCreator {
+class FTraceEntryFile {
   public:
-    MOCK_CONST_METHOD5(create, Entry*(int pid, long timeLow, long timeHigh,
-                                      const char * entryName,
-                                      const char * content));
+    virtual ~FTraceEntryFile() {};
+    virtual void parseTo(vector<FTraceEntry*> & entries) const = 0;
 };
 
-#endif // LTTLWHWHT_FAKE_ENTRY_CREATOR_H
+#endif // LTTLWHWHT_FTRACE_ENTRY_FILE_H

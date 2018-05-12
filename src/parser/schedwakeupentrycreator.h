@@ -17,18 +17,14 @@
 #ifndef LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
 #define LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H
 
-#include "entrycreator.h"
+#include "ftraceentrycreator.h"
+#include "ftraceentry.h"
 
 //! I am an EntryCreator from sched_wakeup content
-class SchedWakeUpEntryCreator {
+class SchedWakeUpEntryCreator : public FTraceEntryCreator {
   public:
     ~SchedWakeUpEntryCreator() {}
-    Entry * create(int pid, long timeLow, long timeHigh, const char * content) const;
+    SchedWakeUpEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
 };
-
-Entry * SchedWakeUpEntryCreator::create(int pid, long timeLow, long timeHigh,
-                                        const char * content) const {
-  return nullptr;
-}
 
 #endif // LTTLWHWHT_SCHED_WAKEUP_ENTRY_CREATOR_H

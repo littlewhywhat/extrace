@@ -1,7 +1,5 @@
-#ifndef LTTLWHWHT_SIMPLE_ENTRY_FILE_H
-#define LTTLWHWHT_SIMPLE_ENTRY_FILE_H
-
-#include "entryfile.h"
+#ifndef LTTLWHWHT_SIMPLE_FTRACE_ENTRY_FILE_H
+#define LTTLWHWHT_SIMPLE_FTRACE_ENTRY_FILE_H
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
@@ -13,30 +11,29 @@
 
 using namespace std;
 
-//! I am an Entry creator. I create it based on name.
-class EntryByNameCreator {
-  public:
-    virtual ~EntryByNameCreator() {}
-    virtual Entry * create(int pid, long timeLow, long timeHigh,
-                           const char * entryName,
-                           const char * content) const = 0;
-};
+#include "ftraceentryfile.h"
 
 //! idea is to update process stats with entries until stats are ready
 //! NOTE some events - like switch could be relevant to two process - switched from and switched to
 //! this should create two entries - SwitchFrom and SwitchTo
-class SimpleEntryFile : public EntryFile {
+class SimpleFTraceEntryFile : public FTraceEntryFile {
   public:
-    SimpleEntryFile(const string & filename,
-                    const EntryByNameCreator * entryCreator):
-                    myFilename(filename), myEntryCreator(entryCreator) {}
-    void parseTo(vector<Entry*> & entries) const override;
+    SimpleFTraceEntryFile(const string & filename,
+                          const FTraceEntryByNameCreator * entryCreator):
+                          myFilename(filename),
+                          myEntryCreator(entryCreator) {}
+    ~SimpleFTraceEntryFile();
+    void parseTo(vector<FTraceEntry*> & entries) const override;
   private:
     const string & myFilename;
-    const EntryByNameCreator * myEntryCreator = NULL;
+    const FTraceEntryByNameCreator * myEntryCreator = NULL;
 };
 
-void SimpleEntryFile::parseTo(vector<Entry*> & entries) const {
+SimpleFTraceEntryFile::~SimpleFTraceEntryFile() {
+  delete myEntryCreator;
+}
+
+void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
   FILE * file = fopen(myFilename.c_str(), "r+");
   if (!file) {
     fprintf(stderr, "error opening %s: %s (%d)\n", myFilename.c_str(),
@@ -68,7 +65,7 @@ void SimpleEntryFile::parseTo(vector<Entry*> & entries) const {
         continue;
       }
       content[couldWrite-1] = '\0';
-      Entry * entry = myEntryCreator->create(pid, timeLow, timeHigh, entryName, content);
+      FTraceEntry * entry = myEntryCreator->create(pid, timeLow, timeHigh, entryName, content);
       if (!entry) {
         fprintf(stderr, "error creating entry - wrong content?\n");
         continue;
@@ -77,7 +74,6 @@ void SimpleEntryFile::parseTo(vector<Entry*> & entries) const {
     }
   }
   fclose(file);
-  
 }
 
-#endif // LTTLWHWHT_SIMPLE_ENTRY_FILE_H
+#endif // LTTLWHWHT_SIMPLE_FTRACE_ENTRY_FILE_H

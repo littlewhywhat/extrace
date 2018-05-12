@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
-#define LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
+#ifndef LTTLWHWHT_FTRACEENTRY_CREATOR_H
+#define LTTLWHWHT_FTRACEENTRY_CREATOR_H
 
 #include "ftraceentry.h"
-#include "ftraceentrycreator.h"
 
-//! I am an EntryCreator from sched_switch content
-class SchedSwitchEntryCreator : public FTraceEntryCreator {
+//! I am an EntryCreator from sched_wakeup content
+class FTraceEntryCreator {
   public:
-    ~SchedSwitchEntryCreator() {}
-    SchedSwitchEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
+    virtual ~FTraceEntryCreator() {}
+    virtual FTraceEntry * create(int pid, long timeLow, long timeHigh, const char * content) const = 0;
 };
 
-#endif // LTTLWHWHT_SCHED_SWITCH_ENTRY_CREATOR_H
+#endif // LTTLWHWHT_FTRACEENTRY_CREATOR_H

@@ -29,17 +29,17 @@ using ::testing::SetArgReferee;
 //! I am a test. I test my SchedWakeUpEntryCreator
 class SchedWakeUpEntryCreatorTest : public ::testing::Test {
   public:
-    void SetUp() {
-
-    }
-
-    void TearDown() {
-
-    }
-
     void testCreateFromCorrectContent() {
-      ASSERT_TRUE(mySchedWakeUpEntryCreator.create(0, 0, 0, "comm=memeater pid=2231 prio=120"
-                                                            " success=1 target_cpu=000"));
+      auto * entry = mySchedWakeUpEntryCreator.create(1, 2, 3, 
+                                                      "comm=memeater pid=2231 prio=120"
+                                                      " success=1 target_cpu=000");
+      EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getTimeLow(), 2);
+      EXPECT_EQ(entry->getTimeHigh(), 3);
+      EXPECT_EQ(entry->getCommandName(), "memeater");
+      EXPECT_EQ(entry->getWakedUpPID(), 2231);
+      EXPECT_EQ(entry->getSuccess(), true);
+      EXPECT_EQ(entry->getTargetCPU(), 0);
     }
   private:
     //! My SchedWakeUpEntryCreator that I test
