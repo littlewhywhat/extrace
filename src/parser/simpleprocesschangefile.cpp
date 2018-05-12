@@ -16,6 +16,10 @@
 
 #include "simpleprocesschangefile.h"
 
+SimpleProcessChangeFile::~SimpleProcessChangeFile() {
+  delete myFTraceEntryFileCreator;
+}
+
 void SimpleProcessChangeFile::parseTo(vector<ProcessChange*> & processChanges) const {
   auto * ftraceEntryFile = myFTraceEntryFileCreator->create(myFilename);
   vector<FTraceEntry*> ftraceEntries;
@@ -25,4 +29,8 @@ void SimpleProcessChangeFile::parseTo(vector<ProcessChange*> & processChanges) c
   for (auto * ftraceEntry : ftraceEntries) {
     ftraceEntry->parseTo(processChanges);
   }
+}
+
+SimpleProcessChangeFile * SimpleProcessChangeFileCreator::create(const string & filename) const {
+  return new SimpleProcessChangeFile(filename, new SimpleFTraceEntryFileCreator());
 }

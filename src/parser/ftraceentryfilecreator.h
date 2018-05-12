@@ -22,7 +22,7 @@
 
 class FTraceEntryFileCreator {
   public:
-    ~FTraceEntryFileCreator() {}
+    virtual ~FTraceEntryFileCreator() {}
     virtual FTraceEntryFile * create(const string & filename) const = 0;
 };
 

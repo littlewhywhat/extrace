@@ -77,6 +77,12 @@ set (SOURCES ${OBJ_SOURCES} ${TEST_SOURCES})
 # target_link_libraries(main_test gmock_main)
 
 file (GLOB OBJ_SOURCES "src/parser/*.cpp")
+set(MAIN "${CMAKE_SOURCE_DIR}/src/parser/extrace_file.cpp")
+list(REMOVE_ITEM OBJ_SOURCES ${MAIN})
+
+add_executable(extracefile ${OBJ_SOURCES} ${MAIN})
+target_link_libraries(extracefile gtest_main)
+target_link_libraries(extracefile gmock_main)
 
 add_executable(extracefile_test ${OBJ_SOURCES})
 target_link_libraries(extracefile_test gtest_main)

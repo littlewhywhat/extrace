@@ -16,8 +16,8 @@
 
 #include "ftraceentry.h"
 
-long FTraceEntry::myTime() const {
-  return (long)myTimeLow + (1000000l * (long)myTimeHigh);
+uint64_t FTraceEntry::myTime() const {
+  return (uint64_t)myTimeLow + (1000000l * (uint64_t)myTimeHigh);
 }
 
 void SchedWakeUpEntry::parseTo(vector<ProcessChange*> & procChanges) const {

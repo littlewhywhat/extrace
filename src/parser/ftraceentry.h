@@ -21,6 +21,7 @@
 #include "processchange.h"
 
 #include <vector>
+#include <cstdint>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ class FTraceEntry {
 
     virtual void parseTo(vector<ProcessChange*> & procChanges) const = 0;
   protected:
-    long myTime() const;
+    uint64_t myTime() const;
   private:
     int myPID;
     int myTimeLow;

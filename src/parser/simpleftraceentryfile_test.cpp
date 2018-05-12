@@ -85,18 +85,18 @@ class SimpleFTraceEntryFileTest : public ::testing::Test {
   private:
     //! Appends string to my test file
     void appendStr(const char * str) {
-      int fd = open(myTestFilename.c_str(), O_CREAT|O_APPEND|O_WRONLY);
-      if (fd == -1) {
+      FILE * file = fopen(myTestFilename.c_str(), "a");
+      if (!file) {
           fprintf(stderr, "error opening %s: %s (%d)\n", myTestFilename.c_str(),
                   strerror(errno), errno);
       }
 
       ssize_t len = strlen(str);
-      if (write(fd, str, len) != len) {
+      if (fprintf(file, "%s", str) != len) {
           fprintf(stderr, "error writing to %s: %s (%d)\n", myTestFilename.c_str(),
                   strerror(errno), errno);
       }
-      close(fd);
+      fclose(file);
     }
 
     //! Clears content of my test file 
