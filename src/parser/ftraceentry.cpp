@@ -19,3 +19,23 @@
 long FTraceEntry::myTime() const {
   return (long)myTimeLow + (1000000l * (long)myTimeHigh);
 }
+
+void SchedWakeUpEntry::parseTo(vector<ProcessChange*> & procChanges) const {
+  procChanges.push_back((new StateChange(myWakedUpPID, myTime()))
+                            ->setState(ProcessState::AWAKE));
+}
+
+void SchedSwitchEntry::parseTo(vector<ProcessChange*> & procChanges) const {
+  procChanges.push_back((new StateChange(myPrevPID, myTime()))
+                            ->setState(ProcessState::SLEEPING));
+  procChanges.push_back((new StateChange(myNextPID, myTime()))
+                            ->setState(ProcessState::RUNNING));
+}
+
+void TracingMarkEntry::parseTo(vector<ProcessChange*> & procChanges) const {
+  procChanges.push_back((new MemoryChange(myTracedPID, myTime()))
+                            ->setVSS(myVSS)
+                            ->setUSS(myUSS)
+                            ->setRSS(myRSS)
+                            ->setPSS(myPSS));
+}

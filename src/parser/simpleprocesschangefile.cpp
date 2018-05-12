@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_FTRACE_ENTRY_BY_NAME_CREATOR_H
-#define LTTLWHWHT_FTRACE_ENTRY_BY_NAME_CREATOR_H
+#include "simpleprocesschangefile.h"
 
-#include "ftraceentry.h"
+void SimpleProcessChangeFile::parseTo(vector<ProcessChange*> & processChanges) const {
+  auto * ftraceEntryFile = myFTraceEntryFileCreator->create(myFilename);
+  vector<FTraceEntry*> ftraceEntries;
 
-//! I am an Entry creator. I create it based on name.
-class FTraceEntryByNameCreator {
-  public:
-    virtual ~FTraceEntryByNameCreator() {}
-    virtual FTraceEntry * create(int pid, long timeLow, long timeHigh,
-                                 const char * entryName,
-                                 const char * content) const = 0;
-};
+  ftraceEntryFile->parseTo(ftraceEntries);
 
-#endif // LTTLWHWHT_FTRACE_ENTRY_BY_NAME_CREATOR_H
+  for (auto * ftraceEntry : ftraceEntries) {
+    ftraceEntry->parseTo(processChanges);
+  }
+}

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_FTRACE_ENTRY_BY_NAME_CREATOR_H
-#define LTTLWHWHT_FTRACE_ENTRY_BY_NAME_CREATOR_H
+#ifndef LTTLWHWHT_PROCESS_CHANGE_FILE_H
+#define LTTLWHWHT_PROCESS_CHANGE_FILE_H
 
-#include "ftraceentry.h"
+#include "processchange.h"
 
-//! I am an Entry creator. I create it based on name.
-class FTraceEntryByNameCreator {
+#include <vector>
+
+using namespace std;
+
+class ProcessChangeFile {
   public:
-    virtual ~FTraceEntryByNameCreator() {}
-    virtual FTraceEntry * create(int pid, long timeLow, long timeHigh,
-                                 const char * entryName,
-                                 const char * content) const = 0;
+    virtual ~ProcessChangeFile() {}
+    virtual void parseTo(vector<ProcessChange*> & procChanges) const = 0;
 };
 
-#endif // LTTLWHWHT_FTRACE_ENTRY_BY_NAME_CREATOR_H
+#endif // LTTLWHWHT_PROCESS_CHANGE_FILE_H

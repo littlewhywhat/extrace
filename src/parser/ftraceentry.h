@@ -18,6 +18,12 @@
 #ifndef LTTLWHWHT_FTRACE_ENTRY_H
 #define LTTLWHWHT_FTRACE_ENTRY_H
 
+#include "processchange.h"
+
+#include <vector>
+
+using namespace std;
+
 //! I am entry
 class FTraceEntry {
   public:
@@ -31,8 +37,11 @@ class FTraceEntry {
     FTraceEntry * setPID(int pid)       { myPID = pid;       return this; }
     FTraceEntry * setTimeHigh(int time) { myTimeHigh = time; return this; }
     FTraceEntry * setTimeLow(int time)  { myTimeLow = time;  return this; }
-  private:
+
+    virtual void parseTo(vector<ProcessChange*> & procChanges) const = 0;
+  protected:
     long myTime() const;
+  private:
     int myPID;
     int myTimeLow;
     int myTimeHigh;
@@ -62,6 +71,8 @@ class SchedWakeUpEntry : public FTraceEntry {
     SchedWakeUpEntry * setPriority(int priority) { myPriority = priority; return this; }
     SchedWakeUpEntry * setSuccess(bool success) { mySuccess = success; return this; }
     SchedWakeUpEntry * setTargetCPU(int targetCPU) { myTargetCPU = targetCPU; return this; }
+
+    void parseTo(vector<ProcessChange*> & procChanges) const override;
   private:
     string myCommandName;
     int    myWakedUpPID;
@@ -96,6 +107,8 @@ class SchedSwitchEntry : public FTraceEntry {
     SchedSwitchEntry * setNextCommandName(const string & nextCommandName) { myNextCommandName = nextCommandName; return this; }
     SchedSwitchEntry * setNextPriority(int nextPriority) { myNextPriority = nextPriority; return this; }
     SchedSwitchEntry * setNextPID(int nextPID) { myNextPID = nextPID; return this; }
+
+    void parseTo(vector<ProcessChange*> & procChanges) const override;
   private:
     string myPrevCommandName;
     int    myPrevPriority;
@@ -129,6 +142,8 @@ class TracingMarkEntry : public FTraceEntry {
     TracingMarkEntry * setPSS(long pss) { myPSS = pss; return this; }
     TracingMarkEntry * setUSS(long uss) { myUSS = uss; return this; }
     TracingMarkEntry * setTracedPID(int pid)  { myTracedPID = pid; return this; }
+
+    void parseTo(vector<ProcessChange*> & procChanges) const override;
   private:
     long myVSS;
     long myRSS;
