@@ -168,8 +168,8 @@ KernelTraceSystem::KernelTraceSystem(const Wire & wire, const shared_ptr<FTrace>
   {
     { FTrace::TracePoint::SCHED_SWITCH, true },
     { FTrace::TracePoint::SCHED_WAKEUP, true },
-    { FTrace::TracePoint::SCHED_BLOCKED_REASON, true },
-    { FTrace::TracePoint::SCHED_CPU_HOTPLUG, true}
+    { FTrace::TracePoint::SCHED_BLOCKED_REASON, false },
+    { FTrace::TracePoint::SCHED_CPU_HOTPLUG, false}
   };
   m_TraceCategoryGroups[TraceCategory::IRQ] =
   {

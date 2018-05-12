@@ -1,7 +1,7 @@
 #ifndef LTTLWHWHT_PM_PROCESS_H
 #define LTTLWHWHT_PM_PROCESS_H
 
-#include "process.h"
+#include "process_mem.h"
 
 #include "pm_kernel.h"
 
