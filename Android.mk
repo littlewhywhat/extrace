@@ -23,6 +23,7 @@ extrace_src_files :=  \
 		src/stopaction.cpp \
 		src/dumpaction.cpp \
 		src/showhelpaction.cpp \
+		src/interpretdumpfileaction.cpp \
 		src/actionsrunner.cpp \
 		src/extracearguments.cpp \
 		src/extraceargumentsbuilder.cpp \
@@ -93,6 +94,7 @@ LOCAL_SRC_FILES:= \
 	  $(libbinder_files) \
 	  $(libz_files) \
 	  $(extrace_src_files) \
+	  $(processrecordfile_src_files) \
 	  $(pagemap_files) \
 	  src/extrace.cpp \
 

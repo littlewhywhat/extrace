@@ -23,6 +23,8 @@
 #include "actionsrunner.h"
 #include "environmentbuilder.h"
 
+#include <memory>
+
 class ExtraceActionsRunnerBuilder {
   public:
     ExtraceActionsRunnerBuilder(EnvironmentBuilder * environmentBuilder):
@@ -32,6 +34,9 @@ class ExtraceActionsRunnerBuilder {
                           const ExtraceArguments & traceArguments) const;
   private:
     EnvironmentBuilder * m_EnvironmentBuilder = NULL;
+    void addStopActions(ActionsRunner & actionsRunner, const Wire & wire,
+                        Signal & signal, const ExtraceArguments & extraceArguments,
+                                            shared_ptr<Environment> & environmen) const;
 };
 
 #endif // LTTLWHWHT_EXTRACEACTIONSRUNNERBUILDER_H

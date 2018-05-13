@@ -28,7 +28,7 @@ class InterruptableEnvironmentAction : public EnvironmentAction {
     InterruptableEnvironmentAction(const Wire & wire, shared_ptr<Environment> environment,
                                    const Signal & signal):
                              EnvironmentAction(wire, environment), m_Signal(signal) {}
-    virtual ~InterruptableEnvironmentAction() {}
+    ~InterruptableEnvironmentAction() {}
   protected:
     //! My signal
     const Signal & m_Signal;

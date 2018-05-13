@@ -53,6 +53,7 @@ list(APPEND OBJ_SOURCES
     "src/stopaction.cpp"
     "src/dumpaction.cpp"
     "src/showhelpaction.cpp"
+    "src/interpretdumpfileaction.cpp"
     "src/actionsrunner.cpp"
     "src/extracearguments.cpp"
     "src/arguments.cpp"
