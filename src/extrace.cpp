@@ -4,7 +4,6 @@
 #include "extraceactioncmdlinebuilder.h"
 #include "extraceactionsrunnerbuilder.h"
 #include "extraceargumentsbuilder.h"
-#include "androidtracesystembuilder.h"
 #include "environmentbuilder.h"
 
 #include <signal.h>

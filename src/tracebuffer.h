@@ -20,6 +20,8 @@
 #include "wired.h"
 #include "signal.h"
 
+#include <stdint.h>
+
 //! I am a buffer of trace. I can support many operations with myself
 
 //! I can stream, send my data and write in myself. I can switch to circular mode,

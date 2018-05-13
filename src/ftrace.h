@@ -23,6 +23,7 @@
 #include <set>
 #include <map>
 #include <string>
+#include <memory>
 
 #include "filesystem.h"
 #include "toolbox.h"

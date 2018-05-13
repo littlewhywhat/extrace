@@ -29,7 +29,6 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
   char line[256];
   char name[17];
   int pid;
-  char tgid[20];
   char skip1[4];
   char skip2[5];
   int timeHigh;

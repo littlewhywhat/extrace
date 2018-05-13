@@ -1,5 +1,3 @@
-run: test
-	./build/main  
 test: build
 	./build/main_test
 build: build_dir
@@ -12,5 +10,3 @@ build_dir:
 	mkdir -p build
 clean:
 	rm -rf build; rm -rf docs/doxygen
-extracefile: build
-	./build/extracefile_test
