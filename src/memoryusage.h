@@ -8,6 +8,7 @@ class MemoryUsage {
   public:
     virtual ~MemoryUsage() {}
     virtual bool tryUpdate() = 0;
+    virtual int getPID() const = 0;
     virtual uint64_t getVSS() const = 0;
     virtual uint64_t getRSS() const = 0;
     virtual uint64_t getPSS() const = 0;

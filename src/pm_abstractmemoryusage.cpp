@@ -15,3 +15,7 @@ uint64_t PM_Kernel::PM_Process::PM_AbstractMemoryUsage::getPSS() const {
 uint64_t PM_Kernel::PM_Process::PM_AbstractMemoryUsage::getUSS() const {
   return m_MemUsage.uss;
 }
+
+int PM_Kernel::PM_Process::PM_AbstractMemoryUsage::getPID() const {
+  return myPID;
+}

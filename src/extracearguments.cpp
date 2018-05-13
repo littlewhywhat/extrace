@@ -16,16 +16,16 @@
 
 #include "extracearguments.h"
 
-void ExtraceArguments::setPID(uint32_t pid) {
-  m_PID = pid;
+void ExtraceArguments::setPIDs(const vector<int> & pids) {
+  m_PIDs = pids;
 }
 
-bool ExtraceArguments::hasPID() const {
-  return m_PID != 0;
+bool ExtraceArguments::hasPIDs() const {
+  return !m_PIDs.empty();
 }
 
-uint32_t ExtraceArguments::getPID() const {
-  return m_PID;
+const vector<int> & ExtraceArguments::getPIDs() const {
+  return m_PIDs;
 }
 
 void ExtraceArguments::setPeriod(uint32_t period) {

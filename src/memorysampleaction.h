@@ -19,21 +19,32 @@
 
 #include "interruptabletraceaction.h"
 
+#include "kernel.h"
+#include "process_mem.h"
+#include "memoryusage.h"
+
+#include <memory>
 #include <stdint.h>
 
 class MemorySampleAction : public InterruptableEnvironmentAction {
   public:
     MemorySampleAction(const Wire & wire, const shared_ptr<Environment> & environment,
-                       const Signal & signal, uint32_t period, uint32_t times, uint32_t pid):
+                       const Signal & signal, uint32_t period, uint32_t times,
+                       const vector<int> & pids):
                   InterruptableEnvironmentAction(wire, environment, signal),
                   m_Period(period),
                   m_Times(times),
-                  m_PID(pid) {}
+                  myPIDs(pids) {}
+    //! Removes my memory usages and processes during run if any
+    ~MemorySampleAction();
     bool tryRun() override;
   private:
     uint32_t m_Period = 0;
     uint32_t m_Times = 0;
-    uint32_t m_PID = 0;
+    Kernel * m_Kernel = NULL;
+    vector<Process*> myProcesses;
+    vector<MemoryUsage*> myMemoryUsages;
+    vector<int> myPIDs;
 };
 
 #endif // LTTLWHWHT_MEMORYSAMPLEACTION_H

@@ -3,8 +3,8 @@
 #include "pm_memoryusage.h"
 #include "pm_workingset.h"
 
-PM_Kernel::PM_Process * PM_Kernel::PM_Process::tryCreate(PM_Kernel & kernel, long pid) {
-  auto * process = new PM_Process();
+PM_Kernel::PM_Process * PM_Kernel::PM_Process::tryCreate(PM_Kernel & kernel, int pid) {
+  auto * process = new PM_Process(pid);
   if (!process->tryInit(kernel, pid)) {
     delete process;
     process = NULL;
@@ -12,12 +12,11 @@ PM_Kernel::PM_Process * PM_Kernel::PM_Process::tryCreate(PM_Kernel & kernel, lon
   return process;
 }
 
-bool PM_Kernel::PM_Process::tryInit(PM_Kernel & kernel, long pid) {
-  fprintf(stderr, "called pm_process_create\n");
+bool PM_Kernel::PM_Process::tryInit(PM_Kernel & kernel, int pid) {
   int error = pm_process_create(kernel.m_Kernel, (pid_t)pid, &m_Process);
   if (error) {
     fprintf(stderr, "error creating process interface -- "
-                    "does process %ld really exist?\n", pid);
+                    "does process %d really exist?\n", pid);
     return false;
   }
   return true;

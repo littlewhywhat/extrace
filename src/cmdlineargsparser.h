@@ -37,6 +37,8 @@ class CmdLineArgsParser {
     void register_integer(const char * specifier, const char * option_name);
     //! Registers string option with specified name under provided specifier
     void register_string(const char * specifier, const char * option_name);
+    //! Registers comma separated integers list under provided optionName
+    void registerCommaSepIntList(const char * specifier, const char * option_name);
     //! Registers comma separated values list under provided optionName
     void registerCommaSepList(const char * specifier, const char * optionName);
     //! Parses argv using list of registered options to arguments
@@ -51,6 +53,8 @@ class CmdLineArgsParser {
     map<string, string> integer_opt_names;
     //! Stores registered string options
     map<string, string> string_opt_names;
+    //! Stores registered comma separated list of integers
+    map<string, string> myCommaSepIntListOptNames;
     //! Stores registered comma separated list of options
     map<string, string> m_CommaSepListOptNames;
     //! Checks if specifier is registered in booleans
@@ -59,6 +63,8 @@ class CmdLineArgsParser {
     bool is_integer_spec(const char * spec);
     //! Checks if specifier is registered in strings
     bool is_string_spec(const char * spec);
+    //! Checks if specified is registered in myCommaSepListOptNames
+    bool isCommaSepIntListSpec(const char * specifier) const;
     //! Checks if specifier is registered in CommaSepListSpec
     bool isCommaSepListSpec(const char * specifier) const;    
 };

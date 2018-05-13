@@ -15,64 +15,67 @@
  */
 #include "memorysampleaction.h"
 
-#include <time.h> // nanosleep, struct timespec
+#include <time.h>     // nanosleep, struct timespec
 #include <errno.h>
 #include <inttypes.h> // PRId64
 
 #include "pm_kernelbuilder.h"
 
-//TODO refactor
+MemorySampleAction::~MemorySampleAction() {
+  for (auto * memoryUsage : myMemoryUsages) {
+    delete memoryUsage;
+  }
+  for (auto * process : myProcesses) {
+    delete process;
+  }
+  delete m_Kernel;
+}
+
 bool MemorySampleAction::tryRun() {
   auto & traceBuffer = m_Environment->getTraceBuffer();
   bool ok = true;
 
-  auto * kernel = PM_KernelBuilder().tryCreate();
-  if (!kernel) {
-    delete kernel;
+  m_Kernel = PM_KernelBuilder().tryCreate();
+  if (!m_Kernel) {
     return false;
   }
-  auto * process = kernel->tryCreateProcess(m_PID);
-  if (!process) {
-    delete process;
-    delete kernel;
-    return false;
-  }
-  auto * memoryUsage = process->tryCreateMemoryUsage();
-  if (!memoryUsage) {
-    delete memoryUsage;
-    delete process;
-    delete kernel;
-    return false;
+  for (int pid : myPIDs) {
+    auto * process = m_Kernel->tryCreateProcess(pid);
+    if (!process) {
+      return false;
+    }
+    myProcesses.push_back(process);
+    auto * memoryUsage = process->tryCreateMemoryUsage();
+    if (!memoryUsage) {
+      return false;
+    }
+    myMemoryUsages.push_back(memoryUsage);
   }
   
-  char buffer[128];
+  char printBuffer[128];
 
   struct timespec timeLeft;
   timeLeft.tv_sec = 0;
   timeLeft.tv_nsec = m_Period;
   for (uint32_t i = 0; i < m_Times; i++) {
     do {
-      if (!memoryUsage->tryUpdate()) {
-        delete memoryUsage;
-        delete process;
-        delete kernel;
-        return false;
+      for (auto * memoryUsage : myMemoryUsages) {
+        if (!memoryUsage->tryUpdate()) {
+          return false;
+        }
+        if (snprintf(printBuffer, 128, "VSS=%7" PRId64 " RSS=%7" PRId64 " PSS=%7" PRId64 " USS=%7" PRId64 " PID=%d", 
+                 memoryUsage->getVSS(), memoryUsage->getRSS(), memoryUsage->getPSS(), memoryUsage->getUSS(),
+                 memoryUsage->getPID()) == 128) {
+          fprintf(m_Wire.getErrorStream(), "can't create string for buffer\n");
+          return false;
+        }
+        traceBuffer.tryWriteString(printBuffer);
       }
-      if (snprintf(buffer, 128, "VSS=%7" PRId64 " RSS=%7" PRId64 " PSS=%7" PRId64 " USS=%7" PRId64 " PID=%d", 
-               memoryUsage->getVSS(), memoryUsage->getRSS(), memoryUsage->getPSS(), memoryUsage->getUSS(),
-               m_PID) == 128) {
-        fprintf(m_Wire.getErrorStream(), "can't create string for buffer\n");
-        delete memoryUsage;
-        delete process;
-        delete kernel;
-        return false;
-      }
-      traceBuffer.tryWriteString(buffer);
       if (m_Signal.isFired()) {
         ok = false;
         break;
       }
-    } while (nanosleep(&timeLeft, &timeLeft) == -1 && errno == EINTR);
+     } while (nanosleep(&timeLeft, &timeLeft) == -1 && errno == EINTR);
   }
   if (!ok) {
     fprintf(m_Wire.getErrorStream(), "error MemorySampleAction::tryRun - sleep aborted\n");

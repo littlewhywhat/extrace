@@ -82,3 +82,18 @@ const vector<string> & Arguments::getStringList(const char * optionName) const {
 bool Arguments::hasStringList(const char * optionName) const {
   return m_ListStrings.find(optionName) != m_ListStrings.end();
 }
+
+void Arguments::putToIntList(const char * optionName, int value) {
+  if (myListInts.find(optionName) == myListInts.end()) {
+    myListInts.insert(std::make_pair(optionName, vector<int>()));
+  }
+  myListInts[optionName].push_back(value);
+}
+
+const vector<int> & Arguments::getIntList(const char * optionName) const {
+  return myListInts.at(optionName);
+}
+
+bool Arguments::hasIntList(const char * optionName) const {
+  return myListInts.find(optionName) != myListInts.end();
+}

@@ -100,12 +100,12 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
       signal.turnOn();
     } 
     else if (extraceArguments.hasPeriod() && extraceArguments.hasTimes()
-             && extraceArguments.hasPID()) {
+             && extraceArguments.hasPIDs()) {
       actionsRunner->addAction(new MemorySampleAction(wire, environment,
                                                       signal,
                                                       extraceArguments.getPeriod(),
                                                       extraceArguments.getTimes(),
-                                                      extraceArguments.getPID()));
+                                                      extraceArguments.getPIDs()));
     }
     else {
       actionsRunner->addAction(new SleepAction(wire, signal,
