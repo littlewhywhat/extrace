@@ -29,7 +29,7 @@ SchedSwitchEntry * SchedSwitchEntryCreator::create(int pid, long timeLow, long t
     fprintf(stderr, "error can't parse content\n");
     return NULL;
   }
-  return (new SchedSwitchEntry(pid, timeLow, timeHigh))
+  return (new SchedSwitchEntry(pid, "SchedSwitch", timeLow, timeHigh))
           ->setPrevCommandName(prevComm)
           ->setPrevPriority(prevPrio)
           ->setPrevPID(prevPID)

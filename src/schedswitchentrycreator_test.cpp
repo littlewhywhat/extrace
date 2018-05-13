@@ -43,6 +43,7 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
                                                                " next_comm=memeater next_pid=2231"
                                                                " next_prio=120");
       EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getName(), string("SchedSwitch"));
       EXPECT_EQ(entry->getTimeLow(), 2);
       EXPECT_EQ(entry->getTimeHigh(), 3);
       EXPECT_EQ(entry->getPrevCommandName(), "swapper");

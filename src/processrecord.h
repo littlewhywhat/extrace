@@ -22,6 +22,7 @@
 #include <ostream>
 #include <iomanip>
 #include <cstdint>
+#include <string>
 
 using namespace std;
 
@@ -36,6 +37,8 @@ class ProcessRecord {
     long getUss()   const { return myUss;    }
     uint64_t getTimeStamp() const { return myTimeStamp; }
     ProcessState getState() const { return myState; }
+    const string & getCause() const { return myCause; }
+
     ProcessRecord * setPID(int pid)       { myPID    = pid;    return this; }
     ProcessRecord * setCpuUsage(int cpuUse) { myCpuUsage = cpuUse; return this; }
     ProcessRecord * setVss(long vss)      { myVss    = vss;    return this; }
@@ -44,6 +47,7 @@ class ProcessRecord {
     ProcessRecord * setUss(long uss)      { myUss    = uss;    return this; }
     ProcessRecord * setTimeStamp(uint64_t time) { myTimeStamp = time; return this; }
     ProcessRecord * setState(const ProcessState & state) { myState = state; return this; }
+    ProcessRecord * setCause(const string & cause) { myCause = cause; return this; }
 
     friend ostream & operator << (ostream& os, const ProcessRecord & record) {
       os << setw(5);
@@ -102,6 +106,7 @@ class ProcessRecord {
         os << record.myTimeStamp;
       }
       os << " | ";
+      os << setw(8);
       switch(record.myState) {
         case ProcessState::RUNNING:
           os << "RUNNING";
@@ -116,6 +121,10 @@ class ProcessRecord {
           os << "?";
           break;
       }
+      os << " |";
+      if (!record.myCause.empty()) {
+        os << " " << record.myCause;
+      }
       return os;
     }   
   private:
@@ -128,6 +137,7 @@ class ProcessRecord {
     // TODO better to switch to long long
     uint64_t myTimeStamp = UINT64_MAX;
     ProcessState myState = ProcessState::UNKNOWN;
+    string myCause;
 };
 
 inline bool operator==(const ProcessRecord & lhs, const ProcessRecord & rhs) {

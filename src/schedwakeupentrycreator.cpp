@@ -26,9 +26,10 @@ SchedWakeUpEntry * SchedWakeUpEntryCreator::create(int pid, long timeLow, long t
     fprintf(stderr, "error can't parse content\n");
     return NULL;
   }
-  return (new SchedWakeUpEntry(pid, timeLow, timeHigh))->setCommandName(comm)
-                                                       ->setWakedUpPID(wakedUpPID)
-                                                       ->setPriority(prio)
-                                                       ->setSuccess(success)
-                                                       ->setTargetCPU(targetCpu);
+  return (new SchedWakeUpEntry(pid, "SchedWakeup", timeLow, timeHigh))
+          ->setCommandName(comm)
+          ->setWakedUpPID(wakedUpPID)
+          ->setPriority(prio)
+          ->setSuccess(success)
+          ->setTargetCPU(targetCpu);
 }

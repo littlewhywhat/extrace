@@ -34,6 +34,7 @@ class SchedWakeUpEntryCreatorTest : public ::testing::Test {
                                                       "comm=memeater pid=2231 prio=120"
                                                       " success=1 target_cpu=000");
       EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getName(), string("SchedWakeup"));
       EXPECT_EQ(entry->getTimeLow(), 2);
       EXPECT_EQ(entry->getTimeHigh(), 3);
       EXPECT_EQ(entry->getCommandName(), "memeater");

@@ -26,7 +26,7 @@ TracingMarkEntry * TracingMarkEntryCreator::create(int pid, long timeLow, long t
     fprintf(stderr, "error can't parse content\n");
     return NULL;
   }
-  return (new TracingMarkEntry(pid, timeLow, timeHigh))
+  return (new TracingMarkEntry(pid, "MemTrace", timeLow, timeHigh))
               ->setVSS(vss)
               ->setRSS(rss)
               ->setPSS(pss)

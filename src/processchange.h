@@ -19,6 +19,7 @@
 
 #include "process.h"
 
+#include <string>
 #include <cstdint>
 
 //! I am a change of Process. You can apply me to Process.
@@ -29,9 +30,11 @@ class ProcessChange {
     virtual ~ProcessChange() {}
     int getPID()        const { return myPID; }
     uint64_t getTimeStamp() const { return myTimeStamp; }
+    const std::string & getCause() const { return myCause; }
 
     ProcessChange * setPID(int pid)        { myPID = pid;       return this; }
     ProcessChange * setTimeStamp(uint64_t time) { myTimeStamp = time; return this; }
+    ProcessChange * setCause(const std::string & cause) { myCause = cause; return this; }
 
     //! Applies me to process
     void applyTo(Process & process) const;
@@ -40,6 +43,7 @@ class ProcessChange {
   private:
     int myPID;
     uint64_t myTimeStamp;
+    std::string myCause;
 };
 
 #endif // LTTLWHWHT_PROCESS_CHANGE_H
