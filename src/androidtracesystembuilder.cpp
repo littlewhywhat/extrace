@@ -20,5 +20,5 @@
 #include "simpleandroidtracesystem.h"
 
 AndroidTraceSystem * AndroidTraceSystemBuilder::build(const Wire & wire) const {
-  return new SimpleAndroidTraceSystem(wire, new AndroidImpl(wire));
+  return new SimpleAndroidTraceSystem(wire, shared_ptr<Android>(new AndroidImpl(wire)));
 }

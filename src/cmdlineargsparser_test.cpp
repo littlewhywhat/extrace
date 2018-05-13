@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "argsparser.h"
+#include "cmdlineargs.h"
+#include "cmdlineargsparser.h"
 #include "androidtoolbox.h"
 
 //! Tests ArgsParser
-class ArgsParserTest : public ::testing::Test {
+class CmdLineArgsParserTest : public ::testing::Test {
   public:
     void SetUp() {
-      parser.setToolBox(make_shared<AndroidToolBox>());
+      parser = new CmdLineArgsParser(make_shared<AndroidToolBox>());
     }
     //! Tests parsing of boolean
     void test_parse_boolean() {
@@ -31,8 +33,9 @@ class ArgsParserTest : public ::testing::Test {
       const int    argc        = 2;
       const char * argv[]      = { "argsparser_test", "-op" };
       Arguments args;
-      parser.register_boolean("-op", option_name);
-      parser.parse(args, argc, argv);
+      parser->register_boolean("-op", option_name);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      parser->parse(args, cmdLineArgs);
       ASSERT_TRUE(args.is_enabled(option_name));
     }
     //! Tests parsing of integer
@@ -46,9 +49,10 @@ class ArgsParserTest : public ::testing::Test {
                                       option_specs[0], "4",
                                       option_specs[1], "44" };
       Arguments args;
-      parser.register_integer(option_specs[0], option_names[0]);
-      parser.register_integer(option_specs[1], option_names[1]);
-      parser.parse(args, argc, argv);
+      parser->register_integer(option_specs[0], option_names[0]);
+      parser->register_integer(option_specs[1], option_names[1]);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      parser->parse(args, cmdLineArgs);
       ASSERT_TRUE(args.has_integer(option_names[0]));
       ASSERT_EQ(args.get_integer(option_names[0]), option_vals[0]);
       ASSERT_TRUE(args.has_integer(option_names[1]));
@@ -65,9 +69,10 @@ class ArgsParserTest : public ::testing::Test {
                                       option_specs[0], option_vals[0],
                                       option_specs[1], option_vals[1] };
       Arguments args;
-      parser.register_string(option_specs[0], option_names[0]);
-      parser.register_string(option_specs[1], option_names[1]);
-      parser.parse(args, argc, argv);
+      parser->register_string(option_specs[0], option_names[0]);
+      parser->register_string(option_specs[1], option_names[1]);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      parser->parse(args, cmdLineArgs);
       ASSERT_TRUE(args.has_string(option_names[0]));
       ASSERT_STREQ(args.get_string(option_names[0]).c_str(), option_vals[0]);
       ASSERT_TRUE(args.has_string(option_names[1]));
@@ -86,9 +91,10 @@ class ArgsParserTest : public ::testing::Test {
                                       option_specs[0], optionOneCommaSepValues.c_str(),
                                       option_specs[1], optionTwoValues[0].c_str() };
       Arguments args;
-      parser.registerCommaSepList(option_specs[0], option_names[0]);
-      parser.registerCommaSepList(option_specs[1], option_names[1]);
-      parser.parse(args, argc, argv);
+      parser->registerCommaSepList(option_specs[0], option_names[0]);
+      parser->registerCommaSepList(option_specs[1], option_names[1]);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      parser->parse(args, cmdLineArgs);
       ASSERT_TRUE(args.hasStringList(option_names[0]));
       ASSERT_EQ(args.getStringList(option_names[0]), optionOneValues);
       ASSERT_TRUE(args.hasStringList(option_names[1]));
@@ -113,11 +119,12 @@ class ArgsParserTest : public ::testing::Test {
                                       option_specs[2], option_str_val,
                                       option_specs[3], commaSepList.c_str() };
       Arguments args;
-      parser.register_boolean(option_specs[0], option_names[0]);
-      parser.register_integer(option_specs[1], option_names[1]);
-      parser.register_string(option_specs[2], option_names[2]);
-      parser.registerCommaSepList(option_specs[3], option_names[3]);
-      parser.parse(args, argc, argv);
+      parser->register_boolean(option_specs[0], option_names[0]);
+      parser->register_integer(option_specs[1], option_names[1]);
+      parser->register_string(option_specs[2], option_names[2]);
+      parser->registerCommaSepList(option_specs[3], option_names[3]);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      parser->parse(args, cmdLineArgs);
       ASSERT_TRUE(args.is_enabled(option_names[0]));
       ASSERT_TRUE(args.has_integer(option_names[1]));
       ASSERT_EQ(args.get_integer(option_names[1]), option_int_val);
@@ -132,7 +139,8 @@ class ArgsParserTest : public ::testing::Test {
       const char * argv[]         = { "argsparser_test",
                                       "-b" };
       Arguments args;
-      ASSERT_EQ(parser.parse(args, argc, argv), 1);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      ASSERT_EQ(parser->parse(args, cmdLineArgs), 0);
     }
     //! Tests invalid parsing
     void test_invalid_parse_int_or_string() {
@@ -140,35 +148,36 @@ class ArgsParserTest : public ::testing::Test {
       const char * argv[]         = { "argsparser_test",
                                       "-b", "unknown" };
       Arguments args;
-      ASSERT_EQ(parser.parse(args, argc, argv), 1);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      ASSERT_EQ(parser->parse(args, cmdLineArgs), 0);
     }
 
   private:
     //! Tested ArgsParser
-    ArgsParser parser;
+    CmdLineArgsParser * parser;
 };
 
-TEST_F(ArgsParserTest, parse_boolean) {
+TEST_F(CmdLineArgsParserTest, parse_boolean) {
   test_parse_boolean();
 }
 
-TEST_F(ArgsParserTest, parse_integer) {
+TEST_F(CmdLineArgsParserTest, parse_integer) {
   test_parse_integer();
 }
 
-TEST_F(ArgsParserTest, parse_string) {
+TEST_F(CmdLineArgsParserTest, parse_string) {
   test_parse_string();
 }
 
-TEST_F(ArgsParserTest, parse) {
+TEST_F(CmdLineArgsParserTest, parse) {
   test_parse();
 }
 
-TEST_F(ArgsParserTest, invalid_parse) {
+TEST_F(CmdLineArgsParserTest, invalid_parse) {
   test_invalid_parse_boolean();
   test_invalid_parse_int_or_string();
 }
 
-TEST_F(ArgsParserTest, parseCommaSepArg) {
+TEST_F(CmdLineArgsParserTest, parseCommaSepArg) {
   testParseCommaSepArg();
 }

@@ -17,6 +17,7 @@
 
 #include <time.h> // nanosleep, struct timespec
 #include <errno.h>
+#include <inttypes.h> // PRId64
 
 #include "pm_kernelbuilder.h"
 
@@ -57,7 +58,7 @@ bool MemorySampleAction::tryRun() {
         delete kernel;
         return false;
       }
-      if (snprintf(buffer, 128, "VSS=%7ld  RSS=%7ld PSS=%7ld USS=%7ld PID=%d", 
+      if (snprintf(buffer, 128, "VSS=%7" PRId64 " RSS=%7" PRId64 " PSS=%7" PRId64 " USS=%7" PRId64 " PID=%d", 
                memoryUsage->getVSS(), memoryUsage->getRSS(), memoryUsage->getPSS(), memoryUsage->getUSS(),
                m_PID) == 128) {
         fprintf(m_Wire.getErrorStream(), "can't create string for buffer\n");

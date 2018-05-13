@@ -11,10 +11,10 @@ class PM_Kernel::PM_Process::PM_AbstractMemoryUsage: public MemoryUsage {
                            m_Process(process.m_Process) {};
     ~PM_AbstractMemoryUsage() {}
     virtual bool tryUpdate();
-    size_t getVSS() const override;
-    size_t getRSS() const override;
-    size_t getPSS() const override;
-    size_t getUSS() const override;
+    uint64_t getVSS() const override;
+    uint64_t getRSS() const override;
+    uint64_t getPSS() const override;
+    uint64_t getUSS() const override;
   protected:
     pm_process_t * m_Process;
     pm_memusage_t m_MemUsage;
