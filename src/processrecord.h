@@ -69,7 +69,7 @@ class ProcessRecord {
       else {
         os << record.myVss;
       }
-      os << " | ";
+      os << " B" << " | ";
       os << setw(10);
       if (record.myRss == -1) {
         os << "?";
@@ -77,7 +77,7 @@ class ProcessRecord {
       else {
         os << record.myRss;
       }
-      os << " | ";
+      os << " B" << " | ";
       os << setw(10);
       if (record.myPss == -1) {
         os << "?";
@@ -85,7 +85,7 @@ class ProcessRecord {
       else {
         os << record.myPss;
       }
-      os << " | ";
+      os << " B" << " | ";
       os << setw(10);
       if (record.myUss == -1) {
         os << "?";
@@ -93,7 +93,7 @@ class ProcessRecord {
       else {
         os << record.myUss;
       }
-      os << " | ";
+      os << " B" << " | ";
       os << setw(11);
       if (record.myTimeStamp == UINT64_MAX) {
         os << "?";

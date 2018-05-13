@@ -45,14 +45,14 @@ class ProcessRecordTest : public ::testing::Test {
       CaptureStdout();
       cout << myProcessRecord;
       string out = GetCapturedStdout();
-      EXPECT_EQ(out, string("    ? |   ? % |          ? |          ? |          ? |          ? |           ? | ?"));
+      EXPECT_EQ(out, string("    ? |   ? % |          ? B |          ? B |          ? B |          ? B |           ? | ?"));
       myProcessRecord.setPID(99999)->setCpuUsage(100)
                       ->setVss(1234567890)->setUss(1234567890)->setRss(1234567890)->setPss(1234567890)
                       ->setTimeStamp(12345678901)->setState(ProcessState::RUNNING);
       CaptureStdout();
       cout << myProcessRecord;
       out = GetCapturedStdout();
-      EXPECT_EQ(out, string("99999 | 100 % | 1234567890 | 1234567890 | 1234567890 | 1234567890 | 12345678901 | RUNNING"));
+      EXPECT_EQ(out, string("99999 | 100 % | 1234567890 B | 1234567890 B | 1234567890 B | 1234567890 B | 12345678901 | RUNNING"));
     }
   private:
     ProcessRecord myProcessRecord;
