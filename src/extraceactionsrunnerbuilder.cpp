@@ -30,9 +30,24 @@
 #include "cleanupaction.h"
 #include "showhelpaction.h"
 #include "memorysampleaction.h"
+#include "interpretdumpfileaction.h"
 
 ExtraceActionsRunnerBuilder::~ExtraceActionsRunnerBuilder() {
   delete m_EnvironmentBuilder;
+}
+
+void ExtraceActionsRunnerBuilder::addStopActions(ActionsRunner & actionsRunner,
+                                            const Wire & wire,
+                                            Signal & signal,
+                                            const ExtraceArguments & extraceArguments,
+                                            shared_ptr<Environment> & environment) const {
+  actionsRunner.addAction(new StopAction(wire, environment));
+  actionsRunner.addAction(DumpAction::Builder()
+                             .buildFrom(wire, environment, extraceArguments));
+  actionsRunner.addAction(new CleanUpAction(wire, environment));
+  if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()) {
+    actionsRunner.addAction(new InterpretDumpFileAction(wire, environment, extraceArguments.getOutputFilename()));
+  }
 }
 
 ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
@@ -67,14 +82,14 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
     }
   }
   else if (extraceArguments.asyncStopEnabled()) {
-    actionsRunner->addAction(new StopAction(wire, environment));
-    actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, environment, extraceArguments));
-    actionsRunner->addAction(new CleanUpAction(wire, environment));
+    addStopActions(*actionsRunner, wire, signal, extraceArguments, environment);
   }
   else if (extraceArguments.asyncDumpEnabled()) {
     actionsRunner->addAction(DumpAction::Builder()
                                .buildFrom(wire, environment, extraceArguments));
+    if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()) {
+      actionsRunner->addAction(new InterpretDumpFileAction(wire, environment, extraceArguments.getOutputFilename()));
+    }
   }
   else {
     actionsRunner->addAction(new StartAction(wire, environment));
@@ -96,10 +111,7 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
       actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getMidSleepDuration()));
     }
-    actionsRunner->addAction(new StopAction(wire, environment));
-    actionsRunner->addAction(DumpAction::Builder()
-                               .buildFrom(wire, environment, extraceArguments));
-    actionsRunner->addAction(new CleanUpAction(wire, environment));
+    addStopActions(*actionsRunner, wire, signal, extraceArguments, environment);
   }
   return actionsRunner;
 }
