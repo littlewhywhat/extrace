@@ -31,20 +31,20 @@ class ProcessRecord {
     ProcessRecord() {}
     int getPID()    const { return myPID;    }
     int getCpuUse() const { return myCpuUsage; }
-    long getVss()   const { return myVss;    }
-    long getRss()   const { return myRss;    }
-    long getPss()   const { return myPss;    }
-    long getUss()   const { return myUss;    }
+    uint64_t getVss()   const { return myVss;    }
+    uint64_t getRss()   const { return myRss;    }
+    uint64_t getPss()   const { return myPss;    }
+    uint64_t getUss()   const { return myUss;    }
     uint64_t getTimeStamp() const { return myTimeStamp; }
     ProcessState getState() const { return myState; }
     const string & getCause() const { return myCause; }
 
     ProcessRecord * setPID(int pid)       { myPID    = pid;    return this; }
     ProcessRecord * setCpuUsage(int cpuUse) { myCpuUsage = cpuUse; return this; }
-    ProcessRecord * setVss(long vss)      { myVss    = vss;    return this; }
-    ProcessRecord * setRss(long rss)      { myRss    = rss;    return this; }
-    ProcessRecord * setPss(long pss)      { myPss    = pss;    return this; }
-    ProcessRecord * setUss(long uss)      { myUss    = uss;    return this; }
+    ProcessRecord * setVss(uint64_t vss)      { myVss    = vss;    return this; }
+    ProcessRecord * setRss(uint64_t rss)      { myRss    = rss;    return this; }
+    ProcessRecord * setPss(uint64_t pss)      { myPss    = pss;    return this; }
+    ProcessRecord * setUss(uint64_t uss)      { myUss    = uss;    return this; }
     ProcessRecord * setTimeStamp(uint64_t time) { myTimeStamp = time; return this; }
     ProcessRecord * setState(const ProcessState & state) { myState = state; return this; }
     ProcessRecord * setCause(const string & cause) { myCause = cause; return this; }
@@ -67,37 +67,37 @@ class ProcessRecord {
       os << " %";
       os << " | ";
       os << setw(10);
-      if (record.myVss == -1) {
+      if (record.myVss == UINT64_MAX) {
         os << "?";
       }
       else {
-        os << record.myVss;
+        os << record.myVss / 1024;
       }
-      os << " B" << " | ";
+      os << " K" << " | ";
       os << setw(10);
-      if (record.myRss == -1) {
+      if (record.myRss == UINT64_MAX) {
         os << "?";
       }
       else {
-        os << record.myRss;
+        os << record.myRss / 1024;
       }
-      os << " B" << " | ";
+      os << " K" << " | ";
       os << setw(10);
-      if (record.myPss == -1) {
+      if (record.myPss == UINT64_MAX) {
         os << "?";
       }
       else {
-        os << record.myPss;
+        os << record.myPss / 1024;
       }
-      os << " B" << " | ";
+      os << " K" << " | ";
       os << setw(10);
-      if (record.myUss == -1) {
+      if (record.myUss == UINT64_MAX) {
         os << "?";
       }
       else {
-        os << record.myUss;
+        os << record.myUss / 1024;
       }
-      os << " B" << " | ";
+      os << " K" << " | ";
       os << setw(11);
       if (record.myTimeStamp == UINT64_MAX) {
         os << "?";
@@ -128,12 +128,12 @@ class ProcessRecord {
       return os;
     }   
   private:
-    int myPID    = -1;
-    int myCpuUsage = -1;
-    long myVss   = -1;
-    long myRss   = -1;
-    long myPss   = -1;
-    long myUss   = -1;
+    int myPID        = -1;
+    int myCpuUsage   = -1;
+    uint64_t myVss   = UINT64_MAX;
+    uint64_t myRss   = UINT64_MAX;
+    uint64_t myPss   = UINT64_MAX;
+    uint64_t myUss   = UINT64_MAX;
     // TODO better to switch to long long
     uint64_t myTimeStamp = UINT64_MAX;
     ProcessState myState = ProcessState::UNKNOWN;

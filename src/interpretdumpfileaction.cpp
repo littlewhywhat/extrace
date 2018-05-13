@@ -17,11 +17,13 @@
 #include "interpretdumpfileaction.h"
 
 #include <vector>
-#include <iostream>
+#include <sstream>
 
 #include "processrecord.h"
 #include "processrecordfile.h"
 #include "simpleprocesschangefile.h"
+
+using namespace std;
 
 InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
                                                  const shared_ptr<Environment> & environment,
@@ -37,9 +39,16 @@ bool InterpretDumpFileAction::tryRun() {
   SimpleProcessRecordFile file(myInputFile, new SimpleProcessChangeFileCreator());
   vector<ProcessRecord*> records;
   file.parseTo(records);
+  fprintf(m_Wire.getOutputStream(), "%5s | %3s | %10s | %10s | %10s | %10s | %11s | %8s | Cause\n",
+                                  "PID", "CPU", "VSS", "RSS", "PSS", "USS", "TIMESTAMP", "STATE"
+         );
+  stringstream ss;
   for (auto * record : records) {
     if (myPIDs.find(record->getPID()) != myPIDs.cend()) {
-      cout << *record << endl;
+      ss << *record;
+      fprintf(m_Wire.getOutputStream(), "%s\n", ss.str().c_str());
+      ss.str(string());
+      ss.clear();
     }
   }
   return true;
