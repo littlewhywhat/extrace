@@ -37,15 +37,28 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
   char content[128];
   int readArgs, readChars;
   while (fgets(line, 256, file)) {
-    readArgs = sscanf(line, "%16[^-]-%5d%*[^[][%3s] %4s %5d.%6d: %[^:]: %n",
-                name, &pid, skip1, skip2, &timeHigh, &timeLow,
+    // read name that is maximum 16 bytes
+    int i = 0, readToName = 0;
+    // skip whitespace
+    while ((line[i] == ' ') && (i < 16)) { i++; }
+    // copy if smth left to name
+    while (i < 16) {
+      name[readToName] = line[i];
+      readToName++;
+      i++;
+    }
+    // terminate name
+    name[readToName] = '\0';
+    // read other arguments
+    readArgs = sscanf(line + 16, "-%5d%*[^[][%3s] %4s %5d.%6d: %[^:]: %n",
+                &pid, skip1, skip2, &timeHigh, &timeLow,
                 entryName, &readChars);
-    if (readArgs != 7) {
-      fprintf(stderr, "error format read %d\n", readArgs);
+    if (readArgs != 6) {
+      fprintf(stderr, "error format read only %d from %s\n", readArgs, line + 16);
       continue;
     }
     else {
-      int couldWrite = snprintf(content, 128,"%s", line + readChars);
+      int couldWrite = snprintf(content, 128,"%s", line + readChars + 16);
       if (couldWrite >= 128) { 
         fprintf(stderr, "error didn't read %d characters from end\n", couldWrite - 128 + 1);
         continue;
@@ -53,7 +66,7 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
       content[couldWrite-1] = '\0';
       FTraceEntry * entry = myEntryCreator->create(pid, timeLow, timeHigh, entryName, content);
       if (!entry) {
-        fprintf(stderr, "error creating entry - wrong content?\n");
+        fprintf(stderr, "error creating entry - wrong content? %s\n", content);
         continue;
       }
       entries.push_back(entry);

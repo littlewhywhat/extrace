@@ -39,7 +39,7 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
 
     void testCreateFromCorrectContent() {
       auto * entry = mySchedSwitchEntryCreator.create(1, 2, 3, "prev_comm=swapper prev_pid=0"
-                                                               " prev_prio=120 prev_state=R ==>"
+                                                               " prev_prio=120 prev_state=R+ ==>"
                                                                " next_comm=memeater next_pid=2231"
                                                                " next_prio=120");
       EXPECT_EQ(entry->getPID(), 1);

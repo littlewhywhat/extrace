@@ -38,15 +38,16 @@ ExtraceActionsRunnerBuilder::~ExtraceActionsRunnerBuilder() {
 
 void ExtraceActionsRunnerBuilder::addStopActions(ActionsRunner & actionsRunner,
                                             const Wire & wire,
-                                            Signal & signal,
                                             const ExtraceArguments & extraceArguments,
                                             shared_ptr<Environment> & environment) const {
   actionsRunner.addAction(new StopAction(wire, environment));
   actionsRunner.addAction(DumpAction::Builder()
                              .buildFrom(wire, environment, extraceArguments));
   actionsRunner.addAction(new CleanUpAction(wire, environment));
-  if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()) {
-    actionsRunner.addAction(new InterpretDumpFileAction(wire, environment, extraceArguments.getOutputFilename()));
+  if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()
+      && extraceArguments.hasPIDs()) {
+    actionsRunner.addAction(new InterpretDumpFileAction(wire, environment, extraceArguments.getOutputFilename(),
+                                                        extraceArguments.getPIDs()));
   }
 }
 
@@ -82,13 +83,15 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
     }
   }
   else if (extraceArguments.asyncStopEnabled()) {
-    addStopActions(*actionsRunner, wire, signal, extraceArguments, environment);
+    addStopActions(*actionsRunner, wire, extraceArguments, environment);
   }
   else if (extraceArguments.asyncDumpEnabled()) {
     actionsRunner->addAction(DumpAction::Builder()
                                .buildFrom(wire, environment, extraceArguments));
-    if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()) {
-      actionsRunner->addAction(new InterpretDumpFileAction(wire, environment, extraceArguments.getOutputFilename()));
+    if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()
+        && extraceArguments.hasPIDs()) {
+      actionsRunner->addAction(new InterpretDumpFileAction(wire, environment,
+                                   extraceArguments.getOutputFilename(), extraceArguments.getPIDs()));
     }
   }
   else {
@@ -111,7 +114,7 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
       actionsRunner->addAction(new SleepAction(wire, signal,
                                            extraceArguments.getMidSleepDuration()));
     }
-    addStopActions(*actionsRunner, wire, signal, extraceArguments, environment);
+    addStopActions(*actionsRunner, wire, extraceArguments, environment);
   }
   return actionsRunner;
 }

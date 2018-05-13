@@ -23,12 +23,24 @@
 #include "processrecordfile.h"
 #include "simpleprocesschangefile.h"
 
+InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
+                                                 const shared_ptr<Environment> & environment,
+                                                 const string & inputFile, const vector<int> pids):
+                                                 EnvironmentAction(wire, environment),
+                                                 myInputFile(inputFile) {
+  for (int pid : pids) {
+    myPIDs.insert(pid);
+  }
+}
+
 bool InterpretDumpFileAction::tryRun() {
   SimpleProcessRecordFile file(myInputFile, new SimpleProcessChangeFileCreator());
   vector<ProcessRecord*> records;
   file.parseTo(records);
   for (auto * record : records) {
-    cout << *record << endl;
+    if (myPIDs.find(record->getPID()) != myPIDs.cend()) {
+      cout << *record << endl;
+    }
   }
   return true;
 }

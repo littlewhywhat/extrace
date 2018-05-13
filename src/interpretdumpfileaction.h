@@ -21,6 +21,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 using namespace std;
 
@@ -29,12 +30,13 @@ class InterpretDumpFileAction : public EnvironmentAction {
   public:
     //! Constructs me
     InterpretDumpFileAction(const Wire & wire, const shared_ptr<Environment> & environment,
-                            const string & inputFile):
-                            EnvironmentAction(wire, environment), myInputFile(inputFile) {}
+                            const string & inputFile, const vector<int> pids);
     bool tryRun() override;
   private:
     //! My input file to read dump from
     string myInputFile;
+    //! My PIDs to focus on
+    set<int> myPIDs;
 };
 
 #endif // LTTLWHWHT_INTERPRET_DUMPFILEACTION_H
