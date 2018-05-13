@@ -49,7 +49,7 @@ class SimpleFTraceEntryFileTest : public ::testing::Test {
     }
 
     void testParseToMemoryEntry() {
-      appendStr("      experiment-975   [002] d..3  2113.393234: sched_switch:"
+      appendStr("     exp-eriment-975   [002] d..3  2113.393234: sched_switch:"
                 " prev_comm=experiment prev_pid=975 prev_prio=120 prev_state=S"
                 " ==> next_comm=swapper/2 next_pid=0 next_prio=120\n");
 

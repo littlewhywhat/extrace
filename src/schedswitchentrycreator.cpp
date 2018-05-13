@@ -19,12 +19,12 @@
 SchedSwitchEntry * SchedSwitchEntryCreator::create(int pid, long timeLow, long timeHigh,
                                         const char * content) const {
   int prevPID, nextPID, prevPrio, nextPrio;
-  char prevState;
+  char prevState[3];
   char prevComm[128], nextComm[128];
   int numArgs = 7;
-  if (sscanf(content, "prev_comm=%s prev_pid=%d prev_prio=%d prev_state=%c"
+  if (sscanf(content, "prev_comm=%s prev_pid=%d prev_prio=%d prev_state=%2s"
                       " ==> next_comm=%s next_pid=%d next_prio=%d",
-                       prevComm, &prevPID, &prevPrio, &prevState,
+                       prevComm, &prevPID, &prevPrio, prevState,
                        nextComm, &nextPID, &nextPrio) != numArgs) {
     fprintf(stderr, "error can't parse content\n");
     return NULL;

@@ -35,8 +35,8 @@ class ExtraceActionsRunnerBuilder {
   private:
     EnvironmentBuilder * m_EnvironmentBuilder = NULL;
     void addStopActions(ActionsRunner & actionsRunner, const Wire & wire,
-                        Signal & signal, const ExtraceArguments & extraceArguments,
-                                            shared_ptr<Environment> & environmen) const;
+                        const ExtraceArguments & extraceArguments,
+                        shared_ptr<Environment> & environmen) const;
 };
 
 #endif // LTTLWHWHT_EXTRACEACTIONSRUNNERBUILDER_H
