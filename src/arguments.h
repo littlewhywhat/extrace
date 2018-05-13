@@ -43,6 +43,12 @@ class Arguments {
     bool has_string(const char * option_name) const;
     //! Returns value for single string option specified by option name
     const std::string & get_string(const char * option_name) const;
+    //! Add new value to list of integers specified by option name
+    void putToIntList(const char * optionName, int value);
+    //! Returns vector of values for list of integers option specified by option name
+    const vector<int> & getIntList(const char * optionName) const;
+    //! Says if list of integers option specified by option name exists
+    bool hasIntList(const char * optionName) const;
     //! Add new value to list of strings specified by option name
     void putToStringList(const char * optionName, const string & value);
     //! Returns vector of values for list of string option specified by option name
@@ -56,6 +62,8 @@ class Arguments {
     std::map<std::string, int> single_integers;
     //! map of single string options
     std::map<std::string, std::string> single_strings;
+    //! map of int list options
+    map<string, vector<int>> myListInts;
     //! map of string list options
     map<string, vector<string>> m_ListStrings;   
 };

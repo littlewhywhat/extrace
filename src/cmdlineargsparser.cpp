@@ -35,6 +35,10 @@ bool CmdLineArgsParser::is_string_spec(const char * spec)
   return this->string_opt_names.find(spec) != this->string_opt_names.end();
 }
 
+bool CmdLineArgsParser::isCommaSepIntListSpec(const char * specifier) const {
+  return myCommaSepIntListOptNames.find(specifier) != myCommaSepIntListOptNames.end();
+}
+
 bool CmdLineArgsParser::isCommaSepListSpec(const char * specifier) const {
   return m_CommaSepListOptNames.find(specifier) != m_CommaSepListOptNames.end();
 }
@@ -52,6 +56,10 @@ void CmdLineArgsParser::register_integer(const char * specifier, const char * op
 void CmdLineArgsParser::register_string(const char * specifier, const char * option_name)
 {
   this->string_opt_names[specifier] = option_name;
+}
+
+void CmdLineArgsParser::registerCommaSepIntList(const char * specifier, const char * optionName) {
+  myCommaSepIntListOptNames[specifier] = optionName;
 }
 
 void CmdLineArgsParser::registerCommaSepList(const char * specifier, const char * optionName) {
@@ -88,8 +96,14 @@ uint32_t CmdLineArgsParser::parse(Arguments & arguments, const CmdLineArgs & cmd
         arguments.putToStringList(m_CommaSepListOptNames[arg].c_str(), token);
       }
     }
-    else
-    {
+    else if (isCommaSepIntListSpec(arg)) {
+      set<string> tokens;
+      m_ToolBox->parseToTokens(optarg, ",", tokens);
+      for (auto & token : tokens) {
+        arguments.putToIntList(myCommaSepIntListOptNames[arg].c_str(), std::stoi(token.c_str()));
+      }
+    }
+    else {
       break;
     }
     i+=2;

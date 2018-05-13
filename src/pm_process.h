@@ -9,13 +9,15 @@
 
 class PM_Kernel::PM_Process : public Process {
   public:
-    static PM_Process * tryCreate(PM_Kernel & kernel, long pid);
+    PM_Process(int pid): m_PID(pid) {}
+    static PM_Process * tryCreate(PM_Kernel & kernel, int pid);
     MemoryUsage * tryCreateMemoryUsage() override;
     MemoryUsage * tryCreateWorkingSet() override;
     class PM_AbstractMemoryUsage;
   private:
     PM_Process() {}
-    bool tryInit(PM_Kernel & kernel, long pid);
+    bool tryInit(PM_Kernel & kernel, int pid);
+    int m_PID;
     pm_process_t * m_Process;
 };
 

@@ -29,9 +29,9 @@ using namespace std;
 class ExtraceArguments {
   public:
     ExtraceArguments();
-    void setPID(uint32_t pid);
-    uint32_t getPID() const;
-    bool hasPID() const;
+    void setPIDs(const vector<int> & pids);
+    const vector<int> & getPIDs() const;
+    bool hasPIDs() const;
     void setPeriod(uint32_t period);
     uint32_t getPeriod() const;
     bool hasPeriod() const;
@@ -103,7 +103,7 @@ class ExtraceArguments {
     uint32_t m_MidSleepDuration = 5;
     uint32_t m_Period = 0;
     uint32_t m_Times = 0;
-    uint32_t m_PID = 0;
+    vector<int> m_PIDs;
     vector<string> m_Apps;
     vector<Android::TraceCategory> m_AndroidCategories;
     vector<KernelTraceSystem::TraceCategory> m_KernelCategories;

@@ -78,6 +78,31 @@ class CmdLineArgsParserTest : public ::testing::Test {
       ASSERT_TRUE(args.has_string(option_names[1]));
       ASSERT_STREQ(args.get_string(option_names[1]).c_str(), option_vals[1]);
     }
+
+    void testParseCommaSepIntArg() {
+      // TODO refactor
+      const char * option_names[] = { "option_one", "option_two" };
+      const char * option_specs[] = { "-op1", "-op2" };
+      vector<string> optionOneValues = { "1", "2" };
+      vector<string> optionTwoValues = { "3" };
+      vector<int> optionOneIntValues = { 1, 2 };
+      vector<int> optionTwoIntValues = { 3 };
+      string optionOneCommaSepValues = optionOneValues[0] + "," + optionOneValues[1];
+      const int    argc           = 5;
+      const char * argv[]         = { "argsparser_test",
+                                      option_specs[0], optionOneCommaSepValues.c_str(),
+                                      option_specs[1], optionTwoValues[0].c_str() };
+      Arguments args;
+      parser->registerCommaSepIntList(option_specs[0], option_names[0]);
+      parser->registerCommaSepIntList(option_specs[1], option_names[1]);
+      CmdLineArgs cmdLineArgs(argc, argv);
+      parser->parse(args, cmdLineArgs);
+      ASSERT_TRUE(args.hasIntList(option_names[0]));
+      ASSERT_EQ(args.getIntList(option_names[0]), optionOneIntValues);
+      ASSERT_TRUE(args.hasIntList(option_names[1]));
+      ASSERT_EQ(args.getIntList(option_names[1]), optionTwoIntValues);
+    }
+
     //! Tests parsing of string
     void testParseCommaSepArg() {
       // TODO refactor
