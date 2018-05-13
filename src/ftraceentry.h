@@ -21,6 +21,7 @@
 #include "processchange.h"
 
 #include <vector>
+#include <string>
 #include <cstdint>
 
 using namespace std;
@@ -28,13 +29,15 @@ using namespace std;
 //! I am entry
 class FTraceEntry {
   public:
-    FTraceEntry(int pid, int timeLow, int timeHigh):
-              myPID(pid), myTimeLow(timeLow), myTimeHigh(timeHigh) {}
+    FTraceEntry(int pid, const string & name, int timeLow, int timeHigh):
+              myName(name), myPID(pid), myTimeLow(timeLow), myTimeHigh(timeHigh) {}
     virtual ~FTraceEntry() {}
+    const string & getName() const { return myName; }
     int getPID()      const { return myPID; }
     int getTimeHigh() const { return myTimeHigh; }
     int getTimeLow()  const { return myTimeLow; }
 
+    FTraceEntry * setName(const string & name) { myName = name; return this; }
     FTraceEntry * setPID(int pid)       { myPID = pid;       return this; }
     FTraceEntry * setTimeHigh(int time) { myTimeHigh = time; return this; }
     FTraceEntry * setTimeLow(int time)  { myTimeLow = time;  return this; }
@@ -42,6 +45,7 @@ class FTraceEntry {
     virtual void parseTo(vector<ProcessChange*> & procChanges) const = 0;
   protected:
     uint64_t myTime() const;
+    string myName;
   private:
     int myPID;
     int myTimeLow;
@@ -59,8 +63,8 @@ using namespace std;
 
 class SchedWakeUpEntry : public FTraceEntry {
   public:
-    SchedWakeUpEntry(int pid, int timeLow, int timeHigh):
-                      FTraceEntry(pid, timeLow, timeHigh) {}
+    SchedWakeUpEntry(int pid, const string & name, int timeLow, int timeHigh):
+                      FTraceEntry(pid, name, timeLow, timeHigh) {}
     const string & getCommandName() { return myCommandName; }
     int getWakedUpPID() { return myWakedUpPID; }
     int getPriority() { return myPriority; }
@@ -93,8 +97,8 @@ using namespace std;
 
 class SchedSwitchEntry : public FTraceEntry {
   public:
-    SchedSwitchEntry(int pid, int timeLow, int timeHigh):
-                      FTraceEntry(pid, timeLow, timeHigh) {}
+    SchedSwitchEntry(int pid, const string & name, int timeLow, int timeHigh):
+                      FTraceEntry(pid, name, timeLow, timeHigh) {}
     const string & getPrevCommandName() const { return myPrevCommandName; }
     int            getPrevPriority() const { return myPrevPriority; }
     int            getPrevPID() const { return myPrevPID; }
@@ -130,8 +134,8 @@ using namespace std;
 
 class TracingMarkEntry : public FTraceEntry {
   public:
-    TracingMarkEntry(int pid, int timeLow, int timeHigh):
-                      FTraceEntry(pid, timeLow, timeHigh) {}
+    TracingMarkEntry(int pid, const string & name, int timeLow, int timeHigh):
+                      FTraceEntry(pid, name, timeLow, timeHigh) {}
     long getVSS() const { return myVSS; }
     long getRSS() const { return myRSS; }
     long getPSS() const { return myPSS; }

@@ -59,6 +59,9 @@ void SimpleProcessRecordFile::parseTo(vector<ProcessRecord*> & records) {
     if (duration) {
       record->setCpuUsage((process.getTotalRun() * 100)/duration);
     }
+    if (!change->getCause().empty()) {
+      record->setCause(change->getCause());
+    }
     records.push_back(record);
   }
 }

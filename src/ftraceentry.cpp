@@ -15,6 +15,7 @@
  */
 
 #include "ftraceentry.h"
+#include "process.h"
 
 uint64_t FTraceEntry::myTime() const {
   return (uint64_t)myTimeLow + (1000000l * (uint64_t)myTimeHigh);
@@ -22,14 +23,17 @@ uint64_t FTraceEntry::myTime() const {
 
 void SchedWakeUpEntry::parseTo(vector<ProcessChange*> & procChanges) const {
   procChanges.push_back((new StateChange(myWakedUpPID, myTime()))
-                            ->setState(ProcessState::AWAKE));
+                            ->setState(ProcessState::AWAKE)
+                            ->setCause(myName));
 }
 
 void SchedSwitchEntry::parseTo(vector<ProcessChange*> & procChanges) const {
   procChanges.push_back((new StateChange(myPrevPID, myTime()))
-                            ->setState(ProcessState::SLEEPING));
+                            ->setState(ProcessState::SLEEPING)
+                            ->setCause(myName));
   procChanges.push_back((new StateChange(myNextPID, myTime()))
-                            ->setState(ProcessState::RUNNING));
+                            ->setState(ProcessState::RUNNING)
+                            ->setCause(myName));
 }
 
 void TracingMarkEntry::parseTo(vector<ProcessChange*> & procChanges) const {
@@ -37,5 +41,6 @@ void TracingMarkEntry::parseTo(vector<ProcessChange*> & procChanges) const {
                             ->setVSS(myVSS)
                             ->setUSS(myUSS)
                             ->setRSS(myRSS)
-                            ->setPSS(myPSS));
+                            ->setPSS(myPSS)
+                            ->setCause(myName));
 }

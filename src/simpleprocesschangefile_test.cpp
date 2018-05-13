@@ -50,11 +50,11 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
 
     void testParseTo() {
       vector<FTraceEntry*> ftraceEntries = {
-        (new SchedSwitchEntry(0,1,0))->setPrevPID(0)->setNextPID(1),
-        (new TracingMarkEntry(0,2,0))->setTracedPID(1)->setVSS(1)->setUSS(2)->setRSS(3)->setPSS(4),
-        (new SchedWakeUpEntry(0,3,0))->setWakedUpPID(0),
-        (new SchedSwitchEntry(0,4,0))->setPrevPID(1)->setNextPID(0),
-        (new SchedWakeUpEntry(0,5,0))->setWakedUpPID(1),
+        (new SchedSwitchEntry(0,"SchedSwitch",1,0))->setPrevPID(0)->setNextPID(1),
+        (new TracingMarkEntry(0,"MemTrace",2,0))->setTracedPID(1)->setVSS(1)->setUSS(2)->setRSS(3)->setPSS(4),
+        (new SchedWakeUpEntry(0,"SchedWakeup",3,0))->setWakedUpPID(0),
+        (new SchedSwitchEntry(0,"SchedSwitch",4,0))->setPrevPID(1)->setNextPID(0),
+        (new SchedWakeUpEntry(0,"SchedWakeup",5,0))->setWakedUpPID(1),
       };
       EXPECT_CALL(*myFTraceEntryFileCreator, create(StrEq(myFilename)))
                                     .WillOnce(Return(myFTraceEntryFile));

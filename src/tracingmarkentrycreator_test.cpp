@@ -42,6 +42,7 @@ class TracingMarkEntryCreatorTest : public ::testing::Test {
                                   "VSS=102588416  RSS=3674112"
                                   " PSS=2631237 USS=2592768 PID=2231");
       EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getName(), string("MemTrace"));
       EXPECT_EQ(entry->getTimeLow(), 2);
       EXPECT_EQ(entry->getTimeHigh(), 3);
       EXPECT_EQ(entry->getVSS(), 102588416);
