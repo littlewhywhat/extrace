@@ -56,6 +56,7 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
         (new SchedSwitchEntry(0,"SchedSwitch",4,0))->setPrevPID(1)->setNextPID(0),
         (new SchedWakeUpEntry(0,"SchedWakeup",5,0))->setWakedUpPID(1),
       };
+      size_t size = 7;
       EXPECT_CALL(*myFTraceEntryFileCreator, create(StrEq(myFilename)))
                                     .WillOnce(Return(myFTraceEntryFile));
       EXPECT_CALL(*myFTraceEntryFile, parseTo(_))
@@ -93,7 +94,7 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
 
       vector<ProcessChange*> procChanges;
       myProcessChangeFile->parseTo(procChanges);
-      EXPECT_EQ(procChanges.size(), 7);
+      EXPECT_EQ(procChanges.size(), size);
       for (auto * change : procChanges) {
         if (change->getPID() == 1) {
           change->applyTo(*myMockProcess);
