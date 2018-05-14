@@ -1,0 +1,44 @@
+@startuml
+
+skinparam monochrome true
+
+class ProcessChange {
+  - m_PID: int
+  - m_TimeStamp: int
+  - m_Cause: string
+  --
+  + applyTo(process: Process): void
+  # applyFurtherTo(process: Process): void
+}
+
+ProcessChange --> Process: applies to
+
+class Process {
+  - m_RSS: int
+  - m_VSS: int
+  - m_PSS: int
+  - m_USS: int
+  - m_State: ProcessState
+  - m_TotalRun: int
+  - m_LastUpdateTime: int
+  + updateTo(time: int): void
+}
+
+class MemoryChange {
+  - m_RSS: int
+  - m_VSS: int
+  - m_PSS: int
+  - m_USS: int
+}
+hide MemoryChange methods
+
+MemoryChange --|> ProcessChange
+
+class StateChange {
+  - m_State: ProcessState
+}
+hide StateChange methods
+
+StateChange --|> ProcessChange
+
+@enduml

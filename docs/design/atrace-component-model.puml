@@ -1,0 +1,33 @@
+@startuml
+
+skinparam monochrome true
+
+package "Presentation" {
+  [EnvironmentAction] - Action
+  [EnvironmentAction] ..> Trace
+  [EnvironmentAction] ..> KernelTraceSystem
+  [EnvironmentAction] ..> AndroidTraceSystem
+  [EnvironmentAction] ..> TraceBuffer
+  [EnvironmentAction] ..> AndroidFileSystem
+  Action <. [CmdLineApp]
+}
+
+package "Core" {
+  TraceBuffer - [AndroidEnvironment]
+  Trace -- [AndroidEnvironment]
+  KernelTraceSystem -- [AndroidEnvironment]
+  AndroidTraceSystem - [AndroidEnvironment]
+  AndroidFileSystem - [AndroidEnvironment]
+  [AndroidEnvironment] ..> Android
+  [AndroidEnvironment] ..> FTrace
+  [AndroidEnvironment] ..> FileSystem
+}
+
+package "System" {
+  FTrace -- [SimpleFTrace]
+  [SimpleFTrace] .> FileSystem
+  Android -- [SimpleAndroid]
+  FileSystem - [SimpleFileSystem]
+}
+
+@enduml

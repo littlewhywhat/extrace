@@ -54,5 +54,5 @@ then list categories and choose one to trace
 ```
 extrace --list_categories
 extrace some_category
-extrace -e sched -p 100000 -m 500 -pid some_PID -o /data/trace
+extrace -d am -e sched -p 100000 -m 500 -pid some_PID -o /data/trace
 ```

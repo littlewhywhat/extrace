@@ -1,0 +1,58 @@
+@startuml
+
+skinparam monochrome true
+
+class Arguments {
+  + putBoolean(optionName: string): void
+  + isEnabled(optionName: string): bool
+  + putInteger(optionName: string, value: int): void
+  + hasInteger(optionName: string): bool
+  + getInteger(optionName: string): int
+  + putString(optionName: string, value: string): void
+  + hasString(optionName: string): bool
+  + getString(optionName: string): string
+  + putToIntList(optionName: string, value: int): void
+  + getIntList(optionName: string): vector<int>
+  + hasIntList(optionName: string): bool
+  + putToStringList(optionName: string, value: string): void
+  + getStringList(optionName: string): vector<string>
+  + hasStringList(optionName: string): bool
+  --
+  - m_Booleans: set<string>
+  - m_Integers: map<string, int>
+  - m_ListInts: map<string, vector<int>>
+  - m_ListStrings: map<string, vector<string>>
+}
+
+class CmdLineArgsParser {
+    - m_BooleanOptNames: map<string, string>
+    - m_IntegerOptNames: map<string, string>
+    - m_StringOptNames: map<string, string>
+    - m_CommaSepIntListOptNames: map<string, string>
+    - m_CommaSepListOptNames: map<string, string>
+    --
+    + registerBoolean(specifier: string, optionName: string): void
+    + registerInteger(specifier: string, optionName: string): void
+    + registerString(specifier: string, optionName: string): void
+    + registerCommaSepIntList(specifier: string, optionName: string): void
+    + registerCommaSepList(specifier: string, optionName: string): void
+    + parse(arguments: Arguments, cmdLineArgs: CmdLineArgs): int
+    - isBooleanSpec(spec: string): bool
+    - isIntegerSpec(spec: string): bool
+    - isStringSpec(spec: string): bool
+    - isCommaSepIntListSpec(specifier: string): bool
+    - isCommaSepListSpec(specifier: string): bool
+}
+
+class CmdLineArgs {
+  - m_Args: vector<string>
+  - m_AppName: string
+  --
+  + get(id: int): string
+  + getCount(): int
+}
+
+CmdLineArgsParser --> CmdLineArgs: parses
+CmdLineArgsParser --> Arguments: parses to
+
+@enduml

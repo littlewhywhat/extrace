@@ -1,0 +1,29 @@
+@startuml
+
+skinparam monochrome true
+
+interface Kernel {
+  + tryCreateProcess(pid: int): Process
+}
+hide Kernel fields
+
+Kernel --> Process: creates
+
+interface Process {
+  + tryCreateMemoryUsage(): MemoryUsage
+  + tryCreateWorkingSet(): MemoryUsage
+}
+hide Process fields
+
+Process --> MemoryUsage: creates
+
+interface MemoryUsage {
+  + tryUpdate(): bool
+  + getPID(): int
+  + getVSS(): int
+  + getRSS(): int
+  + getUSS(): int
+}
+hide MemoryUsage fields
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+
+skinparam monochrome true
+
+interface Android {
+  + {abstract} getTraceAppsMaxNum(): uint32_t
+  + {abstract} getTraceCoreServicesProperty(): string
+  + {abstract} trySetTraceTagsProperty(traceTags: int): bool
+  + {abstract} trySetTraceAppProperty(appName: string, id: int): bool
+  + {abstract} trySetTraceAppsCntProperty(cnt, int): bool
+  + {abstract} tryClearTraceAppsCntProperty(): bool
+  + {abstract} tryPokeBinderServices(): bool
+  + {abstract} logDumpingTrace(): void
+  + {abstract} getCategoryTraceTag(traceCategory: TraceCategory): int
+}
+hide Android fields
+
+@enduml

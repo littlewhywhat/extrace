@@ -1,0 +1,30 @@
+@startuml
+
+skinparam monochrome true
+
+interface FTrace {
+  + getTraceFd(): int
+  + getTracePipeFd(): int
+  + tryCleanTrace(): bool
+  + tryAddFunctionToFilter(function: string): bool
+  + tryGetFunctionsFromFilter(): set<string>
+  + tryClearFunctionFilter(): bool
+  + functionFilterAccessible(): bool
+  + trySetTracer(tracer: Tracer): bool
+  + trySetBufferSize(bufferSize: int): bool
+  + tryWriteMarker(marker: string): bool
+  + tracerChoiceAccessable(): bool
+  + tracePointAccessable(tracePoint: TracePoint): bool
+  + tracePointExists(tracePoint: TracePoint): bool
+  + tryEnableTracePoint(tracePoint: TracePoint): bool
+  + tryDisableTracePoint(tracePoint: TracePoint): bool
+  + hasTraceClockSetTo(clockType: ClockType): bool
+  + trySetClockType(clockType: ClockType): bool
+  + tryEnableOption(option: Option): bool
+  + tryDisableOption(option: Option): bool
+  + tryStartTrace(): bool
+  + tryStopTrace(): bool
+}
+hide FTrace fields
+
+@enduml

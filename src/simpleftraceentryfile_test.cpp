@@ -62,7 +62,7 @@ class SimpleFTraceEntryFileTest : public ::testing::Test {
       appendStr("          <idle>-0     (-----) [000] d..3  4751.149653:"
                 " sched_switch: prev_comm=swapper prev_pid=0 prev_prio=120 prev_state=R ==>"
                 " next_comm=memeater next_pid=2231 next_prio=120\n");
-      SchedSwitchEntry entry(1, 2, 3);
+      SchedSwitchEntry entry(1, "SchedSwitch", 2, 3);
       EXPECT_CALL(*myMockEntryCreator, create(975, 393234, 2113,
                                               StrEq("sched_switch"),
                                               StrEq("prev_comm=experiment prev_pid=975 prev_prio=120 prev_state=S"
