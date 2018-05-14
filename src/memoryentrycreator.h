@@ -21,10 +21,10 @@
 #include "ftraceentrycreator.h"
 
 //! I am an EntryCreator from tracing_mark_write content
-class TracingMarkEntryCreator : public FTraceEntryCreator {
+class MemoryEntryCreator : public FTraceEntryCreator {
   public:
-    ~TracingMarkEntryCreator() {}
-    TracingMarkEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
+    ~MemoryEntryCreator() {}
+    MemoryEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
 };
 
 #endif // LTTLWHWHT_TRACING_MARK_ENTRY_CREATOR_H

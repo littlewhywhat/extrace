@@ -22,7 +22,7 @@
 #include "ftraceentrycreator.h"
 #include "schedswitchentrycreator.h"
 #include "schedwakeupentrycreator.h"
-#include "tracingmarkentrycreator.h"
+#include "memoryentrycreator.h"
 
 #include <map>
 #include <string>
