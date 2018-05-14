@@ -76,8 +76,11 @@ list(APPEND OBJ_SOURCES
     "src/processrecordfile_test.cpp"
     "src/simpleprocesschangefile_test.cpp"
     "src/processrecord_test.cpp"
-    "src/tracingmarkentrycreator_test.cpp"
+    "src/memoryentrycreator_test.cpp"
     "src/simpleftraceentryfile_test.cpp"
+    "src/emptyentrycreator.cpp"
+    "src/androidentrycreator.cpp"
+    "src/memoryentrycreator.cpp"
     ### String8, ... google libraries
     # "src/androidtoolbox.cpp"
     ### android toolbox dependencies

@@ -17,6 +17,7 @@
 #ifndef LTTLWHWHT_PROCESSRECORD_H
 #define LTTLWHWHT_PROCESSRECORD_H
 
+#include "processstate.h"
 #include "process.h"
 
 #include <ostream>

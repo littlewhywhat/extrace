@@ -1,5 +1,5 @@
 test: build
-	./build/main_test
+	./build/extrace_test
 build: build_dir
 	cd build; cmake ..; make; cd ..
 docs: doc_dir

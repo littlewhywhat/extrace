@@ -23,6 +23,8 @@
 #include <memory>
 #include <vector>
 
+#include "processrecord.h"
+
 using namespace std;
 
 //! I am an EnvironmentAction that interpret file contents with uncompressed dump of trace buffer
@@ -31,12 +33,17 @@ class InterpretDumpFileAction : public EnvironmentAction {
     //! Constructs me
     InterpretDumpFileAction(const Wire & wire, const shared_ptr<Environment> & environment,
                             const string & inputFile, const vector<int> pids);
+    //! Destroys my records and me
+    ~InterpretDumpFileAction();
     bool tryRun() override;
   private:
     //! My input file to read dump from
     string myInputFile;
     //! My PIDs to focus on
     set<int> myPIDs;
+    //! My Process records that I collect from input file
+    vector<ProcessRecord*> myRecords;
+
 };
 
 #endif // LTTLWHWHT_INTERPRET_DUMPFILEACTION_H

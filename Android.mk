@@ -9,6 +9,9 @@ processrecordfile_src_files := \
 		src/simpleprocess.cpp                  \
 		src/simpleprocessrecordfile.cpp        \
 		src/memoryentrycreator.cpp        \
+		src/androidentrycreator.cpp       \
+		src/tracingmarkentrycreator.cpp   \
+		src/emptyentrycreator.cpp \
 
 extrace_src_files :=  \
 		src/signal.cpp   \
@@ -74,6 +77,7 @@ common_test_files := \
     src/simpleprocesschangefile_test.cpp \
     src/processrecord_test.cpp      \
     src/memoryentrycreator_test.cpp \
+    src/androidentrycreator_test.cpp \
 
 local_test_files := \
     src/simpleftraceentryfile_test.cpp \
