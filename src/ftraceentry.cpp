@@ -36,7 +36,7 @@ void SchedSwitchEntry::parseTo(vector<ProcessChange*> & procChanges) const {
                             ->setCause(myName));
 }
 
-void TracingMarkEntry::parseTo(vector<ProcessChange*> & procChanges) const {
+void MemoryEntry::parseTo(vector<ProcessChange*> & procChanges) const {
   procChanges.push_back((new MemoryChange(myTracedPID, myTime()))
                             ->setVSS(myVSS)
                             ->setUSS(myUSS)

@@ -132,9 +132,9 @@ class SchedSwitchEntry : public FTraceEntry {
 
 using namespace std;
 
-class TracingMarkEntry : public FTraceEntry {
+class MemoryEntry : public FTraceEntry {
   public:
-    TracingMarkEntry(int pid, const string & name, int timeLow, int timeHigh):
+    MemoryEntry(int pid, const string & name, int timeLow, int timeHigh):
                       FTraceEntry(pid, name, timeLow, timeHigh) {}
     long getVSS() const { return myVSS; }
     long getRSS() const { return myRSS; }
@@ -142,11 +142,11 @@ class TracingMarkEntry : public FTraceEntry {
     long getUSS() const { return myUSS; }
     int  getTracedPID() const { return myTracedPID; }
 
-    TracingMarkEntry * setVSS(long vss) { myVSS = vss; return this; }
-    TracingMarkEntry * setRSS(long rss) { myRSS = rss; return this; }
-    TracingMarkEntry * setPSS(long pss) { myPSS = pss; return this; }
-    TracingMarkEntry * setUSS(long uss) { myUSS = uss; return this; }
-    TracingMarkEntry * setTracedPID(int pid)  { myTracedPID = pid; return this; }
+    MemoryEntry * setVSS(long vss) { myVSS = vss; return this; }
+    MemoryEntry * setRSS(long rss) { myRSS = rss; return this; }
+    MemoryEntry * setPSS(long pss) { myPSS = pss; return this; }
+    MemoryEntry * setUSS(long uss) { myUSS = uss; return this; }
+    MemoryEntry * setTracedPID(int pid)  { myTracedPID = pid; return this; }
 
     void parseTo(vector<ProcessChange*> & procChanges) const override;
   private:
@@ -158,3 +158,12 @@ class TracingMarkEntry : public FTraceEntry {
 };
 
 #endif // LTTLWHWHT_TRACING_MARK_ENTRY_H
+
+#ifndef LTTLWHWHT_ANDROIDENTRY_H
+#define LTTLWHWHT_ANDROIDENTRY_H
+
+#include <string>
+
+using namespace std;
+
+#endif // LTTLWHWHT_ANDROIDENTRY_H

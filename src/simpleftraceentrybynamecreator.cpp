@@ -19,7 +19,7 @@
 SimpleFTraceEntryByNameCreator::SimpleFTraceEntryByNameCreator() {
   myFTraceEntryCreators["sched_switch"] = new SchedSwitchEntryCreator();
   myFTraceEntryCreators["sched_wakeup"] = new SchedWakeUpEntryCreator();
-  myFTraceEntryCreators["tracing_mark_write"] = new TracingMarkEntryCreator();
+  myFTraceEntryCreators["tracing_mark_write"] = new MemoryEntryCreator();
 }
 
 SimpleFTraceEntryByNameCreator::~SimpleFTraceEntryByNameCreator() {

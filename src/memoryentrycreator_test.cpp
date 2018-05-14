@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "tracingmarkentrycreator.h"
+#include "memoryentrycreator.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -26,8 +26,8 @@ using ::testing::_;
 using ::testing::StrEq;
 using ::testing::SetArgReferee;
   
-//! I am a test. I test my TracingMarkEntryCreator
-class TracingMarkEntryCreatorTest : public ::testing::Test {
+//! I am a test. I test my MemoryEntryCreator
+class MemoryEntryCreatorTest : public ::testing::Test {
   public:
     void SetUp() {
 
@@ -38,7 +38,7 @@ class TracingMarkEntryCreatorTest : public ::testing::Test {
     }
 
     void testCreateFromCorrectContent() {
-      auto * entry = myTracingMarkEntryCreator.create(1, 2, 3, 
+      auto * entry = myMemoryEntryCreator.create(1, 2, 3, 
                                   "VSS=102588416  RSS=3674112"
                                   " PSS=2631237 USS=2592768 PID=2231");
       EXPECT_EQ(entry->getPID(), 1);
@@ -52,10 +52,10 @@ class TracingMarkEntryCreatorTest : public ::testing::Test {
       EXPECT_EQ(entry->getTracedPID(), 2231);
     }
   private:
-    //! My TracingMarkEntryCreator that I test
-    TracingMarkEntryCreator myTracingMarkEntryCreator;
+    //! My MemoryEntryCreator that I test
+    MemoryEntryCreator myMemoryEntryCreator;
 };
 
-TEST_F(TracingMarkEntryCreatorTest, testCreateFromCorrectContent) {
+TEST_F(MemoryEntryCreatorTest, testCreateFromCorrectContent) {
   testCreateFromCorrectContent();
 }

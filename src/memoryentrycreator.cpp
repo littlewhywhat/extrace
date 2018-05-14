@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "tracingmarkentrycreator.h"
+#include "memoryentrycreator.h"
 
-TracingMarkEntry * TracingMarkEntryCreator::create(int pid, long timeLow, long timeHigh,
+MemoryEntry * MemoryEntryCreator::create(int pid, long timeLow, long timeHigh,
                                               const char * content) const {
   int tracedPID;
   long vss, rss, pss, uss;
@@ -26,7 +26,7 @@ TracingMarkEntry * TracingMarkEntryCreator::create(int pid, long timeLow, long t
     fprintf(stderr, "error can't parse content\n");
     return NULL;
   }
-  return (new TracingMarkEntry(pid, "MemTrace", timeLow, timeHigh))
+  return (new MemoryEntry(pid, "MemTrace", timeLow, timeHigh))
               ->setVSS(vss)
               ->setRSS(rss)
               ->setPSS(pss)

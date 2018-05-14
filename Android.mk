@@ -8,7 +8,7 @@ processrecordfile_src_files := \
 		src/simpleprocesschangefile.cpp        \
 		src/simpleprocess.cpp                  \
 		src/simpleprocessrecordfile.cpp        \
-		src/tracingmarkentrycreator.cpp        \
+		src/memoryentrycreator.cpp        \
 
 extrace_src_files :=  \
 		src/signal.cpp   \
@@ -73,7 +73,7 @@ common_test_files := \
     src/processrecordfile_test.cpp  \
     src/simpleprocesschangefile_test.cpp \
     src/processrecord_test.cpp      \
-    src/tracingmarkentrycreator_test.cpp \
+    src/memoryentrycreator_test.cpp \
 
 local_test_files := \
     src/simpleftraceentryfile_test.cpp \
