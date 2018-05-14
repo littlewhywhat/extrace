@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-#include "processchange.h"
+#include "emptyentrycreator.h"
 
-void ProcessChange::applyTo(Process & process) const {
-  process.updateTo(myTimeStamp);
-  applyFurtherTo(process);
-}
+#include "ftraceentry.h"
 
-void MemoryChange::applyFurtherTo(Process & process) const {
-  process.setVSS(myVSS)
-         ->setRSS(myRSS)
-         ->setPSS(myPSS)
-         ->setUSS(myUSS);
-}
-
-void StateChange::applyFurtherTo(Process & process) const {
-  process.setState(myState);
-}
-
-void NotificationChange::applyFurtherTo(Process & process) const {
+FTraceEntry * EmptyEntryCreator::create(int pid,
+                                        long timeLow, long timeHigh,
+                                        const char * content) const {
+  return new EmptyEntry(pid, timeLow, timeHigh);
 }

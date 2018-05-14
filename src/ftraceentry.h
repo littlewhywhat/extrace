@@ -166,4 +166,23 @@ class MemoryEntry : public FTraceEntry {
 
 using namespace std;
 
+class AndroidEntry : public FTraceEntry {
+  public:
+    AndroidEntry(int pid, const char * content, long timeLow, long timeHigh):
+                 FTraceEntry(pid, content, timeLow, timeHigh) {}
+    void parseTo(vector<ProcessChange*> & procChanges) const override;
+};
+
 #endif // LTTLWHWHT_ANDROIDENTRY_H
+
+#ifndef LTTLWHWHT_EMPTYENTRY_H
+#define LTTLWHWHT_EMPTYENTRY_H
+
+class EmptyEntry : public FTraceEntry {
+  public:
+    EmptyEntry(int pid, long timeLow, long timeHigh):
+                 FTraceEntry(pid, "", timeLow, timeHigh) {}
+    void parseTo(vector<ProcessChange*> & procChanges) const override;
+};
+
+#endif // LTTLWHWHT_EMPTYENTRY_H
