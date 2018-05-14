@@ -1,0 +1,64 @@
+@startuml
+
+skinparam monochrome true
+
+abstract FTraceEntry {
+  - m_PID: int
+  - m_TimeLow: int
+  - m_TimeHigh: int
+  # m_Name: string
+  + parseTo(procChanges: vector<ProcessChange>)
+}
+
+class SchedWakeUpEntry {
+  - m_CommandName: string
+  - m_WakedUpPID: int
+  - m_Priority: int
+  - m_Success: bool
+  - m_TargetCPU: int
+}
+hide SchedWakeUpEntry methods
+
+FTraceEntry <|-- SchedWakeUpEntry
+
+class SchedSwitchEntry {
+  - m_PrevCommandName: string
+  - m_NextCommandName: string
+  - m_PrevPID: int
+  - m_NextPID: int
+  - m_PrevPriority: int
+  - m_NextPriority: int
+}
+hide SchedSwitchEntry methods
+
+FTraceEntry <|-- SchedSwitchEntry
+
+class FTraceEntryByNameCreator {
+  + create(pid: int, timeLow: int, timeHigh: int, entryName: string, content: string): FTraceEntry
+}
+hide FTraceEntryByNameCreator fields
+
+FTraceEntryByNameCreator --> FTraceEntry: creates
+
+SchedSwitchEntryCreator "1" -- FTraceEntryByNameCreator
+SchedWakeUpEntryCreator "1" -- FTraceEntryByNameCreator
+
+class SchedSwitchEntryCreator
+hide SchedSwitchEntryCreator fields
+hide SchedSwitchEntryCreator methods
+
+class SchedWakeUpEntryCreator
+hide SchedWakeUpEntryCreator fields
+hide SchedWakeUpEntryCreator methods
+
+FTraceEntryCreator <|.. SchedSwitchEntryCreator
+FTraceEntryCreator <|.. SchedWakeUpEntryCreator
+
+interface FTraceEntryCreator {
+  + create(pid: int, timeLow: int, timeHigh: int, content: string): FTraceEntry
+}
+hide FTraceEntryCreator fields
+
+FTraceEntryCreator --> FTraceEntry: creates
+
+@enduml

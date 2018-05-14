@@ -1,0 +1,79 @@
+@startuml
+
+skinparam monochrome true
+
+class CmdLineApp {
+  + run(): int
+  + handleSignal(): void
+}
+hide CmdLineApp fields
+
+CmdLineApp -- "1" Wire
+CmdLineApp - "1" CmdLineArgs
+CmdLineApp -- "1" ATraceCmdLineBuilder
+CmdLineApp - "1" Signal
+
+class CmdLineArgs {
+  - m_AppName: string
+  - m_Args: vector<string>
+  --
+  + getCount(): int
+  + get(id: int): string
+  + getAppName(): string  
+}
+
+class ATraceCmdLineBuilder {
+  + build(wire: Wire, signal: Signal, cmdLineArgs: CmdLineArgs): ATrace 
+}
+hide ATraceCmdLineBuilder fields
+
+ATraceCmdLineBuilder -- "1" ATraceArgsCmdLineBuilder
+ATraceCmdLineBuilder -- "1" ATraceBuilder
+ATraceCmdLineBuilder --> ATrace: builds
+
+class ATraceArgsCmdLineBuilder {
+  + build(wire: Wire, cmdLineArgs: CmdLineArgs): ATraceArgs
+}
+hide ATraceArgsCmdLineBuilder fields
+
+class ATraceBuilder {
+  + build(wire: Wire, signal: Signal, atraceArgs: ATraceArgs): ATrace
+}
+hide ATraceBuilder fields
+
+ATraceBuilder -- "1" FTraceBuilder
+ATraceBuilder -- "1" AndroidBuilder
+ATraceBuilder --> ATrace: builds
+
+class FTraceBuilder {
+  + build(wire: Wire): FTrace
+}
+hide FTraceBuilder fields
+
+class AndroidBuilder {
+  + build(wire: Wire): Android
+}
+hide AndroidBuilder fields
+
+class ATrace {
+  + tryRun(): bool
+}
+hide ATrace fields
+
+class Wire {
+  - m_ErrorStream: FILE *
+  - m_OutputStream: FILE *
+  --
+  + getErrorStream(): FILE *
+  + getOutputStream(): FILE *
+}
+hide Wire methods
+
+class Signal {
+  - isFired: bool
+  --
+  + fire(): void
+  + isFired(): bool
+}
+
+@enduml

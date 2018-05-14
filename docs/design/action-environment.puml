@@ -1,0 +1,74 @@
+@startuml
+
+skinparam monochrome true
+
+interface Action {
+  + tryRun(): bool
+}
+hide Action fields
+
+EnvironmentAction ..> Action
+EnvironmentAction -- "1" Environment
+
+class EnvironmentAction {
+}
+hide EnvironmentAction methods
+hide EnvironmentAction fields
+
+StartAction   -|> EnvironmentAction
+StopAction    --|> EnvironmentAction
+DumpAction    --|> EnvironmentAction
+CleanUpAction --|> EnvironmentAction
+EnvironmentAction  <|- SetupAction
+
+class StartAction {
+}
+hide StartAction methods
+hide StartAction fields
+
+class StopAction {
+}
+hide StopAction methods
+hide StopAction fields
+
+class DumpAction {
+}
+hide DumpAction methods
+hide DumpAction fields
+
+class CleanUpAction {
+}
+hide CleanUpAction methods
+hide CleanUpAction fields
+
+class SetupAction {
+}
+hide SetupAction methods
+hide SetupAction fields
+
+abstract class EnvironmentAction {
+}
+hide EnvironmentAction methods
+hide EnvironmentAction fields
+
+
+class Environment {
+  + getFTrace(): FTrace
+  + getAndroid(): Android
+}
+hide Environment fields
+
+Environment -- "1" FTrace
+Environment -- "1" Android
+
+interface FTrace {
+}
+hide FTrace methods
+hide FTrace fields
+
+interface Android {
+}
+hide Android methods
+hide Android fields
+
+@enduml
