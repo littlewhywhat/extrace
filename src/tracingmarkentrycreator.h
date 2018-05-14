@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-#include "processchange.h"
+#ifndef LTTLWHWHT_TRACINGMARKENTRY_CREATOR_H
+#define LTTLWHWHT_TRACINGMARKENTRY_CREATOR_H
 
-void ProcessChange::applyTo(Process & process) const {
-  process.updateTo(myTimeStamp);
-  applyFurtherTo(process);
-}
+#include "ftraceentrycreator.h"
 
-void MemoryChange::applyFurtherTo(Process & process) const {
-  process.setVSS(myVSS)
-         ->setRSS(myRSS)
-         ->setPSS(myPSS)
-         ->setUSS(myUSS);
-}
+#include <map>
 
-void StateChange::applyFurtherTo(Process & process) const {
-  process.setState(myState);
-}
+//! I am an EntryCreator from tracing_mark content
+class TracingMarkEntryCreator : public FTraceEntryCreator {
+  public:
+    TracingMarkEntryCreator();
+    ~TracingMarkEntryCreator();
+    FTraceEntry * create(int pid, long timeLow, long timeHigh, const char * content) const;
+  private:
+    map<char, FTraceEntryCreator *> myFTraceEntryCreators;
+};
 
-void NotificationChange::applyFurtherTo(Process & process) const {
-}
+#endif // LTTLWHWHT_TRACINGMARKENTRY_CREATOR_H

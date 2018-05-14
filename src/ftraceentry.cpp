@@ -17,6 +17,8 @@
 #include "ftraceentry.h"
 #include "process.h"
 
+#include <set>
+
 uint64_t FTraceEntry::myTime() const {
   return (uint64_t)myTimeLow + (1000000l * (uint64_t)myTimeHigh);
 }
@@ -43,4 +45,21 @@ void MemoryEntry::parseTo(vector<ProcessChange*> & procChanges) const {
                             ->setRSS(myRSS)
                             ->setPSS(myPSS)
                             ->setCause(myName));
+}
+
+void AndroidEntry::parseTo(std::vector<ProcessChange*> & procChanges) const {
+  set<int> pids;
+  for (auto * procChange : procChanges) {
+    if (pids.find(procChange->getPID()) == pids.end()) {
+      pids.insert(procChange->getPID());
+    }
+  }
+
+  for (const auto & pid : pids) {
+    procChanges.push_back((new NotificationChange(pid, myTime()))
+                            ->setCause(myName));
+  }
+}
+
+void EmptyEntry::parseTo(std::vector<ProcessChange*> & procChanges) const {
 }

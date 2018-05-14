@@ -63,7 +63,7 @@ bool MemorySampleAction::tryRun() {
         if (!memoryUsage->tryUpdate()) {
           return false;
         }
-        if (snprintf(printBuffer, 128, "VSS=%7" PRId64 " RSS=%7" PRId64 " PSS=%7" PRId64 " USS=%7" PRId64 " PID=%d", 
+        if (snprintf(printBuffer, 128, "M: VSS=%7" PRId64 " RSS=%7" PRId64 " PSS=%7" PRId64 " USS=%7" PRId64 " PID=%d", 
                  memoryUsage->getVSS(), memoryUsage->getRSS(), memoryUsage->getPSS(), memoryUsage->getUSS(),
                  memoryUsage->getPID()) == 128) {
           fprintf(m_Wire.getErrorStream(), "can't create string for buffer\n");

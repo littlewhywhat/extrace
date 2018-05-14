@@ -99,3 +99,25 @@ class StateChange : public ProcessChange {
 };
 
 #endif // LTTLWHWHT_STATE_CHANGE_H
+
+#ifndef LTTLWHWHT_NOTIFICATION_CHANGE_H
+#define LTTLWHWHT_NOTIFICATION_CHANGE_H
+
+#include "process.h"
+
+class NotificationChange : public ProcessChange {
+  public:
+    NotificationChange(int pid, uint64_t timestamp):
+                ProcessChange(pid, timestamp) {}
+    ~NotificationChange() {}
+
+    const ProcessState & getState() const { return myState; }
+    NotificationChange * setState(const ProcessState & state) { myState = state; return this; }
+  protected:
+    //! Applies me to process
+    void applyFurtherTo(Process & process) const override;
+  private:
+    ProcessState myState;
+};
+
+#endif // LTTLWHWHT_NOTIFICATION_CHANGE_H

@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
-#include "simpleftraceentrybynamecreator.h"
 #include "tracingmarkentrycreator.h"
 
-SimpleFTraceEntryByNameCreator::SimpleFTraceEntryByNameCreator() {
-  myFTraceEntryCreators["sched_switch"] = new SchedSwitchEntryCreator();
-  myFTraceEntryCreators["sched_wakeup"] = new SchedWakeUpEntryCreator();
-  myFTraceEntryCreators["tracing_mark_write"] = new TracingMarkEntryCreator();
+#include "emptyentrycreator.h"
+#include "androidentrycreator.h"
+#include "memoryentrycreator.h"
+
+TracingMarkEntryCreator::TracingMarkEntryCreator() {
+  myFTraceEntryCreators['E'] = new EmptyEntryCreator();
+  myFTraceEntryCreators['B'] = new AndroidEntryCreator();
+  myFTraceEntryCreators['M'] = new MemoryEntryCreator();
 }
 
-SimpleFTraceEntryByNameCreator::~SimpleFTraceEntryByNameCreator() {
+TracingMarkEntryCreator::~TracingMarkEntryCreator() {
   for (const auto & creator : myFTraceEntryCreators) {
     delete creator.second;
   }
 }
 
-FTraceEntry * SimpleFTraceEntryByNameCreator::create(int pid,
+FTraceEntry * TracingMarkEntryCreator::create(int pid,
                                    long timeLow, long timeHigh,
-                                   const char * entryName,
                                    const char * content) const {
-  if (myFTraceEntryCreators.find(entryName) == myFTraceEntryCreators.end()) {
+  if (!content || myFTraceEntryCreators.find(content[0]) == myFTraceEntryCreators.end()) {
     return nullptr;
   }
-  return myFTraceEntryCreators.at(entryName)->create(pid, timeLow, timeHigh, content);
+  return myFTraceEntryCreators.at(content[0])->create(pid, timeLow, timeHigh, content);
 }

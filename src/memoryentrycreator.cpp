@@ -21,7 +21,7 @@ MemoryEntry * MemoryEntryCreator::create(int pid, long timeLow, long timeHigh,
   int tracedPID;
   long vss, rss, pss, uss;
   int numArgs = 5;
-  if (sscanf(content, "VSS=%ld RSS=%ld PSS=%ld USS=%ld PID=%d",
+  if (sscanf(content, "M: VSS=%ld RSS=%ld PSS=%ld USS=%ld PID=%d",
                        &vss, &rss, &pss, &uss, &tracedPID) != numArgs) {
     fprintf(stderr, "error can't parse content\n");
     return NULL;

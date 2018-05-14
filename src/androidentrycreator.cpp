@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-#include "processchange.h"
+#include "androidentrycreator.h"
 
-void ProcessChange::applyTo(Process & process) const {
-  process.updateTo(myTimeStamp);
-  applyFurtherTo(process);
-}
+#include "ftraceentry.h"
 
-void MemoryChange::applyFurtherTo(Process & process) const {
-  process.setVSS(myVSS)
-         ->setRSS(myRSS)
-         ->setPSS(myPSS)
-         ->setUSS(myUSS);
-}
-
-void StateChange::applyFurtherTo(Process & process) const {
-  process.setState(myState);
-}
-
-void NotificationChange::applyFurtherTo(Process & process) const {
+FTraceEntry * AndroidEntryCreator::create(int pid,
+                                         long timeLow, long timeHigh,
+                                         const char * content) const {
+  if (!content) {
+    return nullptr;
+  }
+  return new AndroidEntry(pid, content + 2, timeLow, timeHigh);
 }

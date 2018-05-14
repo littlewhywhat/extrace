@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-#include "processchange.h"
+#ifndef LTTLWHWHT_EMPTYENTRY_CREATOR_H
+#define LTTLWHWHT_EMPTYENTRY_CREATOR_H
 
-void ProcessChange::applyTo(Process & process) const {
-  process.updateTo(myTimeStamp);
-  applyFurtherTo(process);
-}
+#include "ftraceentrycreator.h"
 
-void MemoryChange::applyFurtherTo(Process & process) const {
-  process.setVSS(myVSS)
-         ->setRSS(myRSS)
-         ->setPSS(myPSS)
-         ->setUSS(myUSS);
-}
+//! I am an EntryCreator from tracing_mark content starting with letter E
+class EmptyEntryCreator : public FTraceEntryCreator {
+  public:
+    ~EmptyEntryCreator() {}
+    FTraceEntry * create(int pid, long timeLow, long timeHigh, const char * content) const override;
+};
 
-void StateChange::applyFurtherTo(Process & process) const {
-  process.setState(myState);
-}
-
-void NotificationChange::applyFurtherTo(Process & process) const {
-}
+#endif // LTTLWHWHT_EMPTYENTRY_CREATOR_H
