@@ -17,12 +17,7 @@
 #ifndef LTTLWHWHT_PROCESS_H
 #define LTTLWHWHT_PROCESS_H
 
-enum ProcessState {
-  RUNNING,
-  SLEEPING,
-  AWAKE,
-  UNKNOWN
-};
+#include "processstate.h"
 
 //! I am a process. I can run, sleep and wakeup waiting until running. I can record my statistics in ProcessRecord.
 

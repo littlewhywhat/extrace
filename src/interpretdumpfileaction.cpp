@@ -17,13 +17,22 @@
 #include "interpretdumpfileaction.h"
 
 #include <vector>
-#include <sstream>
+#include <string>
+#include <map>
+#include <queue>
+#include <inttypes.h>
 
-#include "processrecord.h"
+#include "process.h"
 #include "processrecordfile.h"
 #include "simpleprocesschangefile.h"
 
 using namespace std;
+
+InterpretDumpFileAction::~InterpretDumpFileAction() {
+  for (auto * record: myRecords) {
+    delete record;
+  }
+}
 
 InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
                                                  const shared_ptr<Environment> & environment,
@@ -37,18 +46,41 @@ InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
 
 bool InterpretDumpFileAction::tryRun() {
   SimpleProcessRecordFile file(myInputFile, new SimpleProcessChangeFileCreator());
-  vector<ProcessRecord*> records;
-  file.parseTo(records);
-  fprintf(m_Wire.getOutputStream(), "%5s | %3s | %10s | %10s | %10s | %10s | %11s | %8s | Cause\n",
-                                  "PID", "CPU", "VSS", "RSS", "PSS", "USS", "TIMESTAMP", "STATE"
-         );
-  stringstream ss;
-  for (auto * record : records) {
-    if (myPIDs.find(record->getPID()) != myPIDs.cend()) {
-      ss << *record;
-      fprintf(m_Wire.getOutputStream(), "%s\n", ss.str().c_str());
-      ss.str(string());
-      ss.clear();
+  file.parseTo(myRecords);
+  map<int, queue<ProcessRecord*>> sequences;
+
+  for (auto * record : myRecords) {
+    int pid = record->getPID();
+    if (myPIDs.find(pid) != myPIDs.end()) { 
+      if (sequences.find(pid) == sequences.end()) {
+        sequences[pid] = queue<ProcessRecord*>();
+      }
+      sequences[pid].push(record);
+    }
+  }
+  int lineLen;
+  for (auto & pidAndQueue : sequences) {
+    int pid = pidAndQueue.first;
+    fprintf(m_Wire.getOutputStream(), "Sequence of events for PID = %d\n", pid);
+    lineLen = fprintf(m_Wire.getOutputStream(), " * %5s | %3s  | %7s  | %7s  | %7s  | %7s  | %11s | %8s |\n",
+                                      "PID", "CPU", "VSS", "RSS", "PSS", "USS", "TIMESTAMP", "STATE");
+    fprintf(m_Wire.getOutputStream(), "%s\n", string(lineLen, '-').c_str());
+    auto & queue = pidAndQueue.second;
+    while (!queue.empty()) {
+      auto * record = queue.front();
+        fprintf(m_Wire.getOutputStream(), " | %5d | %3d %c |" " %7" PRIu64 "K | %7" PRIu64 "K | %7" PRIu64 "K | %7" PRIu64 "K | %11" PRIu64 " | %8d |\n",
+                                        record->getPID(),
+                                        record->getCpuUse(), '%',
+                                        record->getVss() / 1024,
+                                        record->getRss() / 1024,
+                                        record->getPss() / 1024,
+                                        record->getUss() / 1024,
+                                        record->getTimeStamp(),
+                                        record->getState());
+        fprintf(m_Wire.getOutputStream(), "%s\n", string(lineLen, '-').c_str());
+        fprintf(m_Wire.getOutputStream(), " | %s\n", record->getCause().c_str());
+        fprintf(m_Wire.getOutputStream(), "%s\n", string(lineLen, '-').c_str());
+      queue.pop();
     }
   }
   return true;
