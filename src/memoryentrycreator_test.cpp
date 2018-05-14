@@ -39,7 +39,7 @@ class MemoryEntryCreatorTest : public ::testing::Test {
 
     void testCreateFromCorrectContent() {
       auto * entry = myMemoryEntryCreator.create(1, 2, 3, 
-                                  "VSS=102588416  RSS=3674112"
+                                  "M: VSS=102588416  RSS=3674112"
                                   " PSS=2631237 USS=2592768 PID=2231");
       EXPECT_EQ(entry->getPID(), 1);
       EXPECT_EQ(entry->getName(), string("MemTrace"));
