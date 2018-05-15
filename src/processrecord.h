@@ -40,6 +40,16 @@ class ProcessRecord {
     ProcessState getState() const { return myState; }
     const string & getCause() const { return myCause; }
 
+    bool hasPID()    const { return myPID != -1;    }
+    bool hasCpuUse() const { return myCpuUsage != -1; }
+    bool hasVss()   const { return myVss != UINT64_MAX;    }
+    bool hasRss()   const { return myRss != UINT64_MAX;    }
+    bool hasPss()   const { return myPss != UINT64_MAX;    }
+    bool hasUss()   const { return myUss != UINT64_MAX;    }
+    bool hasTimeStamp() const { return myTimeStamp != UINT64_MAX; }
+    bool hasState() const { return myState != ProcessState::UNKNOWN; }
+    bool hasCause() const { return !myCause.empty(); }
+
     ProcessRecord * setPID(int pid)       { myPID    = pid;    return this; }
     ProcessRecord * setCpuUsage(int cpuUse) { myCpuUsage = cpuUse; return this; }
     ProcessRecord * setVss(uint64_t vss)      { myVss    = vss;    return this; }
