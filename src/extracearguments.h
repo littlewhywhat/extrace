@@ -84,6 +84,10 @@ class ExtraceArguments {
     const vector<Android::TraceCategory> & getAndroidCategories() const;
     const vector<KernelTraceSystem::TraceCategory> & getKernelCategories() const;
     const vector<string> & getKernelFunctions() const;
+    uint64_t getRssLimit() const;
+    void setRssLimit(uint64_t rssLimit);
+    int getCpuLimit() const;
+    void setCpuLimit(int limit);
   private:
     bool m_CircleBuffer = false;
     bool m_IgnoreSignals = false;
@@ -103,6 +107,8 @@ class ExtraceArguments {
     uint32_t m_MidSleepDuration = 5;
     uint32_t m_Period = 0;
     uint32_t m_Times = 0;
+    uint64_t myRssLimit = 0;
+    int myCpuLimit = 0;
     vector<int> m_PIDs;
     vector<string> m_Apps;
     vector<Android::TraceCategory> m_AndroidCategories;

@@ -32,6 +32,10 @@
 #include "memorysampleaction.h"
 #include "interpretdumpfileaction.h"
 
+#include "cpurssfilter.h"
+#include "cpuguard.h"
+#include "rssguard.h"
+
 ExtraceActionsRunnerBuilder::~ExtraceActionsRunnerBuilder() {
   delete m_EnvironmentBuilder;
 }
@@ -46,8 +50,15 @@ void ExtraceActionsRunnerBuilder::addStopActions(ActionsRunner & actionsRunner,
   actionsRunner.addAction(new CleanUpAction(wire, environment));
   if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()
       && extraceArguments.hasPIDs()) {
-    actionsRunner.addAction(new InterpretDumpFileAction(wire, environment, extraceArguments.getOutputFilename(),
-                                                        extraceArguments.getPIDs()));
+    actionsRunner.addAction(new InterpretDumpFileAction(wire,
+                                                        environment,
+                                                        extraceArguments.getOutputFilename(),
+                                                        extraceArguments.getPIDs(),
+                                                        new CpuRssFilter(
+                                                          new CpuGuard(extraceArguments.getCpuLimit()),
+                                                          new RssGuard(extraceArguments.getRssLimit())
+                                                        ))
+                            );
   }
 }
 
@@ -90,8 +101,16 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
                                .buildFrom(wire, environment, extraceArguments));
     if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()
         && extraceArguments.hasPIDs()) {
-      actionsRunner->addAction(new InterpretDumpFileAction(wire, environment,
-                                   extraceArguments.getOutputFilename(), extraceArguments.getPIDs()));
+      actionsRunner->addAction(
+        new InterpretDumpFileAction(wire,
+          environment,
+          extraceArguments.getOutputFilename(),
+          extraceArguments.getPIDs(),
+          new CpuRssFilter(
+            new CpuGuard(extraceArguments.getCpuLimit()),
+            new RssGuard(extraceArguments.getRssLimit())
+          ))
+      );
     }
   }
   else {

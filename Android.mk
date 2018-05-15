@@ -13,7 +13,7 @@ processrecordfile_src_files := \
 		src/tracingmarkentrycreator.cpp   \
 		src/emptyentrycreator.cpp \
 
-extrace_src_files :=  \
+common_src_files :=  \
 		src/signal.cpp   \
 		src/cmdlineapp.cpp \
 		src/environment.cpp \
@@ -47,6 +47,9 @@ extrace_src_files :=  \
 		src/simpleandroidtracesystem.cpp \
 		src/kerneltracecategory.cpp \
 		src/androidtracecategory.cpp \
+		src/cpuguard.cpp \
+    src/rssguard.cpp \
+    src/cpurssfilter.cpp \
 
 libbinder_files := \
 		src/android_impl.cpp \
@@ -78,6 +81,9 @@ common_test_files := \
     src/processrecord_test.cpp      \
     src/memoryentrycreator_test.cpp \
     src/androidentrycreator_test.cpp \
+    "src/cpuguard_test.cpp" \
+    "src/rssguard_test.cpp" \
+    "src/cpurssfilter_test.cpp" \
 
 local_test_files := \
     src/simpleftraceentryfile_test.cpp \
@@ -97,7 +103,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
 	  $(libbinder_files) \
 	  $(libz_files) \
-	  $(extrace_src_files) \
+	  $(common_src_files) \
 	  $(processrecordfile_src_files) \
 	  $(pagemap_files) \
 	  src/extrace.cpp \
@@ -161,7 +167,7 @@ LOCAL_CPPFLAGS := $(common_cflags)
 LOCAL_SRC_FILES := \
 	  $(libbinder_files) \
 		$(libz_files) \
-		$(extrace_src_files) \
+		$(common_src_files) \
 	  $(processrecordfile_src_files) \
     ${common_test_files} \
 		src/extrace_test.cpp \
@@ -189,10 +195,11 @@ LOCAL_MODULE_HOST := linux
 LOCAL_CPPFLAGS := $(common_cflags)
 LOCAL_C_INCLUDES := $(TOP)/system/core/cutils
 LOCAL_SRC_FILES := \
-		$(extrace_src_files) \
+		$(common_src_files) \
 	  $(processrecordfile_src_files) \
     ${common_test_files} \
 		src/extrace_test.cpp \
+    "src/cpurssfilter.cpp" \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock_host \
