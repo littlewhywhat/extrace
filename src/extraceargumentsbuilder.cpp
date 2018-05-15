@@ -60,7 +60,7 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "  -minUss N       minimal Uss that should trace record have to display to user\n"
          "  -n              ignore signals\n"
          "  -s N            sleep for N seconds before tracing [default 0]\n"
-         "  -t N            trace for N seconds [defualt 5]\n"
+         "  -t N            trace for N seconds [default 5]\n"
          "  -z              compress the trace dump\n"
          "  --async_start   start circular trace and return immediatly\n"
          "  --async_dump    dump the current contents of circular trace buffer\n"
@@ -143,8 +143,9 @@ void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArg
   cmdLineArgsParser.registerCommaSepList("-k", KERNEL_FUNC_OPTION_NAME);
 }
 
-ExtraceArguments * ExtraceArgumentsBuilder::createHelpExtraceArguments() const {
+ExtraceArguments * ExtraceArgumentsBuilder::createHelpExtraceArguments(const string & appName) const {
   ExtraceArguments * traceArguments = new ExtraceArguments();
+  traceArguments->setAppName(appName);
   traceArguments->setHelpMessage(getHelpMessage());
   return traceArguments;
 }
@@ -275,11 +276,11 @@ const ExtraceArguments * ExtraceArgumentsBuilder::build(const Wire & wire, const
   registerCmdLineOpts(cmdLineArgsParser);
   Arguments arguments;
   if (cmdLineArgsParser.parse(arguments, cmdLineArgs) != cmdLineArgs.getCount()) {
-    return createHelpExtraceArguments();
+    return createHelpExtraceArguments(cmdLineArgs.getAppName());
   }
   auto * traceArguments = createExtraceArguments(arguments);
   if (!traceArguments) {
-    return createHelpExtraceArguments();
+    return createHelpExtraceArguments(cmdLineArgs.getAppName());
   }
   traceArguments->setAppName(cmdLineArgs.getAppName());
   if (traceArguments->hasHelpMessage()
@@ -290,7 +291,7 @@ const ExtraceArguments * ExtraceArgumentsBuilder::build(const Wire & wire, const
        || traceArguments->hasKernelFunctions()) {
     return traceArguments;
   }
-  return createHelpExtraceArguments();
+  return createHelpExtraceArguments(cmdLineArgs.getAppName());
 }
 
 const string & ExtraceArgumentsBuilder::getHelpMessage() const {
