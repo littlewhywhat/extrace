@@ -16,16 +16,16 @@
 
 #include "extracearguments.h"
 
-uint64_t ExtraceArguments::getRssLimit() const {
-  return myRssLimit;
+uint64_t ExtraceArguments::getUssLimit() const {
+  return myUssLimit;
 }
 
 int ExtraceArguments::getCpuLimit() const {
   return myCpuLimit;
 }
 
-void ExtraceArguments::setRssLimit(uint64_t rssLimit) {
-  myRssLimit = rssLimit;
+void ExtraceArguments::setUssLimit(uint64_t rssLimit) {
+  myUssLimit = rssLimit;
 }
 
 void ExtraceArguments::setCpuLimit(int cpuLimit) {

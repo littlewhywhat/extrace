@@ -51,14 +51,12 @@ void ExtraceActionsRunnerBuilder::addStopActions(ActionsRunner & actionsRunner,
   if (extraceArguments.hasOutputFilename() && !extraceArguments.compressionEnabled()
       && extraceArguments.hasPIDs()) {
     actionsRunner.addAction(new InterpretDumpFileAction(wire,
-                                                        environment,
-                                                        extraceArguments.getOutputFilename(),
-                                                        extraceArguments.getPIDs(),
-                                                        new CpuRssFilter(
-                                                          new CpuGuard(extraceArguments.getCpuLimit()),
-                                                          new RssGuard(extraceArguments.getRssLimit())
-                                                        ))
-                            );
+                              environment,
+                              extraceArguments.getOutputFilename(),
+                              extraceArguments.getPIDs(),
+                              extraceArguments.getCpuLimit(),
+                              extraceArguments.getUssLimit()
+                            ));
   }
 }
 
@@ -106,10 +104,9 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
           environment,
           extraceArguments.getOutputFilename(),
           extraceArguments.getPIDs(),
-          new CpuRssFilter(
-            new CpuGuard(extraceArguments.getCpuLimit()),
-            new RssGuard(extraceArguments.getRssLimit())
-          ))
+          extraceArguments.getCpuLimit(),
+          extraceArguments.getUssLimit()
+        )
       );
     }
   }

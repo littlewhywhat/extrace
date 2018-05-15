@@ -40,7 +40,7 @@ static const char * PERIOD_OPTION_NAME = "Period";
 static const char * TIMES_OPTION_NAME = "Times";
 static const char * PIDS_OPTION_NAME = "PIDs";
 static const char * CPU_OPTION_NAME = "CPULimit";
-static const char * RSS_OPTION_NAME = "RSSLimit";
+static const char * USS_OPTION_NAME = "USSLimit";
 
 static const string HELP_MESSAGE = "usage: %s [options]\n"
          "options include:\n"
@@ -57,7 +57,7 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "  -m N            number of periods to pass\n"
          "  -pids N,...     PIDs to take memory measurement of\n"
          "  -minCpu N       minimal CPU usage that should trace record have to display to user\n"
-         "  -minRss N       minimal RSS that should trace record have to display to user\n"
+         "  -minUss N       minimal Uss that should trace record have to display to user\n"
          "  -n              ignore signals\n"
          "  -s N            sleep for N seconds before tracing [default 0]\n"
          "  -t N            trace for N seconds [defualt 5]\n"
@@ -135,7 +135,7 @@ void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArg
   cmdLineArgsParser.register_integer("-p", PERIOD_OPTION_NAME);
   cmdLineArgsParser.register_integer("-m", TIMES_OPTION_NAME);
   cmdLineArgsParser.register_integer("-minCpu", CPU_OPTION_NAME);
-  cmdLineArgsParser.register_integer("-minRss", RSS_OPTION_NAME);
+  cmdLineArgsParser.register_integer("-minUss", USS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepIntList("-pids", PIDS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-a", APPS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-d", ANDROID_CATEG_OPTION_NAME);
@@ -170,8 +170,8 @@ ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Argumen
   if (arguments.has_integer(CPU_OPTION_NAME)) {
     traceArguments->setCpuLimit(arguments.get_integer(CPU_OPTION_NAME));
   }
-  if (arguments.has_integer(RSS_OPTION_NAME)) {
-    traceArguments->setRssLimit(arguments.get_integer(RSS_OPTION_NAME));
+  if (arguments.has_integer(USS_OPTION_NAME)) {
+    traceArguments->setUssLimit(arguments.get_integer(USS_OPTION_NAME) * 1024);
   }
   if (arguments.has_integer(PERIOD_OPTION_NAME)) {
     traceArguments->setPeriod(arguments.get_integer(PERIOD_OPTION_NAME));
