@@ -36,7 +36,7 @@ class ExtraceArgumentsBuilder {
     map<string, KernelTraceSystem::TraceCategory> m_KernelTraceCategories;
     bool tryPutCategoriesFromFile(ExtraceArguments * extraceArguments, const string & filename) const;
     void registerCmdLineOpts(CmdLineArgsParser & cmdLineArgsParser) const;
-    ExtraceArguments * createHelpExtraceArguments() const;
+    ExtraceArguments * createHelpExtraceArguments(const string & appName) const;
     ExtraceArguments * createExtraceArguments(const Arguments & arguments) const;
     const string & getHelpMessage() const;
 };
