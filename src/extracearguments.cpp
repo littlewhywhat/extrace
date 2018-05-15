@@ -16,6 +16,22 @@
 
 #include "extracearguments.h"
 
+uint64_t ExtraceArguments::getRssLimit() const {
+  return myRssLimit;
+}
+
+int ExtraceArguments::getCpuLimit() const {
+  return myCpuLimit;
+}
+
+void ExtraceArguments::setRssLimit(uint64_t rssLimit) {
+  myRssLimit = rssLimit;
+}
+
+void ExtraceArguments::setCpuLimit(int cpuLimit) {
+  myCpuLimit = cpuLimit;
+}
+
 void ExtraceArguments::setPIDs(const vector<int> & pids) {
   m_PIDs = pids;
 }

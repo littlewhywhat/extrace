@@ -36,9 +36,12 @@ InterpretDumpFileAction::~InterpretDumpFileAction() {
 
 InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
                                                  const shared_ptr<Environment> & environment,
-                                                 const string & inputFile, const vector<int> pids):
+                                                 const string & inputFile,
+                                                 const vector<int> pids,
+                                                 const CpuRssFilter * filter):
                                                  EnvironmentAction(wire, environment),
-                                                 myInputFile(inputFile) {
+                                                 myInputFile(inputFile),
+                                                 myCpuRssFilter(filter) {
   for (int pid : pids) {
     myPIDs.insert(pid);
   }
@@ -58,6 +61,13 @@ bool InterpretDumpFileAction::tryRun() {
       sequences[pid].push(record);
     }
   }
+
+  // apply user filter
+  for (auto & pidAndQueue : sequences) {
+    myCpuRssFilter->process(pidAndQueue.second);
+  }
+
+  // print what left
   int lineLen;
   for (auto & pidAndQueue : sequences) {
     int pid = pidAndQueue.first;

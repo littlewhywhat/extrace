@@ -39,6 +39,9 @@ static const char * KERNEL_FUNC_OPTION_NAME = "KernelFunctions";
 static const char * PERIOD_OPTION_NAME = "Period";
 static const char * TIMES_OPTION_NAME = "Times";
 static const char * PIDS_OPTION_NAME = "PIDs";
+static const char * CPU_OPTION_NAME = "CPULimit";
+static const char * RSS_OPTION_NAME = "RSSLimit";
+
 static const string HELP_MESSAGE = "usage: %s [options]\n"
          "options include:\n"
          "  -a appname      enable app-level tracing for a comma\n"
@@ -53,6 +56,8 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "  -p N            period of memory measurement\n"
          "  -m N            number of periods to pass\n"
          "  -pids N,...     PIDs to take memory measurement of\n"
+         "  -minCpu N       minimal CPU usage that should trace record have to display to user\n"
+         "  -minRss N       minimal RSS that should trace record have to display to user\n"
          "  -n              ignore signals\n"
          "  -s N            sleep for N seconds before tracing [default 0]\n"
          "  -t N            trace for N seconds [defualt 5]\n"
@@ -129,6 +134,8 @@ void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArg
   cmdLineArgsParser.register_integer("-t", MID_SLEEP_OPTION_NAME);
   cmdLineArgsParser.register_integer("-p", PERIOD_OPTION_NAME);
   cmdLineArgsParser.register_integer("-m", TIMES_OPTION_NAME);
+  cmdLineArgsParser.register_integer("-minCpu", CPU_OPTION_NAME);
+  cmdLineArgsParser.register_integer("-minRss", RSS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepIntList("-pids", PIDS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-a", APPS_OPTION_NAME);
   cmdLineArgsParser.registerCommaSepList("-d", ANDROID_CATEG_OPTION_NAME);
@@ -160,6 +167,12 @@ bool ExtraceArgumentsBuilder::tryPutCategoriesFromFile(ExtraceArguments * extrac
 
 ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Arguments & arguments) const {
   ExtraceArguments * traceArguments = new ExtraceArguments();
+  if (arguments.has_integer(CPU_OPTION_NAME)) {
+    traceArguments->setCpuLimit(arguments.get_integer(CPU_OPTION_NAME));
+  }
+  if (arguments.has_integer(RSS_OPTION_NAME)) {
+    traceArguments->setRssLimit(arguments.get_integer(RSS_OPTION_NAME));
+  }
   if (arguments.has_integer(PERIOD_OPTION_NAME)) {
     traceArguments->setPeriod(arguments.get_integer(PERIOD_OPTION_NAME));
   }

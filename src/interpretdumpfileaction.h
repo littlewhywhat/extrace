@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "processrecord.h"
+#include "cpurssfilter.h"
 
 using namespace std;
 
@@ -31,8 +32,11 @@ using namespace std;
 class InterpretDumpFileAction : public EnvironmentAction {
   public:
     //! Constructs me
-    InterpretDumpFileAction(const Wire & wire, const shared_ptr<Environment> & environment,
-                            const string & inputFile, const vector<int> pids);
+    InterpretDumpFileAction(const Wire & wire,
+                            const shared_ptr<Environment> & environment,
+                            const string & inputFile,
+                            const vector<int> pids,
+                            const CpuRssFilter * cpuRssFilter);
     //! Destroys my records and me
     ~InterpretDumpFileAction();
     bool tryRun() override;
@@ -43,7 +47,8 @@ class InterpretDumpFileAction : public EnvironmentAction {
     set<int> myPIDs;
     //! My Process records that I collect from input file
     vector<ProcessRecord*> myRecords;
-
+    //! My CpuRssFilter to filter records
+    const CpuRssFilter * myCpuRssFilter;
 };
 
 #endif // LTTLWHWHT_INTERPRET_DUMPFILEACTION_H
