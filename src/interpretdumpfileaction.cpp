@@ -38,10 +38,12 @@ InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
                                                  const shared_ptr<Environment> & environment,
                                                  const string & inputFile,
                                                  const vector<int> pids,
-                                                 const CpuRssFilter * filter):
+                                                 int cpuLimit,
+                                                 uint64_t rssLimit):
                                                  EnvironmentAction(wire, environment),
                                                  myInputFile(inputFile),
-                                                 myCpuRssFilter(filter) {
+                                                 myCpuLimit(cpuLimit),
+                                                 myUssLimit(rssLimit) {
   for (int pid : pids) {
     myPIDs.insert(pid);
   }
@@ -62,9 +64,47 @@ bool InterpretDumpFileAction::tryRun() {
     }
   }
 
-  // apply user filter
   for (auto & pidAndQueue : sequences) {
-    myCpuRssFilter->process(pidAndQueue.second);
+    auto & records = pidAndQueue.second;
+    size_t size;
+
+    size = records.size();
+    // apply user CPU filter
+    for (size_t i = 0; i < size; i++) {
+      auto * record = records.front();
+      records.pop();
+      if (!record->hasCpuUse()) {
+        continue;      
+      }  
+      else {
+        if (record->getCpuUse() >= myCpuLimit) {
+          records.push(record);
+        }
+      }
+    }
+
+    // apply user Mem filter
+    size = records.size();
+    uint64_t history;
+    bool initHistory = false;
+    for (size_t i = 0; i < size; i++) {
+      auto * record = records.front();
+      records.pop();
+      if (record->hasUss()) {
+        if (!initHistory) {
+          history = record->getUss();
+          records.push(record);
+          initHistory = true;
+        }
+        else {
+          uint64_t rss = record->getUss();
+          if (rss < history + myUssLimit) {
+            continue;
+          }
+          records.push(record);
+        }
+      }
+    }
   }
 
   // print what left
@@ -76,9 +116,18 @@ bool InterpretDumpFileAction::tryRun() {
                                       "PID", "CPU", "VSS", "RSS", "PSS", "USS", "TIMESTAMP", "STATE");
     fprintf(m_Wire.getOutputStream(), "%s\n", string(lineLen, '-').c_str());
     auto & queue = pidAndQueue.second;
+    map<ProcessState, string> stateNames;
+    stateNames = {
+      { ProcessState::RUNNING, "RUNNING" },
+      { ProcessState::SLEEPING, "SLEEPING"},
+      { ProcessState::AWAKE, "AWAKE"},
+      { ProcessState::UNKNOWN, "UNKNOWN"}
+    };
     while (!queue.empty()) {
       auto * record = queue.front();
-        fprintf(m_Wire.getOutputStream(), " | %5d | %3d %c |" " %7" PRIu64 "K | %7" PRIu64 "K | %7" PRIu64 "K | %7" PRIu64 "K | %11" PRIu64 " | %8d |\n",
+
+
+        fprintf(m_Wire.getOutputStream(), " | %5d | %3d %c |" " %7" PRIu64 "K | %7" PRIu64 "K | %7" PRIu64 "K | %7" PRIu64 "K | %11" PRIu64 " | %8s |\n",
                                         record->getPID(),
                                         record->getCpuUse(), '%',
                                         record->getVss() / 1024,
@@ -86,7 +135,7 @@ bool InterpretDumpFileAction::tryRun() {
                                         record->getPss() / 1024,
                                         record->getUss() / 1024,
                                         record->getTimeStamp(),
-                                        record->getState());
+                                        stateNames[record->getState()].c_str());
         fprintf(m_Wire.getOutputStream(), "%s\n", string(lineLen, '-').c_str());
         fprintf(m_Wire.getOutputStream(), " | %s\n", record->getCause().c_str());
         fprintf(m_Wire.getOutputStream(), "%s\n", string(lineLen, '-').c_str());
