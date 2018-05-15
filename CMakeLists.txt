@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.1)
 
 # Download and unpack googletest at configure time
-configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
+# configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+# execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+#   RESULT_VARIABLE result
+#   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+# if(result)
+#   message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+# endif()
+# execute_process(COMMAND ${CMAKE_COMMAND} --build .
+#   RESULT_VARIABLE result
+#   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+# if(result)
+#   message(FATAL_ERROR "Build step for googletest failed: ${result}")
+# endif()
 
 # Prevent overriding the parent project's compiler/linker
 # settings on Windows
@@ -81,6 +81,12 @@ list(APPEND OBJ_SOURCES
     "src/emptyentrycreator.cpp"
     "src/androidentrycreator.cpp"
     "src/memoryentrycreator.cpp"
+    "src/cpuguard.cpp"
+    "src/cpuguard_test.cpp"
+    "src/rssguard.cpp"
+    "src/rssguard_test.cpp"
+    "src/cpurssfilter.cpp"
+    "src/cpurssfilter_test.cpp"
     ### String8, ... google libraries
     # "src/androidtoolbox.cpp"
     ### android toolbox dependencies
