@@ -44,20 +44,19 @@ static const char * USS_OPTION_NAME = "USSLimit";
 
 static const string HELP_MESSAGE = "usage: %s [options]\n"
          "options include:\n"
-         "  -a appname      enable app-level tracing for a comma\n"
-         "                  separated list of cmdlines\n"
+         "  -a app_package  enable app-level tracing for a comma\n"
+         "                  separated list of package names\n"
          "  -b N            use a trace buffer size of N KB\n"
          "  -c              trace into a circular buffer\n"
          "  -d aname,...    trace the listed android categories\n"
          "  -e kname,...    trace the listed kernel categories\n"
          "  -f filename     use the categories written in a file as space-separated\n"
          "                    values in a line\n"
-         "  -k fname,...    trace the listed kernel functions\n"
          "  -p N            period of memory measurement\n"
          "  -m N            number of periods to pass\n"
          "  -pids N,...     PIDs to take memory measurement of\n"
          "  -minCpu N       minimal CPU usage that should trace record have to display to user\n"
-         "  -minUss N       minimal Uss that should trace record have to display to user\n"
+         "  -minUss N       minimal Uss that should a trace record have to be displayed to user\n"
          "  -n              ignore signals\n"
          "  -s N            sleep for N seconds before tracing [default 0]\n"
          "  -t N            trace for N seconds [default 5]\n"
@@ -158,10 +157,10 @@ bool ExtraceArgumentsBuilder::tryPutCategoriesFromFile(ExtraceArguments * extrac
     return false;
   }
   for (const auto & token : tokens) {
-    if (m_AndroidTraceCategories.find(token) == m_AndroidTraceCategories.cend()) {
+    if (m_KernelTraceCategories.find(token) == m_KernelTraceCategories.cend()) {
       return false;
     }
-    extraceArguments->addAndroidCategory(m_AndroidTraceCategories.at(token));
+    extraceArguments->addKernelCategory(m_KernelTraceCategories.at(token));
   }
   return true;
 }
@@ -288,7 +287,10 @@ const ExtraceArguments * ExtraceArgumentsBuilder::build(const Wire & wire, const
        || traceArguments->hasKernelCategories()
        || traceArguments->hasAndroidCategories()
        || traceArguments->hasApps()
-       || traceArguments->hasKernelFunctions()) {
+       || traceArguments->hasKernelFunctions()
+       || traceArguments->coreServicesEnabled()
+       || traceArguments->asyncStopEnabled()
+       || traceArguments->asyncDumpEnabled()) {
     return traceArguments;
   }
   return createHelpExtraceArguments(cmdLineArgs.getAppName());
