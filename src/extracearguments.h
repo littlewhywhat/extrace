@@ -29,6 +29,7 @@ using namespace std;
 class ExtraceArguments {
   public:
     ExtraceArguments();
+    const string & getMountPoint() const;
     void setPIDs(const vector<int> & pids);
     const vector<int> & getPIDs() const;
     bool hasPIDs() const;
@@ -102,6 +103,7 @@ class ExtraceArguments {
     string m_HelpMessage;
     string m_OutputFilename;
     string m_KernelCategoryFilename;
+    string myMountPoint = "/sys/kernel/debug";
     uint32_t m_BufferSize = 1024;
     uint32_t m_InitSleepDuration = 0;
     uint32_t m_MidSleepDuration = 5;

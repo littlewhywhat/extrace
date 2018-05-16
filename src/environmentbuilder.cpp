@@ -30,7 +30,7 @@
 Environment * EnvironmentBuilder::build(const Wire & wire, const ExtraceArguments & traceArguments) const {
   auto toolBox = shared_ptr<ToolBox>(new AndroidToolBox());
   auto fileSystem = shared_ptr<FileSystem>(new FileSystemImpl(wire));
-  auto ftrace = shared_ptr<FTrace>(new FTrace(wire, fileSystem, toolBox));
+  auto ftrace = shared_ptr<FTrace>(new FTrace(wire, fileSystem, toolBox, traceArguments.getMountPoint()));
   auto android = shared_ptr<Android>(new AndroidImpl(wire));
   FileDataMaker * fileDataMaker;
   if (traceArguments.compressionEnabled()) {

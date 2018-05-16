@@ -38,7 +38,8 @@ class FTrace : public Wired {
     enum class Tracer;
     FTrace(const Wire & wire,
            shared_ptr<FileSystem> & fileSystem,
-           shared_ptr<ToolBox> toolBox);
+           shared_ptr<ToolBox> toolBox,
+           const string & mountPoint);
     ~FTrace() {};
     int getTraceFd();
     int getTracePipeFd();
@@ -116,14 +117,14 @@ class FTrace : public Wired {
       NOP,
     };
   private:
-    const char * m_TraceClockPath =  "/sys/kernel/debug/tracing/trace_clock";
-    const char * m_TraceBufferSizePath =  "/sys/kernel/debug/tracing/buffer_size_kb";
-    const char * m_CurrentTracerPath =  "/sys/kernel/debug/tracing/current_tracer";
-    const char * m_TraceFilterPath =  "/sys/kernel/debug/tracing/set_ftrace_filter";
-    const char * m_TracingOnPath =  "/sys/kernel/debug/tracing/tracing_on";
-    const char * m_TracePath =  "/sys/kernel/debug/tracing/trace";
-    const char * m_TracePipePath =  "/sys/kernel/debug/tracing/trace_pipe";
-    const char * m_TraceMarkerPath =  "/sys/kernel/debug/tracing/trace_marker";
+    string m_TraceClockPath;
+    string m_TraceBufferSizePath;
+    string m_CurrentTracerPath;
+    string m_TraceFilterPath;
+    string m_TracingOnPath;
+    string m_TracePath;
+    string m_TracePipePath;
+    string m_TraceMarkerPath;
     map<TracePoint, string> m_TracePoints;
     map<Option, string> m_Options;
     map<ClockType, string> m_ClockTypes;

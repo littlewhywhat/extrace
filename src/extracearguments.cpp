@@ -16,6 +16,10 @@
 
 #include "extracearguments.h"
 
+const string & ExtraceArguments::getMountPoint() const {
+  return myMountPoint;
+}
+
 uint64_t ExtraceArguments::getUssLimit() const {
   return myUssLimit;
 }
