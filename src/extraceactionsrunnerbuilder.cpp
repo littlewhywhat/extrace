@@ -32,7 +32,6 @@
 #include "memorysampleaction.h"
 #include "interpretdumpfileaction.h"
 
-#include "cpurssfilter.h"
 #include "cpuguard.h"
 #include "rssguard.h"
 

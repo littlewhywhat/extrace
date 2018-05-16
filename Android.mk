@@ -49,7 +49,6 @@ common_src_files :=  \
 		src/androidtracecategory.cpp \
 		src/cpuguard.cpp \
     src/rssguard.cpp \
-    src/cpurssfilter.cpp \
 
 libbinder_files := \
 		src/android_impl.cpp \
@@ -83,7 +82,6 @@ common_test_files := \
     src/androidentrycreator_test.cpp \
     "src/cpuguard_test.cpp" \
     "src/rssguard_test.cpp" \
-    "src/cpurssfilter_test.cpp" \
 
 local_test_files := \
     src/simpleftraceentryfile_test.cpp \
@@ -122,35 +120,6 @@ LOCAL_SHARED_LIBRARIES := \
     libutils \
     libz \
     libpagemap \
-
-include $(BUILD_EXECUTABLE)
-
-# memeater
-# ========
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := memeater
-
-LOCAL_CPPFLAGS := $(common_cflags)
-
-LOCAL_SRC_FILES := \
-						src/memeater.cpp \
-
-include $(BUILD_EXECUTABLE)
-
-# extrace_file
-# ============
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := extrace_file
-
-LOCAL_CPPFLAGS := $(common_cflags)
-
-LOCAL_SRC_FILES := \
-		$(processrecordfile_src_files) \
-		src/extrace_file.cpp           \
 
 include $(BUILD_EXECUTABLE)
 
@@ -199,7 +168,6 @@ LOCAL_SRC_FILES := \
 	  $(processrecordfile_src_files) \
     ${common_test_files} \
 		src/extrace_test.cpp \
-    "src/cpurssfilter.cpp" \
 
 LOCAL_STATIC_LIBRARIES := \
     libgmock_host \
