@@ -63,6 +63,7 @@ list(APPEND OBJ_SOURCES
     "src/filesystem_impl.cpp"
     "src/trace_impl.cpp"
     "src/ftrace.cpp"
+    "src/ftrace_test.cpp"
     "src/kerneltracesystem.cpp"
     "src/simplefiledata.cpp"
     "src/filedataslice.cpp"
@@ -90,6 +91,8 @@ list(APPEND OBJ_SOURCES
     ### android toolbox dependencies
     # "src/cmdlineargsparser_test.cpp"
     # "src/extraceargumentsbuilder.cpp"
+    # "src/simpleandroidtracesystem.cpp"
+    # "src/simpleandroidtracesystem_test.cpp"
     ### systemtime library
     # "src/systemtime_impl.cpp"
     ### systemtime dependencies
@@ -97,7 +100,6 @@ list(APPEND OBJ_SOURCES
     ### android Binder, properties
     # "src/android_impl.cpp"
     ### android_impl dependencies
-    # "src/simpleandroidtracesystem.cpp"
     # "src/environmentbuilder.cpp"
     # "src/extraceactioncmdlinebuilder.cpp"
     # "src/extraceactionsrunnerbuilder.cpp"
