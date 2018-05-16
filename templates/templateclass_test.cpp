@@ -14,29 +14,65 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+/*
+   This is a template for test of ClassName.
+   Things to substitute:
+    - ClassName, classname
+    - Dependency, dependency, dependencyMethodName
+    - MethodName, methodName, 
+   After test is run and fails with testThatIrun,
+   remove it and uncomment other methods
+ */
 
-#include "templateclass.h"
-#include "mock_templateinterface.h"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+#include "classname.h"
+// #include "mock_dependency.h"
 
 using ::testing::Return;
+using ::testing::_;
 
-//! Tests TemplateClassTest
-class TemplateClassTest : public ::testing::Test {
+//! I am a test of ClassName. I can test its methods.
+class ClassNameTest : public ::testing::Test {
   public:
-    //! tests method of TemplateClass
-    void test_method() {
-      MockTemplateInterface * templateinterface = new MockTemplateInterface();
-      EXPECT_CALL(*templateinterface, mock_method())
-                                      .AtLeast(1);
-      templateclass.set_templateinterface(templateinterface);
+    //! Setups my resources
+    // void SetUp() {
+    //   myMockDependency = new MockDependency();
+    //   myClassName = new ClassName(myMockDependency);
+    // }
+
+    //! Tears down my resources
+    // void TearDown() {
+    //   // assumed here that MockDependency is managed by ClassName
+    //   delete myClassName;
+    //   myMockDependency = NULL;
+    //   myClassName = NULL;
+    // }
+
+    //! Tests ClassName's methodName method
+    // void testMethodName() {
+    //   EXPECT_CALL(*myMockDependency, mockMethod())
+    //                                   .WillOnce(Return(true));
+    //   myClassName->methodName();
+    // }
+
+    void testThatIrun() {
+      ASSERT_TRUE(false);
     }
   private:
-    //! Tested instance of TemplateClass
-    TemplateClass templateclass;
+    //! Tested instance of ClassName
+    ClassName * myClassName = NULL;
+    // MockDependency * myMockDependency = NULL;
+
 };
 
-TEST_F(TemplateClassTest, method)
+// TEST_F(ClassNameTest, testMethodName)
+// {
+//   testMethodName();
+// }
+
+TEST_F(ClassNameTest, testThatIrun)
 {
-  test_method();
+  testThatIrun();
 }

@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_MOCK_TEMPLATEINTERFACE_H
-#define LTTLWHWHT_MOCK_TEMPLATEINTERFACE_H
+/* This is a template for MockInterfaceName
+   Things to substitute:
+    - InterfaceName, interfacename, INTERFACENAME
+    - methodName
+ */
+
+#ifndef LTTLWHWHT_MOCK_INTERFACENAME_H
+#define LTTLWHWHT_MOCK_INTERFACENAME_H
 
 #include <gmock/gmock.h>
 
-class MockInterface : public TemplateInterface {
- public:
-  MOCK_METHOD0(method, void(void));
+#include "interfacename.h"
+
+class MockInterfaceName : public InterfaceName {
+  public:
+    MOCK_METHOD0(methodName, void(void));
+    MOCK_CONST_METHOD0(methodName, void(void));
 };
 
-#endif // LTTLWHWHT_MOCK_TEMPLATEINTERFACE_H
+#endif // LTTLWHWHT_MOCK_INTERFACENAME_H
