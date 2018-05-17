@@ -28,7 +28,7 @@
 //! Number of app packages to trace
 #define MAX_PACKAGES 16;
 
-AndroidImpl::AndroidImpl(const Wire & wire): Android(wire) {
+AndroidImpl::AndroidImpl(const Wire & wire): Wired(wire), Android() {
   m_TraceCategoriesTags[TraceCategory::GRAPHICS]         = ATRACE_TAG_GRAPHICS;
   m_TraceCategoriesTags[TraceCategory::INPUT]            = ATRACE_TAG_INPUT;
   m_TraceCategoriesTags[TraceCategory::VIEW]             = ATRACE_TAG_VIEW;

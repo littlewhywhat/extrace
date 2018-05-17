@@ -23,7 +23,7 @@
 
 using namespace std;
 
-class AndroidImpl : public Android {
+class AndroidImpl : public Wired, public Android {
   public:
     AndroidImpl(const Wire & wire);
     ~AndroidImpl() {}

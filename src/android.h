@@ -25,10 +25,9 @@
 
 using namespace std;
 
-class Android : public Wired {
+class Android {
   public:
     enum class TraceCategory;
-    Android(const Wire & wire): Wired(wire) {}
     virtual ~Android() {}
     virtual uint32_t getTraceAppsMaxNum() const = 0;
     virtual const string getTraceCoreServicesProperty() = 0;
