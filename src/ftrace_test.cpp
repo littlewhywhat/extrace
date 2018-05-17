@@ -74,7 +74,7 @@ class FTraceTest : public ::testing::Test {
                                       .Times(0);
       EXPECT_CALL(*myMockFileSystem, fileIsWritable(_))
                                       .WillOnce(Return(false));
-      EXPECT_FALSE(myFTrace->tryEnableTracePoint(FTrace::TracePoint::SCHED_SWITCH));
+      EXPECT_FALSE(myFTrace->tryEnableTracePoint(tracePoint));
     }
 
     //! Tests FTrace's tryCleanTrace method
@@ -191,6 +191,35 @@ class FTraceTest : public ::testing::Test {
       tokens.erase("wild*card");
       EXPECT_EQ(functions, tokens);
     }
+
+    //! Tests FTrace's trySetBufferSize
+    void testTrySetBufferSize() {
+      EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                    + "/tracing/buffer_size_kb"),
+                                              StrEq("4294967295")))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->trySetBufferSize(UINT32_MAX));
+    }
+
+    //! Tests FTrace's tryEnableOption nethod with accessible option
+    void testTryEnableAccessableOption(const FTrace::Option & option,
+                                       const char * optionPath) {
+      EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                    + optionPath), StrEq("1")))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(_))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tryEnableOption(option));
+    }
+
+    //! Tests FTrace's tryEnableOption method with not accessable tracepoint
+    void testTryEnableNotAccessableOption(const FTrace::Option & option) {
+      EXPECT_CALL(*myMockFileSystem, writeStr(_,_))
+                                      .Times(0);
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(_))
+                                      .WillOnce(Return(false));
+      EXPECT_FALSE(myFTrace->tryEnableOption(option));
+    }
   private:
     //! Tested instance of FTrace
     FTrace * myFTrace = NULL;
@@ -209,6 +238,17 @@ TEST_F(FTraceTest, testTryEnableAccessableTracePoint)
 TEST_F(FTraceTest, testTryEnableNotAccessableTracePoint)
 {
   testTryEnableNotAccessableTracePoint(FTrace::TracePoint::SCHED_SWITCH);
+}
+
+TEST_F(FTraceTest, testTryEnableAccessableOption)
+{
+  testTryEnableAccessableOption(FTrace::Option::OVERWRITE,
+                                "/tracing/options/overwrite");
+}
+
+TEST_F(FTraceTest, testTryEnableNotAccessableOption)
+{
+  testTryEnableNotAccessableOption(FTrace::Option::OVERWRITE);
 }
 
 TEST_F(FTraceTest, testTryCleanTrace) {
@@ -259,4 +299,8 @@ TEST_F(FTraceTest, testTryStopTrace) {
 
 TEST_F(FTraceTest, tryGetFunctionsFromFilter) {
   testTryGetFunctionsFromFilter();
+}
+
+TEST_F(FTraceTest, trySetBufferSize) {
+  testTrySetBufferSize();
 }

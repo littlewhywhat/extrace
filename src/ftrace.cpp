@@ -149,7 +149,8 @@ bool FTrace::tryCleanTrace()
 bool FTrace::trySetBufferSize(uint32_t bufferSize)
 {
   if (bufferSize == 0) {
-    fprintf(m_Wire.getErrorStream(), "error FTrace: bufferSize can't be set to 0\n");    
+    fprintf(m_Wire.getErrorStream(), "error FTrace: bufferSize can't be set to 0\n");
+    return false; 
   }
   char str[32];
   snprintf(str, 32, "%u", bufferSize);
