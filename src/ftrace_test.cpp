@@ -199,6 +199,7 @@ class FTraceTest : public ::testing::Test {
                                               StrEq("4294967295")))
                                       .WillOnce(Return(true));
       EXPECT_TRUE(myFTrace->trySetBufferSize(UINT32_MAX));
+      EXPECT_FALSE(myFTrace->trySetBufferSize(0));
     }
 
     //! Tests FTrace's tryEnableOption nethod with accessible option
@@ -219,6 +220,28 @@ class FTraceTest : public ::testing::Test {
       EXPECT_CALL(*myMockFileSystem, fileIsWritable(_))
                                       .WillOnce(Return(false));
       EXPECT_FALSE(myFTrace->tryEnableOption(option));
+    }
+
+    //! Tests FTrace's hasTraceClockSetTo
+    void testHasTraceClockSetTo() {
+      const char * traceClockContent = "global [local]";
+      EXPECT_CALL(*myMockFileSystem, readStr(StrEq(myFTraceMountPoint
+                                                     + "/tracing/trace_clock"),
+                                             _, 4097))
+                                      .WillOnce(
+                                        DoAll(
+                                          SetArrayArgument<1>(traceClockContent,
+                                                              traceClockContent
+                                                              + strlen(traceClockContent)), 
+                                                      Return(true)))
+                                      .WillOnce(
+                                        DoAll(
+                                          SetArrayArgument<1>(traceClockContent,
+                                                              traceClockContent
+                                                              + strlen(traceClockContent)), 
+                                                      Return(true)));
+      EXPECT_FALSE(myFTrace->hasTraceClockSetTo(FTrace::ClockType::GLOBAL));
+      EXPECT_TRUE(myFTrace->hasTraceClockSetTo(FTrace::ClockType::LOCAL));
     }
   private:
     //! Tested instance of FTrace
@@ -303,4 +326,8 @@ TEST_F(FTraceTest, tryGetFunctionsFromFilter) {
 
 TEST_F(FTraceTest, trySetBufferSize) {
   testTrySetBufferSize();
+}
+
+TEST_F(FTraceTest, hasTraceClockSetTo) {
+  testHasTraceClockSetTo();
 }
