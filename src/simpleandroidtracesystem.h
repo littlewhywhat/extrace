@@ -18,6 +18,7 @@
 #define LTTLWHWHT_SIMPLEANDROIDSYSTEM_H
 
 #include "androidtracesystem.h"
+#include "toolbox.h"
 
 #include <set>
 #include <memory>
@@ -30,8 +31,12 @@ using namespace std;
 class SimpleAndroidTraceSystem : public AndroidTraceSystem {
   public:
     //! Constructs me for Android
-    SimpleAndroidTraceSystem(const Wire & wire, const shared_ptr<Android> & android):
-                             AndroidTraceSystem(wire), m_Android(android) {}
+    SimpleAndroidTraceSystem(const Wire & wire,
+                             const shared_ptr<Android> & android,
+                             const shared_ptr<ToolBox> & toolBox):
+                             AndroidTraceSystem(wire),
+                             m_Android(android),
+                             myToolBox(toolBox) {}
     bool canTraceCoreServices() const override;
     void rememberToTrace(const string & appName) override;
     void rememberToTrace(const Android::TraceCategory & category) override;
@@ -41,6 +46,7 @@ class SimpleAndroidTraceSystem : public AndroidTraceSystem {
     bool tryNotToTrace() override;
   private:
     shared_ptr<Android> m_Android = NULL;
+    shared_ptr<ToolBox> myToolBox = NULL;
     set<string> m_AppNames;
     set<Android::TraceCategory> m_Categories;
     void stopTraceAllApps();

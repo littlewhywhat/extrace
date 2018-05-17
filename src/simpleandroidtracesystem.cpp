@@ -18,7 +18,6 @@
 #include "simpleandroidtracesystem.h"
 
 #include "android.h"
-#include "androidtoolbox.h"
 
 bool SimpleAndroidTraceSystem::canTraceCoreServices() const {
   const string coreServicesPropertyValue = m_Android->getTraceCoreServicesProperty();
@@ -36,7 +35,7 @@ void SimpleAndroidTraceSystem::rememberToTrace(const Android::TraceCategory & ca
 void SimpleAndroidTraceSystem::rememberToTraceCoreServices() {
   const string coreServicesPropertyValue = m_Android->getTraceCoreServicesProperty();
   set<string> tokens;
-  AndroidToolBox().parseToTokens(coreServicesPropertyValue.c_str(), ",", tokens);
+  myToolBox->parseToTokens(coreServicesPropertyValue.c_str(), ",", tokens);
   for (const auto & token : tokens) {
     rememberToTrace(token);
   }

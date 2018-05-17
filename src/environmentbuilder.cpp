@@ -44,7 +44,7 @@ Environment * EnvironmentBuilder::build(const Wire & wire, const ExtraceArgument
   for (const auto & category: traceArguments.getKernelCategories()) {
     kernelTraceSystem->rememberToTrace(category);    
   }
-  auto androidTraceSystem = shared_ptr<AndroidTraceSystem>(new SimpleAndroidTraceSystem(wire, android));
+  auto androidTraceSystem = shared_ptr<AndroidTraceSystem>(new SimpleAndroidTraceSystem(wire, android, toolBox));
   for (const auto & category: traceArguments.getAndroidCategories()) {
     androidTraceSystem->rememberToTrace(category);    
   }
