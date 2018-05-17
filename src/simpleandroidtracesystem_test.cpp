@@ -77,10 +77,57 @@ class SimpleAndroidTraceSystemTest : public ::testing::Test {
       EXPECT_TRUE(mySimpleAndroidTraceSystem->canTraceCoreServices());
     }
 
+    //! Tests SimpleAndroidTraceSystem's tryToTrace method with apps, categories and core
+    void testTryToTrace() {
+      const string coreservices = "core1,core2,core3";
+      EXPECT_CALL(*myMockAndroid, getTraceCoreServicesProperty())
+                                      .WillOnce(Return(coreservices));
+      set<string> tokens = { "core1", "core2", "core3" };
+      EXPECT_CALL(*myMockToolBox, parseToTokens(StrEq(coreservices),
+                                                StrEq(","), _))
+                  .WillOnce(SetArgReferee<2>(tokens));
+      EXPECT_CALL(*myMockAndroid, getTraceAppsMaxNum())
+                                      .WillOnce(Return(2+3));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq("app1"), 0))
+                                      .WillOnce(Return(true));                                      
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq("app2"), 1))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq("core1"), 2))
+                                      .WillOnce(Return(true));                                      
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq("core2"), 3))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq("core3"), 4))
+                                      .WillOnce(Return(true));                                      
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppsCntProperty(5))
+                                      .WillOnce(Return(true));  
+      EXPECT_CALL(*myMockAndroid, tryPokeBinderServices())
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, getCategoryTraceTag(Android::TraceCategory::ACTIVITY_MANAGER))
+                                      .WillOnce(Return(1));                                      
+      EXPECT_CALL(*myMockAndroid, getCategoryTraceTag(Android::TraceCategory::POWER))
+                                      .WillOnce(Return(2));
+      EXPECT_CALL(*myMockAndroid, trySetTraceTagsProperty(3))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, logDumpingTrace())
+                                      .Times(1);                          
+
+      const vector<string> apps = { "app1", "app2" };
+      const vector<Android::TraceCategory> categories = { Android::TraceCategory::ACTIVITY_MANAGER,
+                                                          Android::TraceCategory::POWER };
+      mySimpleAndroidTraceSystem->rememberToTraceCoreServices();
+      for (auto & app : apps) {
+        mySimpleAndroidTraceSystem->rememberToTrace(app);
+      }
+      for (auto & category : categories) {
+        mySimpleAndroidTraceSystem->rememberToTrace(category);
+      }
+      mySimpleAndroidTraceSystem->tryToTrace();
+    }
+
   private:
     //! Tested instance of SimpleAndroidTraceSystem
     Wire * myWire = NULL;
-    ToolBox * myMockToolBox = NULL;
+    MockToolBox * myMockToolBox = NULL;
     MockAndroid * myMockAndroid = NULL;
     SimpleAndroidTraceSystem * mySimpleAndroidTraceSystem = NULL;
 };
@@ -95,3 +142,6 @@ TEST_F(SimpleAndroidTraceSystemTest, testCanTraceCoreServicesFalse)
   testCanTraceCoreServicesFalse();
 }
 
+TEST_F(SimpleAndroidTraceSystemTest, testTryToTrace) {
+  testTryToTrace();
+}
