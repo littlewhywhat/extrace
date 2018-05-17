@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-/*
-   This is a template for test of FTrace.
-   Things to substitute:
-    - FTrace, ftrace
-    - FileSystem, filesystem
-    - TryEnableTracePoint, tryEnableTracePoint
-   After test is run and fails with testThatIrun,
-   remove it and uncomment other methods
- */
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -38,6 +28,9 @@ using namespace std;
 using ::testing::Return;
 using ::testing::_;
 using ::testing::StrEq;
+using ::testing::SetArgPointee;
+using ::testing::SetArgReferee;
+using ::testing::SetArrayArgument;
 
 //! I am a test of FTrace. I can test its methods.
 class FTraceTest : public ::testing::Test {
@@ -177,6 +170,27 @@ class FTraceTest : public ::testing::Test {
                                       .WillOnce(Return(true));
       EXPECT_TRUE(myFTrace->tryStopTrace());
     }
+
+    //! Tests FTrace's tryGetFunctionsFromFilter
+    void testTryGetFunctionsFromFilter() {
+      const char * functionFilterContent = "function1\nwild*card\nfunction2\n";
+      EXPECT_CALL(*myMockFileSystem, readStr(StrEq(myFTraceMountPoint
+                                                     + "/tracing/set_ftrace_filter"),
+                                             _, 4097))
+                                      .WillOnce(
+                                        DoAll(
+                                          SetArrayArgument<1>(functionFilterContent,
+                                                              functionFilterContent
+                                                              + strlen(functionFilterContent)), 
+                                                      Return(true)));
+      set<string> tokens = { "function1", "wild*card", "function2" };
+      EXPECT_CALL(*myMockToolBox, parseToTokens(StrEq(functionFilterContent),
+                                                StrEq("\n"), _))
+                  .WillOnce(SetArgReferee<2>(tokens));
+      const set<string> functions = myFTrace->tryGetFunctionsFromFilter();
+      tokens.erase("wild*card");
+      EXPECT_EQ(functions, tokens);
+    }
   private:
     //! Tested instance of FTrace
     FTrace * myFTrace = NULL;
@@ -241,4 +255,8 @@ TEST_F(FTraceTest, testTryStartTrace) {
 
 TEST_F(FTraceTest, testTryStopTrace) {
   testTryStopTrace();
+}
+
+TEST_F(FTraceTest, tryGetFunctionsFromFilter) {
+  testTryGetFunctionsFromFilter();
 }
