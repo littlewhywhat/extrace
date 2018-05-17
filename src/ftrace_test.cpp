@@ -67,11 +67,12 @@ class FTraceTest : public ::testing::Test {
     //! Tests FTrace's tryEnableTracePoint method with accessable tracepoint
     void testTryEnableAccessableTracePoint(const FTrace::TracePoint & tracePoint,
                                            const char * tracePointPath) {
-      EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(tracePointPath), StrEq("1")))
+      EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                    + tracePointPath), StrEq("1")))
                                       .WillOnce(Return(true));
       EXPECT_CALL(*myMockFileSystem, fileIsWritable(_))
                                       .WillOnce(Return(true));
-      myFTrace->tryEnableTracePoint(tracePoint);
+      EXPECT_TRUE(myFTrace->tryEnableTracePoint(tracePoint));
     }
 
     //! Tests FTrace's tryEnableTracePoint method with not accessable tracepoint
@@ -80,16 +81,109 @@ class FTraceTest : public ::testing::Test {
                                       .Times(0);
       EXPECT_CALL(*myMockFileSystem, fileIsWritable(_))
                                       .WillOnce(Return(false));
-      myFTrace->tryEnableTracePoint(FTrace::TracePoint::SCHED_SWITCH);
+      EXPECT_FALSE(myFTrace->tryEnableTracePoint(FTrace::TracePoint::SCHED_SWITCH));
     }
 
+    //! Tests FTrace's tryCleanTrace method
+    void testTryCleanTrace() {
+      EXPECT_CALL(*myMockFileSystem, truncateFile(StrEq(myFTraceMountPoint
+                                                        + "/tracing/trace")))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tryCleanTrace());
+    }
+    //! Tests FTrace's tracePointAccessable method
+    void testTracePointAccessable(const FTrace::TracePoint & tracePoint,
+                                  const char * tracePointPath) {
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(StrEq(myFTraceMountPoint
+                                                          + tracePointPath)))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tracePointAccessable(tracePoint));
+    }
+    //! Tests FTrace's tracePointExists method
+    void testTracePointExists(const FTrace::TracePoint & tracePoint,
+                              const char * tracePointPath) {
+      EXPECT_CALL(*myMockFileSystem, fileExists(StrEq(myFTraceMountPoint
+                                                      + tracePointPath)))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tracePointExists(tracePoint));
+    }
+    //! Tests FTrace's tryWriteMarker method
+    void testTryWriteMarker(const char * marker) {
+       EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                     + "/tracing/trace_marker"),
+                                               StrEq(marker)))
+                                      .WillOnce(Return(true));
+       EXPECT_TRUE(myFTrace->tryWriteMarker(marker));
+    }
+    //! Tests FTrace's trySetTracer method
+    void testTrySetTracer(const FTrace::Tracer & tracer, const char * tracerName) {
+       EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                     + "/tracing/current_tracer"),
+                                               StrEq(tracerName)))
+                                      .WillOnce(Return(true));
+       EXPECT_TRUE(myFTrace->trySetTracer(tracer));
+    }
+
+    //! Tests FTrace's tryClearFunctionFilter method
+    void testTryClearFunctionFilter() {
+      EXPECT_CALL(*myMockFileSystem, truncateFile(StrEq(myFTraceMountPoint
+                                                     + "/tracing/set_ftrace_filter")))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tryClearFunctionFilter());
+    }
+    //! Tests FTrace's tryAddFunctionToFilter method
+    void testTryAddFunctionToFilter(const char * function) {
+       EXPECT_CALL(*myMockFileSystem, appendStr(StrEq(myFTraceMountPoint
+                                                     + "/tracing/set_ftrace_filter"),
+                                                StrEq(function)))
+                                      .WillOnce(Return(true));
+       EXPECT_TRUE(myFTrace->tryAddFunctionToFilter(function));
+    }
+    //! Tests FTrace's tracerChoiceAccessable method
+    void testTracerChoiceAccessable() {
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(StrEq(myFTraceMountPoint
+                                                     + "/tracing/current_tracer")))
+                                     .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tracerChoiceAccessable());
+    }
+    //! Tests FTrace's tunctionFilterAccessible method
+    void testFunctionFilterAccessible() {
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(StrEq(myFTraceMountPoint
+                                                     + "/tracing/set_ftrace_filter")))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->functionFilterAccessible());
+    }
+
+    //! Tests FTrace's tryStart
+    void testTryStartTrace() {
+      EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                    + "/tracing/tracing_on"),
+                                              StrEq("1")))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(StrEq(myFTraceMountPoint
+                                                    + "/tracing/tracing_on")))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tryStartTrace());
+    }
+
+    //! Tests FTrace's tryStop
+    void testTryStopTrace() {
+      EXPECT_CALL(*myMockFileSystem, writeStr(StrEq(myFTraceMountPoint
+                                                    + "/tracing/tracing_on"),
+                                              StrEq("0")))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockFileSystem, fileIsWritable(StrEq(myFTraceMountPoint
+                                                    + "/tracing/tracing_on")))
+                                      .WillOnce(Return(true));
+      EXPECT_TRUE(myFTrace->tryStopTrace());
+    }
   private:
     //! Tested instance of FTrace
     FTrace * myFTrace = NULL;
     MockFileSystem * myMockFileSystem = NULL;
     MockToolBox * myMockToolBox = NULL;
     Wire * myWire = NULL;
-    const string myFTraceMountPoint;
+    const string myFTraceMountPoint = "/sys/debug";
 };
 
 TEST_F(FTraceTest, testTryEnableAccessableTracePoint)
@@ -101,4 +195,50 @@ TEST_F(FTraceTest, testTryEnableAccessableTracePoint)
 TEST_F(FTraceTest, testTryEnableNotAccessableTracePoint)
 {
   testTryEnableNotAccessableTracePoint(FTrace::TracePoint::SCHED_SWITCH);
+}
+
+TEST_F(FTraceTest, testTryCleanTrace) {
+  testTryCleanTrace();
+}
+
+TEST_F(FTraceTest, testTracePointAccessable) {
+  testTracePointAccessable(FTrace::TracePoint::SCHED_SWITCH,
+                           "/tracing/events/sched/sched_switch/enable");
+}
+
+TEST_F(FTraceTest, testTracePointExists) {
+  testTracePointExists(FTrace::TracePoint::SCHED_SWITCH,
+                       "/tracing/events/sched/sched_switch/enable");
+}
+
+TEST_F(FTraceTest, testTryWriteMarker) {
+  testTryWriteMarker("marker");
+}
+
+TEST_F(FTraceTest, testTrySetTracer) {
+  testTrySetTracer(FTrace::Tracer::NOP, "nop");
+}
+
+TEST_F(FTraceTest, testTryClearFunctionFilter) {
+  testTryClearFunctionFilter();
+}
+
+TEST_F(FTraceTest, testTryAddFunctionToFilter) {
+  testTryAddFunctionToFilter("function_one");
+}
+
+TEST_F(FTraceTest, testTracerChoiceAccessable) {
+  testTracerChoiceAccessable();
+}
+
+TEST_F(FTraceTest, testFunctionFilterAccessible) {
+  testFunctionFilterAccessible();
+}
+
+TEST_F(FTraceTest, testTryStartTrace) {
+  testTryStartTrace();
+}
+
+TEST_F(FTraceTest, testTryStopTrace) {
+  testTryStopTrace();
 }
