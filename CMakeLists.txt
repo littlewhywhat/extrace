@@ -86,13 +86,13 @@ list(APPEND OBJ_SOURCES
     "src/cpuguard_test.cpp"
     "src/rssguard.cpp"
     "src/rssguard_test.cpp"
+    "src/simpleandroidtracesystem.cpp"
+    "src/simpleandroidtracesystem_test.cpp"
     ### String8, ... google libraries
     # "src/androidtoolbox.cpp"
     ### android toolbox dependencies
     # "src/cmdlineargsparser_test.cpp"
     # "src/extraceargumentsbuilder.cpp"
-    # "src/simpleandroidtracesystem.cpp"
-    # "src/simpleandroidtracesystem_test.cpp"
     ### systemtime library
     # "src/systemtime_impl.cpp"
     ### systemtime dependencies
