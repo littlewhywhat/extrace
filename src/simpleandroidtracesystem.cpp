@@ -101,7 +101,8 @@ bool SimpleAndroidTraceSystem::tryTraceCategories() {
 }
 
 void SimpleAndroidTraceSystem::stopTraceAllApps() {
-  for (uint32_t i = 0; i < m_Android->getTraceAppsMaxNum(); i++) {
+  uint32_t appsNum = m_Android->getTraceAppsMaxNum();
+  for (uint32_t i = 0; i < appsNum; i++) {
     if (!m_Android->trySetTraceAppProperty("", i)) {
       fprintf(m_Wire.getErrorStream(), "error clearing app properties\n");
     }

@@ -124,6 +124,31 @@ class SimpleAndroidTraceSystemTest : public ::testing::Test {
       mySimpleAndroidTraceSystem->tryToTrace();
     }
 
+     void testTryNotToTrace() {
+      EXPECT_CALL(*myMockAndroid, getTraceAppsMaxNum())
+                                      .WillOnce(Return(6));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq(""), 0))
+                                      .WillOnce(Return(true));                                      
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq(""), 1))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq(""), 2))
+                                      .WillOnce(Return(true));                                      
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq(""), 3))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq(""), 4))
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, trySetTraceAppProperty(StrEq(""), 5))
+                                      .WillOnce(Return(true));                                 
+      EXPECT_CALL(*myMockAndroid, tryClearTraceAppsCntProperty())
+                                      .WillOnce(Return(true));  
+      EXPECT_CALL(*myMockAndroid, tryPokeBinderServices())
+                                      .WillOnce(Return(true));
+      EXPECT_CALL(*myMockAndroid, trySetTraceTagsProperty(0))
+                                      .WillOnce(Return(true));
+
+      mySimpleAndroidTraceSystem->tryNotToTrace();
+    }
+
   private:
     //! Tested instance of SimpleAndroidTraceSystem
     Wire * myWire = NULL;
@@ -144,4 +169,8 @@ TEST_F(SimpleAndroidTraceSystemTest, testCanTraceCoreServicesFalse)
 
 TEST_F(SimpleAndroidTraceSystemTest, testTryToTrace) {
   testTryToTrace();
+}
+
+TEST_F(SimpleAndroidTraceSystemTest, testTryNotToTrace) {
+  testTryNotToTrace();
 }
