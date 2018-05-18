@@ -18,7 +18,7 @@
 
 #include "androidtoolbox.h"
 #include "filesystem_impl.h"
-#include "ftrace.h"
+#include "simpleftrace.h"
 #include "android_impl.h"
 #include "compressedfiledatamaker.h"
 #include "simplefiledatamaker.h"

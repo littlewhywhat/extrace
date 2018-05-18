@@ -38,7 +38,7 @@ common_src_files :=  \
 		src/systemtime_impl.cpp \
 		src/filesystem_impl.cpp \
 		src/trace_impl.cpp \
-		src/ftrace.cpp \
+		src/simpleftrace.cpp \
 		src/kerneltracesystem.cpp \
 		src/simplefiledata.cpp \
 		src/filedataslice.cpp \

@@ -22,7 +22,7 @@
 #include <vector>
 #include <memory>
 
-#include "ftrace.h"
+#include "simpleftrace.h"
 
 using namespace std;
 

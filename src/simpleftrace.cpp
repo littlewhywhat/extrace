@@ -1,4 +1,4 @@
-#include "ftrace.h"
+#include "simpleftrace.h"
 
 #include <errno.h>  // errno
 #include <fcntl.h>  // creat, ope, O_WRONLY, O_CREAT

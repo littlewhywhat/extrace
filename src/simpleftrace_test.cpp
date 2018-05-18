@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "ftrace.h"
+#include "simpleftrace.h"
 #include "mock_filesystem.h"
 #include "mock_toolbox.h"
 #include "wire.h"
