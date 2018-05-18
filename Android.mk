@@ -80,8 +80,12 @@ common_test_files := \
     src/processrecord_test.cpp      \
     src/memoryentrycreator_test.cpp \
     src/androidentrycreator_test.cpp \
-    "src/cpuguard_test.cpp" \
-    "src/rssguard_test.cpp" \
+    src/cpuguard_test.cpp \
+    src/rssguard_test.cpp \
+    src/androidtoolbox_test.cpp \
+    src/simpleandroidtracesystem_test.cpp \
+    src/kerneltracesystem_test.cpp \
+    src/simpleftrace_test.cpp \
 
 local_test_files := \
     src/simpleftraceentryfile_test.cpp \

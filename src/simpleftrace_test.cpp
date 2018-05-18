@@ -181,7 +181,7 @@ class SimpleFTraceTest : public ::testing::Test {
                                         DoAll(
                                           SetArrayArgument<1>(functionFilterContent,
                                                               functionFilterContent
-                                                              + strlen(functionFilterContent)), 
+                                                              + strlen(functionFilterContent) + 1), 
                                                       Return(true)));
       set<string> tokens = { "function1", "wild*card", "function2" };
       EXPECT_CALL(*myMockToolBox, parseToTokens(StrEq(functionFilterContent),
