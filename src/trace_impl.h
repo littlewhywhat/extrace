@@ -20,7 +20,7 @@
 #include "trace.h"
 
 #include "wire.h"
-#include "simpleftrace.h"
+#include "ftrace.h"
 #include "androidtracesystem.h"
 #include "kerneltracesystem.h"
 

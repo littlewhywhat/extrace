@@ -18,7 +18,7 @@
 #define LTTLWHWHT_FTRACEBUFFERFILE_H
 
 #include "tracebuffer.h"
-#include "simpleftrace.h"
+#include "ftrace.h"
 #include "filedatamaker.h"
 #include "signal.h"
 

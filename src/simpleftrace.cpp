@@ -4,7 +4,7 @@
 #include <fcntl.h>  // creat, ope, O_WRONLY, O_CREAT
 #include <string.h>
 
-FTrace::FTrace(const Wire & wire,
+SimpleFTrace::SimpleFTrace(const Wire & wire,
                shared_ptr<FileSystem> & fileSystem,
                shared_ptr<ToolBox> toolBox,
                const string & mountPoint):
@@ -68,22 +68,22 @@ FTrace::FTrace(const Wire & wire,
   m_Tracers[Tracer::FUNCTION_GRAPH] = "function_graph";
 }
 
-bool FTrace::tracePointAccessable(const FTrace::TracePoint & tracePoint) const
+bool SimpleFTrace::tracePointAccessable(const SimpleFTrace::TracePoint & tracePoint) const
 {
   return m_FileSystem->fileIsWritable(m_TracePoints.at(tracePoint).c_str());
 }
 
-bool FTrace::tracePointExists(const FTrace::TracePoint & tracePoint) const
+bool SimpleFTrace::tracePointExists(const SimpleFTrace::TracePoint & tracePoint) const
 {
   return m_FileSystem->fileExists(m_TracePoints.at(tracePoint).c_str());
 }
 
-bool FTrace::tryEnableTracePoint(const FTrace::TracePoint & tracePoint)
+bool SimpleFTrace::tryEnableTracePoint(const SimpleFTrace::TracePoint & tracePoint)
 {
   return tryConfigTracePoint(tracePoint, true);
 }
 
-bool FTrace::tryDisableTracePoint(const FTrace::TracePoint & tracePoint)
+bool SimpleFTrace::tryDisableTracePoint(const SimpleFTrace::TracePoint & tracePoint)
 {
   if (!tryConfigTracePoint(tracePoint, false)) {
     // fprintf(m_Wire.getErrorStream(), "Can't disable tracepoint: %s\n",
@@ -93,12 +93,12 @@ bool FTrace::tryDisableTracePoint(const FTrace::TracePoint & tracePoint)
   return true;
 }
 
-bool FTrace::tryConfigTracePoint(const FTrace::TracePoint & tracePoint, bool enable)
+bool SimpleFTrace::tryConfigTracePoint(const SimpleFTrace::TracePoint & tracePoint, bool enable)
 {
   return tryConfigFileSwitch(m_TracePoints.at(tracePoint).c_str(), enable);
 }
 
-bool FTrace::tryEnableOption(const FTrace::Option & option)
+bool SimpleFTrace::tryEnableOption(const SimpleFTrace::Option & option)
 {
   if (!tryConfigFileSwitch(m_Options.at(option).c_str(), true)) {
     fprintf(m_Wire.getErrorStream(), "can't enable property\n");
@@ -107,12 +107,12 @@ bool FTrace::tryEnableOption(const FTrace::Option & option)
   return true;
 }
 
-bool FTrace::tryDisableOption(const FTrace::Option & option)
+bool SimpleFTrace::tryDisableOption(const SimpleFTrace::Option & option)
 {
   return tryConfigFileSwitch(m_Options.at(option).c_str(), false);
 }
 
-bool FTrace::tryConfigFileSwitch(const char * filename, bool enable)
+bool SimpleFTrace::tryConfigFileSwitch(const char * filename, bool enable)
 {
   if (!m_FileSystem->fileIsWritable(filename)) {
     fprintf(m_Wire.getErrorStream(), "file is not writable %s\n", filename);
@@ -121,17 +121,17 @@ bool FTrace::tryConfigFileSwitch(const char * filename, bool enable)
   return m_FileSystem->writeStr(filename, enable? "1" : "0");
 }
 
-int FTrace::getTracePipeFd()
+int SimpleFTrace::getTracePipeFd()
 {
   return tryOpenFile(m_TracePipePath.c_str());
 }
 
-int FTrace::getTraceFd()
+int SimpleFTrace::getTraceFd()
 {
   return tryOpenFile(m_TracePath.c_str());
 }
 
-int FTrace::tryOpenFile(const char * filename)
+int SimpleFTrace::tryOpenFile(const char * filename)
 {
   int traceFD = open(filename, O_RDWR);
   if (traceFD == -1) {
@@ -141,15 +141,15 @@ int FTrace::tryOpenFile(const char * filename)
   return traceFD;
 }
 
-bool FTrace::tryCleanTrace()
+bool SimpleFTrace::tryCleanTrace()
 {
   return m_FileSystem->truncateFile(m_TracePath.c_str());
 }
 
-bool FTrace::trySetBufferSize(uint32_t bufferSize)
+bool SimpleFTrace::trySetBufferSize(uint32_t bufferSize)
 {
   if (bufferSize == 0) {
-    fprintf(m_Wire.getErrorStream(), "error FTrace: bufferSize can't be set to 0\n");
+    fprintf(m_Wire.getErrorStream(), "error SimpleFTrace: bufferSize can't be set to 0\n");
     return false; 
   }
   char str[32];
@@ -161,22 +161,22 @@ bool FTrace::trySetBufferSize(uint32_t bufferSize)
   return true;
 }
 
-bool FTrace::trySetClockType(const ClockType & clockType)
+bool SimpleFTrace::trySetClockType(const ClockType & clockType)
 {
   return m_FileSystem->writeStr(m_TraceClockPath.c_str(), m_ClockTypes.at(clockType).c_str());
 }
 
-bool FTrace::tryStartTrace()
+bool SimpleFTrace::tryStartTrace()
 {
   return tryConfigFileSwitch(m_TracingOnPath.c_str(), true);
 }
 
-bool FTrace::tryStopTrace()
+bool SimpleFTrace::tryStopTrace()
 {
   return tryConfigFileSwitch(m_TracingOnPath.c_str(), false);
 }
 
-const set<string> FTrace::tryGetFunctionsFromFilter() const {
+const set<string> SimpleFTrace::tryGetFunctionsFromFilter() const {
   char buffer[4097];    
   if (!m_FileSystem->readStr(m_TraceFilterPath.c_str(), buffer, 4097)) {
     return set<string>();
@@ -198,12 +198,12 @@ const set<string> FTrace::tryGetFunctionsFromFilter() const {
   return filters;
 }
 
-bool FTrace::tryWriteMarker(const char * marker) {
+bool SimpleFTrace::tryWriteMarker(const char * marker) {
   return m_FileSystem->writeStr(m_TraceMarkerPath.c_str(), marker);
 }
 
 
-bool FTrace::hasTraceClockSetTo(const ClockType & clockType) const
+bool SimpleFTrace::hasTraceClockSetTo(const ClockType & clockType) const
 {
     char buf[4097];    
     if (!m_FileSystem->readStr(m_TraceClockPath.c_str(), buf, 4097)) {
@@ -225,22 +225,22 @@ bool FTrace::hasTraceClockSetTo(const ClockType & clockType) const
     return strcmp(m_ClockTypes.at(clockType).c_str(), start) == 0;
 }
 
-bool FTrace::trySetTracer(const Tracer & tracer) {
+bool SimpleFTrace::trySetTracer(const Tracer & tracer) {
   return m_FileSystem->writeStr(m_CurrentTracerPath.c_str(), m_Tracers.at(tracer).c_str());
 }
 
-bool FTrace::tryClearFunctionFilter() {
+bool SimpleFTrace::tryClearFunctionFilter() {
   return m_FileSystem->truncateFile(m_TraceFilterPath.c_str());
 }
 
-bool FTrace::tryAddFunctionToFilter(const string & function) {
+bool SimpleFTrace::tryAddFunctionToFilter(const string & function) {
   return m_FileSystem->appendStr(m_TraceFilterPath.c_str(), function.c_str());
 }
 
-bool FTrace::tracerChoiceAccessable() const {
+bool SimpleFTrace::tracerChoiceAccessable() const {
   return m_FileSystem->fileIsWritable(m_CurrentTracerPath.c_str());
 }
 
-bool FTrace::functionFilterAccessible() const {
+bool SimpleFTrace::functionFilterAccessible() const {
   return m_FileSystem->fileIsWritable(m_TraceFilterPath.c_str());
 }

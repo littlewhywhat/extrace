@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef LTTLWHWHT_FTRACE_H
-#define LTTLWHWHT_FTRACE_H
+#ifndef LTTLWHWHT_SIMPLEFTRACE_H
+#define LTTLWHWHT_SIMPLEFTRACE_H
 
 #include "wired.h"
+#include "ftrace.h"
 
-#include <cstdint>
-#include <set>
 #include <map>
-#include <string>
 #include <memory>
 
 #include "filesystem.h"
@@ -30,92 +28,34 @@
 
 using namespace std;
 
-class FTrace : public Wired {
+class SimpleFTrace : public Wired, public FTrace {
   public:
-    enum class ClockType;
-    enum class TracePoint;
-    enum class Option;
-    enum class Tracer;
-    FTrace(const Wire & wire,
+    SimpleFTrace(const Wire & wire,
            shared_ptr<FileSystem> & fileSystem,
            shared_ptr<ToolBox> toolBox,
            const string & mountPoint);
-    ~FTrace() {};
-    int getTraceFd();
-    int getTracePipeFd();
-    bool tryCleanTrace();
-    bool tryAddFunctionToFilter(const string & function);
-    const set<string> tryGetFunctionsFromFilter() const;
-    bool tryClearFunctionFilter();
-    bool functionFilterAccessible() const;
-    bool trySetTracer(const Tracer & tracer);
-    bool trySetBufferSize(uint32_t bufferSize);
-    bool tryWriteMarker(const char * marker);
-    bool tracerChoiceAccessable() const;
-    bool tracePointAccessable(const TracePoint & tracePoint) const;
-    bool tracePointExists(const TracePoint & tracePoint) const;
-    bool tryEnableTracePoint(const TracePoint & tracePoint);
-    bool tryDisableTracePoint(const TracePoint & tracePoint);
-    bool hasTraceClockSetTo(const ClockType & clockType) const;
-    bool trySetClockType(const ClockType & clockType);
-    bool tryEnableOption(const Option & option);
-    bool tryDisableOption(const Option & option);
-    bool tryStartTrace();
-    bool tryStopTrace();
-    enum class ClockType {
-      GLOBAL,
-      LOCAL,
-      CLOCKTYPE_CNT
-    };
-    enum class TracePoint {
-      SCHED_SWITCH,
-      SCHED_WAKEUP,
-      SCHED_BLOCKED_REASON,
-      SCHED_CPU_HOTPLUG,
-      IRQ,
-      IPI,
-      CPU_FREQUENCY,
-      CLOCK_SET_RATE,
-      CPU_FREQUENCY_LIMITS,
-      MEMORY_BUS,
-      CPU_IDLE,
-      F2FS_SYNC_FILE_ENTER,
-      F2FS_SYNC_FILE_EXIT,
-      F2FS_WRITE_BEGIN,
-      F2FS_WRITE_END,
-      EXT4_DA_WRITE_BEGIN,
-      EXT4_DA_WRITE_END,
-      EXT4_SYNC_FILE_ENTER,
-      EXT4_SYNC_FILE_EXIT,
-      BLOCK_RQ_ISSUE,
-      BLOCK_RQ_COMPLETE,
-      MMC,
-      CPUFREQ_INTERACTIVE,
-      SYNC,
-      WORKQUEUE,
-      MM_VMSCAN_DIRECT_RECLAIM_BEGIN,
-      MM_VMSCAN_DIRECT_RECLAIM_END,
-      MM_VMSCAN_KSWAPD_WAKE,
-      MM_VMSCAN_KSWAPD_SLEEP,
-      REGULATOR,
-      BINDER_TRANSACTION,
-      BINDER_TRANSACTION_RECEIVED,
-      BINDER_LOCK,
-      BINDER_LOCKED,
-      BINDER_UNLOCK,
-      FILEMAP,
-    };
-    enum class Option {
-      OVERWRITE,
-      PRINT_TGID,
-      FUNCGRAPH_ABSTIME,
-      FUNCGRAPH_CPU,
-      FUNCGRAPH_PROC,
-    };
-    enum class Tracer {
-      FUNCTION_GRAPH,
-      NOP,
-    };
+    ~SimpleFTrace() {};
+    int getTraceFd() override;
+    int getTracePipeFd() override;
+    bool tryCleanTrace() override;
+    bool tryAddFunctionToFilter(const string & function) override;
+    const set<string> tryGetFunctionsFromFilter() const override;
+    bool tryClearFunctionFilter() override;
+    bool functionFilterAccessible() const override;
+    bool trySetTracer(const FTrace::Tracer & tracer) override;
+    bool trySetBufferSize(uint32_t bufferSize) override;
+    bool tryWriteMarker(const char * marker) override;
+    bool tracerChoiceAccessable() const override;
+    bool tracePointAccessable(const FTrace::TracePoint & tracePoint) const override;
+    bool tracePointExists(const FTrace::TracePoint & tracePoint) const override;
+    bool tryEnableTracePoint(const FTrace::TracePoint & tracePoint) override;
+    bool tryDisableTracePoint(const FTrace::TracePoint & tracePoint) override;
+    bool hasTraceClockSetTo(const FTrace::ClockType & clockType) const override;
+    bool trySetClockType(const FTrace::ClockType & clockType) override;
+    bool tryEnableOption(const FTrace::Option & option) override;
+    bool tryDisableOption(const FTrace::Option & option) override;
+    bool tryStartTrace() override;
+    bool tryStopTrace() override;
   private:
     string m_TraceClockPath;
     string m_TraceBufferSizePath;
@@ -125,10 +65,10 @@ class FTrace : public Wired {
     string m_TracePath;
     string m_TracePipePath;
     string m_TraceMarkerPath;
-    map<TracePoint, string> m_TracePoints;
-    map<Option, string> m_Options;
-    map<ClockType, string> m_ClockTypes;
-    map<Tracer, string> m_Tracers;
+    map<FTrace::TracePoint, string> m_TracePoints;
+    map<FTrace::Option, string> m_Options;
+    map<FTrace::ClockType, string> m_ClockTypes;
+    map<FTrace::Tracer, string> m_Tracers;
     shared_ptr<FileSystem> m_FileSystem = NULL;
     shared_ptr<ToolBox> m_ToolBox = NULL;
     bool tryConfigTracePoint(const TracePoint & tracePoint, bool enable);
@@ -137,4 +77,4 @@ class FTrace : public Wired {
     int tryOpenFile(const char * filename);
 };
 
-#endif // LTTLWHWHT_FTRACE_H
+#endif // LTTLWHWHT_SIMPLEFTRACE_H

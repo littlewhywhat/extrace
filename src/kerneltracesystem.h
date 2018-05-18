@@ -17,12 +17,15 @@
 #ifndef LTTLWHWHT_KERNELTRACESYSTEM_H
 #define LTTLWHWHT_KERNELTRACESYSTEM_H
 
+#include "wired.h"
+
 #include <set>
 #include <string>
 #include <vector>
+#include <map>
 #include <memory>
 
-#include "simpleftrace.h"
+#include "ftrace.h"
 
 using namespace std;
 
