@@ -39,8 +39,6 @@ class KernelTraceSystem : public Wired {
     KernelTraceSystem(const Wire & wire, const shared_ptr<FTrace> & ftrace);
     //! Destroys me
     ~KernelTraceSystem() {}
-    //! Tries to enable trace category 
-    bool tryEnableCategory(const TraceCategory & traceCategory); 
     //! Tries to disable all set categories
     bool tryDisableAllCategories();
     //! Tries set specified function to trace
@@ -86,6 +84,8 @@ class KernelTraceSystem : public Wired {
     bool supportsCategoryWithRoot(const TraceCategory & traceCategory) const;
     //! Verifies if specified functions are set for tracing
     bool verifyFunctions(const set<string> & functions) const;
+    //! Tries to enable trace category 
+    bool tryEnableCategory(const TraceCategory & traceCategory); 
 };
 
 //! Category of kernel events to trace

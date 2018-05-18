@@ -65,6 +65,7 @@ list(APPEND OBJ_SOURCES
     "src/simpleftrace.cpp"
     "src/simpleftrace_test.cpp"
     "src/kerneltracesystem.cpp"
+    "src/kerneltracesystem_test.cpp"
     "src/simplefiledata.cpp"
     "src/filedataslice.cpp"
     "src/simplefiledatamaker.cpp"

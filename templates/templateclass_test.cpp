@@ -30,8 +30,13 @@
 #include "classname.h"
 // #include "mock_dependency.h"
 
+using namespace std;
 using ::testing::Return;
 using ::testing::_;
+using ::testing::StrEq;
+using ::testing::SetArgPointee;
+using ::testing::SetArgReferee;
+using ::testing::SetArrayArgument;
 
 //! I am a test of ClassName. I can test its methods.
 class ClassNameTest : public ::testing::Test {
