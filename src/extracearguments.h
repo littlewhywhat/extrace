@@ -49,6 +49,7 @@ class ExtraceArguments {
     void enableStream();
     void enableListCategories();
     void enableCoreServices();
+    void enableInterpret();
     void setOutputFilename(const string & filename);
     void setBufferSize(uint32_t size);
     void setInitSleepDuration(uint32_t duration);
@@ -74,6 +75,7 @@ class ExtraceArguments {
     bool streamEnabled() const;
     bool listCategoriesEnabled() const;
     bool coreServicesEnabled() const;
+    bool interpretEnabled() const;
     const string & getAppName() const;
     const string & getOutputFilename() const;
     const string & getHelpMessage() const;
@@ -99,6 +101,7 @@ class ExtraceArguments {
     bool m_Stream = false;
     bool m_ListCategories = false;
     bool m_CoreServices = false;
+    bool m_Interpret = false;
     string m_AppName;
     string m_HelpMessage;
     string m_OutputFilename;
