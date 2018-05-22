@@ -58,7 +58,6 @@ bool TraceImpl::cleanUp() {
   ok &= m_AndroidTraceSystem->tryNotToTrace();
 
   ok &= m_FTrace->tryDisableOption(FTrace::Option::OVERWRITE);
-  ok &= m_FTrace->tryEnableOption(FTrace::Option::OVERWRITE);
   ok &= m_FTrace->trySetBufferSize(1);
   ok &= setGlobalClockEnable(false);
   ok &= m_FTrace->tryDisableOption(FTrace::Option::PRINT_TGID);
