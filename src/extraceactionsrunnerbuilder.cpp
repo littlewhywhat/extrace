@@ -113,6 +113,21 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
       );
     }
   }
+  else if (extraceArguments.interpretEnabled()) {
+    if (extraceArguments.hasOutputFilename() && extraceArguments.hasPIDs()) {
+      actionsRunner->addAction(
+        new InterpretDumpFileAction(wire,
+          environment,
+          extraceArguments.getOutputFilename(),
+          extraceArguments.getPIDs(),
+          extraceArguments.getCpuLimit(),
+          extraceArguments.hasUssLimit() ?
+            new USSFilter(extraceArguments.getUssLimit())
+            : NULL
+        )
+      );
+    }
+  }
   else {
     actionsRunner->addAction(new StartAction(wire, environment));
     actionsRunner->addAction(new SleepAction(wire, signal,

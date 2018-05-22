@@ -41,6 +41,7 @@ static const char * TIMES_OPTION_NAME = "Times";
 static const char * PIDS_OPTION_NAME = "PIDs";
 static const char * CPU_OPTION_NAME = "CPULimit";
 static const char * USS_OPTION_NAME = "USSLimit";
+static const char * INTERPRET_OPTION_NAME = "Interpret";
 
 static const string HELP_MESSAGE = "usage: %s [options]\n"
          "options include:\n"
@@ -73,7 +74,8 @@ static const string HELP_MESSAGE = "usage: %s [options]\n"
          "                  list the available tracing categories\n"
          " -o filename      write the trace to the specified file instead\n"
          "                    of outstream.\n"
-         " --acore          add core services.\n";
+         " --acore          add core services.\n"
+         " --interpret      interpret dump file only\n";
 
 ExtraceArgumentsBuilder::ExtraceArgumentsBuilder() {
   m_AndroidTraceCategories["gfx"]          = Android::TraceCategory::GRAPHICS         ;
@@ -126,6 +128,7 @@ void ExtraceArgumentsBuilder::registerCmdLineOpts(CmdLineArgsParser & cmdLineArg
   cmdLineArgsParser.register_boolean("--stream", STREAM_OPTION_NAME);
   cmdLineArgsParser.register_boolean("--list_categories", LIST_CATEGORIES_OPTION_NAME);
   cmdLineArgsParser.register_boolean("--acore", CORE_SERVICES_OPTION_NAME);
+  cmdLineArgsParser.register_boolean("--interpret", INTERPRET_OPTION_NAME);
   cmdLineArgsParser.register_string("-f", KERNEL_CATEG_FILE_OPTION_NAME);
   cmdLineArgsParser.register_string("-o", OUT_FILE_OPTION_NAME);
   cmdLineArgsParser.register_integer("-b", BUFFER_SIZE_OPTION_NAME);
@@ -212,6 +215,9 @@ ExtraceArguments * ExtraceArgumentsBuilder::createExtraceArguments(const Argumen
   if (arguments.is_enabled(CORE_SERVICES_OPTION_NAME)) {
     traceArguments->enableCoreServices();
   }
+  if (arguments.is_enabled(INTERPRET_OPTION_NAME)) {
+    traceArguments->enableInterpret();
+  }
   if (arguments.has_string(KERNEL_CATEG_FILE_OPTION_NAME)) {
     if (!tryPutCategoriesFromFile(traceArguments,
                                   arguments.get_string(KERNEL_CATEG_FILE_OPTION_NAME))) {
@@ -290,7 +296,10 @@ const ExtraceArguments * ExtraceArgumentsBuilder::build(const Wire & wire, const
        || traceArguments->hasKernelFunctions()
        || traceArguments->coreServicesEnabled()
        || traceArguments->asyncStopEnabled()
-       || traceArguments->asyncDumpEnabled()) {
+       || traceArguments->asyncDumpEnabled()
+       || (traceArguments->interpretEnabled()
+           && traceArguments->hasPIDs()
+           && traceArguments->hasOutputFilename())) {
     return traceArguments;
   }
   return createHelpExtraceArguments(cmdLineArgs.getAppName());

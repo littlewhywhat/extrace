@@ -120,6 +120,10 @@ void ExtraceArguments::enableCoreServices() {
   m_CoreServices = true;
 }
 
+void ExtraceArguments::enableInterpret() {
+  m_Interpret = true;
+}
+
 void ExtraceArguments::setOutputFilename(const string & filename) {
   m_OutputFilename = filename;
 }
@@ -213,6 +217,10 @@ bool ExtraceArguments::listCategoriesEnabled() const {
 
 bool ExtraceArguments::coreServicesEnabled() const {
   return m_CoreServices;
+}
+
+bool ExtraceArguments::interpretEnabled() const {
+  return m_Interpret;
 }
 
 const string & ExtraceArguments::getOutputFilename() const {
