@@ -43,6 +43,41 @@ class SimpleProcessRecordFileTest : public ::testing::Test {
       delete myProcessChangeFile;
     }
 
+    void testParseToWithNotifications() {
+      vector<ProcessChange*> processChanges = {
+        (new StateChange(0,0))->setState(ProcessState::RUNNING),
+        (new StateChange(1,0))->setState(ProcessState::SLEEPING),
+        (new NotificationChange(0,0))->setCause("Test started"),
+        (new NotificationChange(1,0))->setCause("Test started"),
+        (new NotificationChange(0,1))->setCause("Test stopped"),
+        (new NotificationChange(1,1))->setCause("Test stopped"),
+      };
+      vector<ProcessRecord*> procRecordsExpect = {
+        (new ProcessRecord())->setPID(0)->setTimeStamp(0)->setState(ProcessState::RUNNING),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(0)->setState(ProcessState::SLEEPING),
+        (new ProcessRecord())->setPID(0)->setTimeStamp(0)->setCause("Test started")
+                             ->setState(ProcessState::RUNNING),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(0)->setCause("Test started")
+                             ->setState(ProcessState::SLEEPING),
+        (new ProcessRecord())->setPID(0)->setTimeStamp(1)->setCause("Test stopped")
+                             ->setCpuUsage(100)->setState(ProcessState::RUNNING),
+        (new ProcessRecord())->setPID(1)->setTimeStamp(1)->setCause("Test stopped")
+                             ->setCpuUsage(0)->setState(ProcessState::SLEEPING),
+      };
+      // TODO better to switch to long long
+      EXPECT_CALL(*myProcessChangeFileCreator, create(StrEq(myFilename)))
+                                    .WillOnce(Return(myProcessChangeFile));
+      EXPECT_CALL(*myProcessChangeFile, parseTo(_))
+                                    .WillOnce(SetArgReferee<0>(processChanges));
+
+      vector<ProcessRecord*> procRecords;
+      myProcessRecordFile->parseTo(procRecords);
+      EXPECT_EQ(procRecords.size(), procRecordsExpect.size());
+      for (size_t i = 0; i < procRecords.size(); i++) {
+        EXPECT_EQ(*(procRecords[i]), *(procRecordsExpect[i]));
+      }
+    }
+
     void testParseTo() {
       vector<ProcessChange*> processChanges = {
         (new StateChange(0,0))->setState(ProcessState::RUNNING),
@@ -83,7 +118,7 @@ class SimpleProcessRecordFileTest : public ::testing::Test {
 
       vector<ProcessRecord*> procRecords;
       myProcessRecordFile->parseTo(procRecords);
-      EXPECT_EQ(procRecords.size(), processChanges.size());
+      EXPECT_EQ(procRecords.size(), procRecordsExpect.size());
       for (size_t i = 0; i < procRecords.size(); i++) {
         EXPECT_EQ(*(procRecords[i]), *(procRecordsExpect[i]));
       }
@@ -98,4 +133,8 @@ class SimpleProcessRecordFileTest : public ::testing::Test {
 
 TEST_F(SimpleProcessRecordFileTest, testParseTo) {
   testParseTo();
+}
+
+TEST_F(SimpleProcessRecordFileTest, testParseToWithNotifications) {
+  testParseToWithNotifications();
 }

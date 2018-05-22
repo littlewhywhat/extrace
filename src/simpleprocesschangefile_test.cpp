@@ -48,6 +48,31 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
       delete myMockProcess;
     }
 
+    void testParseToWithAndroidEntries() { 
+      vector<FTraceEntry*> ftraceEntries = {
+        (new SchedWakeUpEntry(0,"SchedWakeup",1,0))->setWakedUpPID(0),
+        (new SchedWakeUpEntry(0,"SchedWakeup",2,0))->setWakedUpPID(1),
+        (new AndroidEntry(0,"Event 3",3,0)),
+        (new AndroidEntry(0,"Event 4",4,0)),
+      };
+      EXPECT_CALL(*myFTraceEntryFileCreator, create(StrEq(myFilename)))
+                                    .WillOnce(Return(myFTraceEntryFile));
+      EXPECT_CALL(*myFTraceEntryFile, parseTo(_))
+                                    .WillOnce(SetArgReferee<0>(ftraceEntries));
+      vector<ProcessChange*> procChanges;
+      myProcessChangeFile->parseTo(procChanges);
+      EXPECT_EQ(procChanges.size(), (size_t)6);
+
+      EXPECT_EQ(procChanges[2]->getPID(), 0);
+      EXPECT_EQ(procChanges[2]->getCause(), string("Event 3"));
+      EXPECT_EQ(procChanges[3]->getPID(), 1);
+      EXPECT_EQ(procChanges[3]->getCause(), string("Event 3"));
+      EXPECT_EQ(procChanges[4]->getPID(), 0);
+      EXPECT_EQ(procChanges[4]->getCause(), string("Event 4"));
+      EXPECT_EQ(procChanges[5]->getPID(), 1);
+      EXPECT_EQ(procChanges[5]->getCause(), string("Event 4"));
+    }
+
     void testParseTo() {
       vector<FTraceEntry*> ftraceEntries = {
         (new SchedSwitchEntry(0,"SchedSwitch",1,0))->setPrevPID(0)->setNextPID(1),
@@ -112,4 +137,8 @@ class SimpleProcessChangeFileTest : public ::testing::Test {
 
 TEST_F(SimpleProcessChangeFileTest, testParseTo) {
   testParseTo();
+}
+
+TEST_F(SimpleProcessChangeFileTest, testParseToWithAndroidEntries) {
+  testParseToWithAndroidEntries();
 }
