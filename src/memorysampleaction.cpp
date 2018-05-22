@@ -57,7 +57,7 @@ bool MemorySampleAction::tryRun() {
   struct timespec timeLeft;
   timeLeft.tv_sec = 0;
   timeLeft.tv_nsec = m_Period;
-  for (uint32_t i = 0; i < m_Times; i++) {
+  for (uint32_t i = 0; (i < m_Times) && !m_Signal.isFired(); i++) {
     do {
       for (auto * memoryUsage : myMemoryUsages) {
         if (!memoryUsage->tryUpdate()) {

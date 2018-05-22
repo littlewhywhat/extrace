@@ -48,6 +48,9 @@ Environment * EnvironmentBuilder::build(const Wire & wire, const ExtraceArgument
   for (const auto & category: traceArguments.getAndroidCategories()) {
     androidTraceSystem->rememberToTrace(category);    
   }
+  for (const auto & appName : traceArguments.getApps()) {
+    androidTraceSystem->rememberToTrace(appName);
+  }
   auto * trace = new TraceImpl(wire, ftrace, androidTraceSystem, kernelTraceSystem);
   trace->setTraceBufferSizeKB(traceArguments.getBufferSize());
   if (traceArguments.circleBufferEnabled()) {

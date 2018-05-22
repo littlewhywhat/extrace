@@ -32,6 +32,7 @@ InterpretDumpFileAction::~InterpretDumpFileAction() {
   for (auto * record: myRecords) {
     delete record;
   }
+  delete myUSSFilter;
 }
 
 InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
@@ -39,11 +40,11 @@ InterpretDumpFileAction::InterpretDumpFileAction(const Wire & wire,
                                                  const string & inputFile,
                                                  const vector<int> pids,
                                                  int cpuLimit,
-                                                 uint64_t rssLimit):
+                                                 USSFilter * ussFilter):
                                                  EnvironmentAction(wire, environment),
                                                  myInputFile(inputFile),
                                                  myCpuLimit(cpuLimit),
-                                                 myUssLimit(rssLimit) {
+                                                 myUSSFilter(ussFilter) {
   for (int pid : pids) {
     myPIDs.insert(pid);
   }
@@ -84,26 +85,8 @@ bool InterpretDumpFileAction::tryRun() {
     }
 
     // apply user Mem filter
-    size = records.size();
-    uint64_t history;
-    bool initHistory = false;
-    for (size_t i = 0; i < size; i++) {
-      auto * record = records.front();
-      records.pop();
-      if (record->hasUss()) {
-        if (!initHistory) {
-          history = record->getUss();
-          records.push(record);
-          initHistory = true;
-        }
-        else {
-          uint64_t rss = record->getUss();
-          if (rss < history + myUssLimit) {
-            continue;
-          }
-          records.push(record);
-        }
-      }
+    if (myUSSFilter) {
+      myUSSFilter->filter(records);
     }
   }
 

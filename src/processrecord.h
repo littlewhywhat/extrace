@@ -159,7 +159,8 @@ inline bool operator==(const ProcessRecord & lhs, const ProcessRecord & rhs) {
          && lhs.getPss() == rhs.getPss()   
          && lhs.getUss() == rhs.getUss()   
          && lhs.getTimeStamp() == rhs.getTimeStamp() 
-         && lhs.getState() == rhs.getState();
+         && lhs.getState() == rhs.getState()
+         && lhs.getCause() == rhs.getCause();
 }
 
 #endif // LTTLWHWHT_PROCESSRECORD_H

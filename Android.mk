@@ -49,6 +49,7 @@ common_src_files :=  \
 		src/androidtracecategory.cpp \
 		src/cpuguard.cpp \
     src/rssguard.cpp \
+    src/ussfilter.cpp \
 
 libbinder_files := \
 		src/android_impl.cpp \

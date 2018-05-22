@@ -87,6 +87,7 @@ class ExtraceArguments {
     const vector<string> & getKernelFunctions() const;
     uint64_t getUssLimit() const;
     void setUssLimit(uint64_t rssLimit);
+    bool hasUssLimit() const;
     int getCpuLimit() const;
     void setCpuLimit(int limit);
   private:
@@ -109,7 +110,7 @@ class ExtraceArguments {
     uint32_t m_MidSleepDuration = 5;
     uint32_t m_Period = 0;
     uint32_t m_Times = 0;
-    uint64_t myUssLimit = 0;
+    uint64_t myUssLimit = UINT64_MAX;
     int myCpuLimit = 0;
     vector<int> m_PIDs;
     vector<string> m_Apps;

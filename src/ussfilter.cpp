@@ -13,13 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "stopaction.h"
 
-bool StopAction::tryRun() {
-  if (!m_Environment->getTrace().stop()) {
-    fprintf(m_Wire.getErrorStream(), "error StopAction::tryRun\n");
-    return false;
+#include "ussfilter.h"
+
+void USSFilter::filter(queue<ProcessRecord*> & records) const {
+  size_t size = records.size();
+  uint64_t history;
+  bool initHistory = false;
+  for (size_t i = 0; i < size; i++) {
+    auto * record = records.front();
+    records.pop();
+    if (record->hasUss()) {
+      if (!initHistory) {
+        history = record->getUss();
+        records.push(record);
+        initHistory = true;
+      }
+      else {
+        uint64_t rss = record->getUss();
+        if (rss < history + myUssLimit) {
+          continue;
+        }
+        records.push(record);
+      }
+    }
   }
-  fprintf(m_Wire.getOutputStream(), "stopped trace.\n");
-  return true;
 }
