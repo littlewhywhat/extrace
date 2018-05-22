@@ -85,6 +85,7 @@ list(APPEND OBJ_SOURCES
     "src/cpuguard_test.cpp"
     "src/rssguard.cpp"
     "src/rssguard_test.cpp"
+    "src/ussfilter.cpp"
     ### String8, ... google libraries
     # "src/androidtoolbox.cpp"
     ### android toolbox dependencies

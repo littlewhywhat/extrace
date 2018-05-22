@@ -54,7 +54,9 @@ void ExtraceActionsRunnerBuilder::addStopActions(ActionsRunner & actionsRunner,
                               extraceArguments.getOutputFilename(),
                               extraceArguments.getPIDs(),
                               extraceArguments.getCpuLimit(),
-                              extraceArguments.getUssLimit()
+                              extraceArguments.hasUssLimit() ?
+                                new USSFilter(extraceArguments.getUssLimit())
+                                : NULL
                             ));
   }
 }
@@ -104,7 +106,9 @@ ActionsRunner * ExtraceActionsRunnerBuilder::build(const Wire & wire,
           extraceArguments.getOutputFilename(),
           extraceArguments.getPIDs(),
           extraceArguments.getCpuLimit(),
-          extraceArguments.getUssLimit()
+          extraceArguments.hasUssLimit() ?
+            new USSFilter(extraceArguments.getUssLimit())
+            : NULL
         )
       );
     }

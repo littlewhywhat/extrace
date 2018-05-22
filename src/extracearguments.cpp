@@ -16,6 +16,10 @@
 
 #include "extracearguments.h"
 
+bool ExtraceArguments::hasUssLimit() const {
+  return myUssLimit != UINT64_MAX;
+}
+
 uint64_t ExtraceArguments::getUssLimit() const {
   return myUssLimit;
 }

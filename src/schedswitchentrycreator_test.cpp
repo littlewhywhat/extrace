@@ -37,11 +37,30 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
 
     }
 
+    void testCreateFromSpacedContent() {
+      auto * entry = mySchedSwitchEntryCreator.create(1, 2, 3, "prev_comm=AsyncTask #1 prev_pid=0"
+                                                               " prev_prio=120 prev_state=R+ ==>"
+                                                               " next_comm=POSIX timer 1 next_pid=2231"
+                                                               " next_prio=120");
+      ASSERT_TRUE(entry);
+      EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getName(), string("SchedSwitch"));
+      EXPECT_EQ(entry->getTimeLow(), 2);
+      EXPECT_EQ(entry->getTimeHigh(), 3);
+      EXPECT_EQ(entry->getPrevCommandName(), "AsyncTask #1");
+      EXPECT_EQ(entry->getPrevPriority(), 120);
+      EXPECT_EQ(entry->getPrevPID(), 0);
+      EXPECT_EQ(entry->getNextCommandName(), "POSIX timer 1");
+      EXPECT_EQ(entry->getNextPriority(), 120);
+      EXPECT_EQ(entry->getNextPID(), 2231);
+    }
+
     void testCreateFromCorrectContent() {
       auto * entry = mySchedSwitchEntryCreator.create(1, 2, 3, "prev_comm=swapper prev_pid=0"
                                                                " prev_prio=120 prev_state=R+ ==>"
                                                                " next_comm=memeater next_pid=2231"
                                                                " next_prio=120");
+      ASSERT_TRUE(entry);
       EXPECT_EQ(entry->getPID(), 1);
       EXPECT_EQ(entry->getName(), string("SchedSwitch"));
       EXPECT_EQ(entry->getTimeLow(), 2);
@@ -60,4 +79,8 @@ class SchedSwitchEntryCreatorTest : public ::testing::Test {
 
 TEST_F(SchedSwitchEntryCreatorTest, testCreateFromCorrectContent) {
   testCreateFromCorrectContent();
+}
+
+TEST_F(SchedSwitchEntryCreatorTest, testCreateFromSpacedContent) {
+  testCreateFromSpacedContent();
 }

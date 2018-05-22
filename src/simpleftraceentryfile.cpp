@@ -36,7 +36,9 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
   char entryName[64];
   char content[128];
   int readArgs, readChars;
+  int lineNum = 0;
   while (fgets(line, 256, file)) {
+    lineNum++;
     // read name that is maximum 16 bytes
     int i = 0, readToName = 0;
     // skip whitespace
@@ -54,7 +56,8 @@ void SimpleFTraceEntryFile::parseTo(vector<FTraceEntry*> & entries) const {
                 &pid, skip1, skip2, &timeHigh, &timeLow,
                 entryName, &readChars);
     if (readArgs != 6) {
-      fprintf(stderr, "error format read only %d from %s\n", readArgs, line + 16);
+      fprintf(stderr, "error format read only %d from '%s' lineNum %d\n",
+              readArgs, line + 16, lineNum);
       continue;
     }
     else {

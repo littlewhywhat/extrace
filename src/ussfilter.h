@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "stopaction.h"
 
-bool StopAction::tryRun() {
-  if (!m_Environment->getTrace().stop()) {
-    fprintf(m_Wire.getErrorStream(), "error StopAction::tryRun\n");
-    return false;
-  }
-  fprintf(m_Wire.getOutputStream(), "stopped trace.\n");
-  return true;
-}
+#ifndef LTTLWHWHT_USSFILTER_H
+#define LTTLWHWHT_USSFILTER_H
+
+#include "processrecord.h"
+
+#include <cstdint>
+#include <queue>
+
+using namespace std;
+
+class USSFilter {
+  public:
+    USSFilter(uint64_t limit): myUssLimit(limit) {}
+    void filter(queue<ProcessRecord*> & records) const;
+  private:
+    uint64_t myUssLimit = 0;
+};
+
+#endif // LTTLWHWHT_USSFILTER_H

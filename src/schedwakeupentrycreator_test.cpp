@@ -29,6 +29,21 @@ using ::testing::SetArgReferee;
 //! I am a test. I test my SchedWakeUpEntryCreator
 class SchedWakeUpEntryCreatorTest : public ::testing::Test {
   public:
+    void testCreateFromSpacedContent() {
+      auto * entry = mySchedWakeUpEntryCreator.create(1, 2, 3, 
+                                                      "comm=AsyncTask #1 pid=2231 prio=120"
+                                                      " success=1 target_cpu=000");
+      ASSERT_TRUE(entry);
+      EXPECT_EQ(entry->getPID(), 1);
+      EXPECT_EQ(entry->getName(), string("SchedWakeup"));
+      EXPECT_EQ(entry->getTimeLow(), 2);
+      EXPECT_EQ(entry->getTimeHigh(), 3);
+      EXPECT_EQ(entry->getCommandName(), "AsyncTask #1");
+      EXPECT_EQ(entry->getWakedUpPID(), 2231);
+      EXPECT_EQ(entry->getSuccess(), true);
+      EXPECT_EQ(entry->getTargetCPU(), 0);
+    }
+
     void testCreateFromCorrectContent() {
       auto * entry = mySchedWakeUpEntryCreator.create(1, 2, 3, 
                                                       "comm=memeater pid=2231 prio=120"
@@ -49,4 +64,8 @@ class SchedWakeUpEntryCreatorTest : public ::testing::Test {
 
 TEST_F(SchedWakeUpEntryCreatorTest, testCreateFromCorrectContent) {
   testCreateFromCorrectContent();
+}
+
+TEST_F(SchedWakeUpEntryCreatorTest, testCreateFromSpacedContent) {
+  testCreateFromSpacedContent();
 }
